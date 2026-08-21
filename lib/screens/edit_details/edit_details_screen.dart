@@ -25,32 +25,27 @@ class EditDetailsScreen extends StatefulWidget {
 
 class _EditDetailsScreenState extends State<EditDetailsScreen> {
   final informationFormKey = GlobalKey<FormState>();
-  // bool isSelected = false;
   String? firstNameError;
   String? lastNameError;
   String? emailError;
   String? idCardError;
   String? contactError;
+  String? whatsappError;
   String? passwordError;
   String? confirmPasswordError;
   String? schoolError;
   String? subjectError;
+  String? gradeError;
+  String? subjectMediumError;
   String? choiceError;
   DateTime? _selectedDate;
   String? _dobErrorText;
   File? selectedImage;
   bool _isBottomSheetVisible = false;
   final accProvider = Provider.of<AccountProvider>(ContextHelper.navigatorKey.currentContext!, listen: false);
-  // final filterProvider = Provider.of<FiltterProvider>(
-  //   ContextHelper.navigatorKey.currentContext!,
-  //   listen: false,
-  // );
 
   FilterModel filterDetails = FilterModel();
   late FilterModel _initialFilterDetails;
-
-  // PersonDetailsModel personDetails = PersonDetailsModel(uid: filterProvider.firebaseUser.uid, authEmail: filterProvider.firebaseUser.uid);
-  // late PersonDetailsModel _initialPersonDetails;
 
   @override
   void initState() {
@@ -74,6 +69,7 @@ class _EditDetailsScreenState extends State<EditDetailsScreen> {
       gramaNiladhariDivision: accProvider.appUser?.gramaNiladhariDivision ?? '',
       scheme: accProvider.appUser?.scheme ?? '',
       subject: accProvider.appUser?.subject ?? '',
+      subjectMedium: accProvider.appUser?.subjectMedium ?? '',
       grade: accProvider.appUser?.grade ?? '',
       choice1: accProvider.appUser?.choice1 ?? '',
       choice2: accProvider.appUser?.choice2 ?? '',
@@ -154,7 +150,6 @@ class _EditDetailsScreenState extends State<EditDetailsScreen> {
               textAlign: TextAlign.start,
               style: context.regular14(color: ColorManager.black.withOpacity(0.8)),
             ),
-
             actions: [
               TextButton(
                 onPressed: onCancel,
@@ -183,7 +178,6 @@ class _EditDetailsScreenState extends State<EditDetailsScreen> {
               textAlign: TextAlign.start,
               style: context.regular14(color: ColorManager.black.withOpacity(0.8)),
             ),
-
             actions: [
               TextButton(
                 onPressed: () => Navigator.pop(context, false),
@@ -208,6 +202,12 @@ class _EditDetailsScreenState extends State<EditDetailsScreen> {
       summary.add('Contact: ${accProvider.contactController.text}');
     }
     summary.add('Contact Visibility: ${accProvider.isContactVisible ? "Hidden" : "Visible"}');
+
+    if (accProvider.whatsappController.text.isNotEmpty) {
+      summary.add('WhatsApp: ${accProvider.whatsappController.text}');
+    }
+    summary.add('WhatsApp Visibility: ${accProvider.isWhatsappVisible ? "Hidden" : "Visible"}');
+
     summary.add(
       '${(filterDetails.job == "Provincial School Teacher" || filterDetails.job == "National School Teacher")
           ? "School Visibility"
@@ -240,6 +240,7 @@ class _EditDetailsScreenState extends State<EditDetailsScreen> {
     if (filter.gramaNiladhariDivision.isNotEmpty) summary.add('Office: ${filter.gramaNiladhariDivision}');
     if (filter.scheme.isNotEmpty) summary.add('Scheme: ${filter.scheme}');
     if (filter.subject.isNotEmpty) summary.add('Subject: ${filter.subject}');
+    if (filter.subjectMedium.isNotEmpty) summary.add('Subject Medium: ${filter.subjectMedium}');
     if (filter.grade.isNotEmpty) summary.add('Grade: ${filter.grade}');
     if (filter.choice1.isNotEmpty) {
       summary.add('First Choise: ${filter.choice1}');
@@ -274,8 +275,10 @@ class _EditDetailsScreenState extends State<EditDetailsScreen> {
                     accProvider.appUser?.displayName !=
                         "${accProvider.firstNameController.text.trim()} ${accProvider.lastNameController.text.trim()}" ||
                     accProvider.appUser?.phone != accProvider.contactController.text.trim() ||
+                    accProvider.appUser?.whatsapp != accProvider.whatsappController.text.trim() ||
                     accProvider.appUser?.note != accProvider.noteController.text.trim() ||
                     accProvider.appUser?.isPhoneHide != accProvider.isContactVisible ||
+                    accProvider.appUser?.isWhatsappHide != accProvider.isWhatsappVisible ||
                     accProvider.appUser?.isSchoolHide != accProvider.isSchoolVisible)
                 ? _confirmAlertDialog(
                   context,
@@ -288,7 +291,10 @@ class _EditDetailsScreenState extends State<EditDetailsScreen> {
                     accProvider.lastNameController.text = parts.length > 1 ? parts[1] : '';
                     accProvider.contactController.text =
                         accProvider.appUser?.phone != null ? accProvider.appUser!.phone.toString() : '';
+                    accProvider.whatsappController.text =
+                        accProvider.appUser?.whatsapp != null ? accProvider.appUser!.whatsapp.toString() : '';
                     accProvider.isContactVisible = accProvider.appUser?.isPhoneHide ?? false;
+                    accProvider.isWhatsappVisible = accProvider.appUser?.isWhatsappHide ?? false;
                     accProvider.isSchoolVisible = accProvider.appUser?.isSchoolHide ?? false;
                     accProvider.noteController.text = accProvider.appUser?.note ?? '';
                     Navigator.of(context)
@@ -372,7 +378,7 @@ class _EditDetailsScreenState extends State<EditDetailsScreen> {
                                                         (context) => CustomCameraNw(
                                                           onImageSelected: (File image) {
                                                             setState(() {
-                                                              selectedImage = image; // Update parent state
+                                                              selectedImage = image;
                                                             });
                                                           },
                                                         ),
@@ -519,7 +525,6 @@ class _EditDetailsScreenState extends State<EditDetailsScreen> {
                           controller: acc.contactController,
                           inputType: TextInputType.number,
                           hintText: 'Contact Number',
-                          // enabled: false,
                           validator: (value) {
                             if (acc.contactController.text.isEmpty) {
                               setState(() {
@@ -539,69 +544,68 @@ class _EditDetailsScreenState extends State<EditDetailsScreen> {
                           },
                           errorMessage: contactError,
                         ),
-                        SizedBox(height: context.verticalSize(20)),
-                        // Align(
-                        //   alignment: Alignment.centerLeft,
-                        //   child: Text(
-                        //     "Select Your Job Category",
-                        //     style: context.semiBold14(
-                        //       color: ColorManager.white,
-                        //     ),
-                        //   ),
-                        // ),
-                        // SizedBox(height: context.verticalSize(8)),
-                        // Container(
-                        //   height: context.verticalSize(40),
-                        //   width: double.infinity,
-                        //   padding: const EdgeInsets.symmetric(horizontal: 12),
-                        //   decoration: BoxDecoration(
-                        //     color: ColorManager.white10,
-                        //     borderRadius: BorderRadius.circular(20),
-                        //   ),
-                        //   child: DropdownButton<String>(
-                        //     value:
-                        //         filterDetails.job.isNotEmpty
-                        //             ? filterDetails.job
-                        //             : null,
-                        //     hint: Text(
-                        //       "Select Job Category",
-                        //       style: context.regular14(
-                        //         color: ColorManager.disabledText,
-                        //       ),
-                        //     ),
-                        //     items:
-                        //         filterDetails.category
-                        //             .map(
-                        //               (jobCategory) => DropdownMenuItem<String>(
-                        //                 value: jobCategory,
-                        //                 child: Text(
-                        //                   jobCategory,
-                        //                   style: context.regular14(
-                        //                     color: ColorManager.disabledText,
-                        //                   ),
-                        //                 ),
-                        //               ),
-                        //             )
-                        //             .toList(),
-                        //     onChanged: (value) {
-                        //       setState(() {
-                        //         filterDetails.job = value ?? '';
-                        //         filterDetails.province = '';
-                        //         filterDetails.district = ''; // reset district
-                        //         filterDetails.kalapa = ''; // reset kalapa
-                        //         filterDetails.kottasa = ''; // reset kottasa
-                        //         filterDetails.school = ''; // reset School
-                        //       });
-                        //     },
-                        //     dropdownColor: ColorManager.kPrimaryBlack,
-                        //     underline: const SizedBox(),
-                        //     icon: Icon(
-                        //       Icons.arrow_drop_down,
-                        //       color: ColorManager.disabledText,
-                        //     ),
-                        //     isExpanded: true,
-                        //   ),
-                        // ),
+
+                        SizedBox(height: context.verticalSize(10)),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              "WhatsApp Number (Optional)",
+                              style: context.semiBold14(color: ColorManager.blackMedium),
+                            ),
+                            GestureDetector(
+                              onTap: () {
+                                setState(() {
+                                  acc.isWhatsappVisible = !acc.isWhatsappVisible;
+                                });
+                              },
+                              child: Row(
+                                children: [
+                                  Text(
+                                    "Hide",
+                                    style: context.semiBold14(
+                                      color: acc.isWhatsappVisible ? ColorManager.disabledText : ColorManager.kPrimary,
+                                    ),
+                                  ),
+                                  SizedBox(width: context.horizontalSize(10)),
+                                  Container(
+                                    width: 18,
+                                    height: 18,
+                                    decoration: BoxDecoration(
+                                      color: acc.isWhatsappVisible ? ColorManager.disabledText : Colors.transparent,
+                                      borderRadius: BorderRadius.circular(20),
+                                      border: Border.all(color: ColorManager.disabledText),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                        SizedBox(height: context.verticalSize(8)),
+                        CustomTextField(
+                          radius: 30,
+                          height: context.verticalSize(40),
+                          controller: acc.whatsappController,
+                          inputType: TextInputType.number,
+                          hintText: 'WhatsApp Number',
+                          validator: (value) {
+                            if (value != null && value.isNotEmpty) {
+                              if (value.length < 5 || value.length > 20) {
+                                setState(() {
+                                  whatsappError = "Enter Valid WhatsApp number";
+                                });
+                                return '';
+                              }
+                            }
+                            setState(() {
+                              whatsappError = null;
+                            });
+                            return null;
+                          },
+                          errorMessage: whatsappError,
+                        ),
+
                         SizedBox(height: context.verticalSize(20)),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -666,10 +670,10 @@ class _EditDetailsScreenState extends State<EditDetailsScreen> {
                             onChanged: (value) {
                               setState(() {
                                 filterDetails.province = value ?? '';
-                                filterDetails.district = ''; // reset district
-                                filterDetails.kalapa = ''; // reset kalapa
-                                filterDetails.kottasa = ''; // reset kottasa
-                                filterDetails.school = ''; // reset School
+                                filterDetails.district = '';
+                                filterDetails.kalapa = '';
+                                filterDetails.kottasa = '';
+                                filterDetails.school = '';
                                 filterDetails.kottasaForNationalScl = '';
                                 filterDetails.nationalSchool = '';
                                 filterDetails.institutionTypeForNurse = '';
@@ -691,7 +695,6 @@ class _EditDetailsScreenState extends State<EditDetailsScreen> {
 
                         SizedBox(height: context.verticalSize(filterDetails.province.isNotEmpty ? 20 : 0)),
 
-                        // District Dropdown
                         filterDetails.province.isNotEmpty
                             ? Container(
                               height: context.verticalSize(40),
@@ -724,9 +727,9 @@ class _EditDetailsScreenState extends State<EditDetailsScreen> {
                                 onChanged: (value) {
                                   setState(() {
                                     filterDetails.district = value ?? '';
-                                    filterDetails.kalapa = ''; // reset kalapa
-                                    filterDetails.kottasa = ''; // reset kottasa
-                                    filterDetails.school = ''; // reset School
+                                    filterDetails.kalapa = '';
+                                    filterDetails.kottasa = '';
+                                    filterDetails.school = '';
                                     filterDetails.kottasaForNationalScl = '';
                                     filterDetails.nationalSchool = '';
                                     filterDetails.institutionTypeForNurse = '';
@@ -747,7 +750,6 @@ class _EditDetailsScreenState extends State<EditDetailsScreen> {
                             )
                             : SizedBox.shrink(),
                         SizedBox(height: context.verticalSize(filterDetails.district.isNotEmpty ? 20 : 0)),
-                        // Kalapa Dropdown
                         filterDetails.district.isNotEmpty
                             ? Container(
                               height: context.verticalSize(40),
@@ -871,7 +873,7 @@ class _EditDetailsScreenState extends State<EditDetailsScreen> {
                                         : filterDetails.job == "Grama Niladari"
                                         ? filterDetails.divisionalSecretariat = value ?? ''
                                         : '';
-                                    filterDetails.kottasa = ''; // reset kottasa
+                                    filterDetails.kottasa = '';
                                     filterDetails.school = '';
                                     filterDetails.kottasaForNationalScl = '';
                                     filterDetails.nationalSchool = '';
@@ -1086,14 +1088,10 @@ class _EditDetailsScreenState extends State<EditDetailsScreen> {
                                 items:
                                     (filterDetails.job == "Provincial School Teacher"
                                             ? filterDetails.kottasa.isNotEmpty
-                                                ? filterDetails.kottasaSchools[filterDetails
-                                                        // .kalapaSchool[filterDetails
-                                                        .kottasa] ??
-                                                    []
+                                                ? filterDetails.kottasaSchools[filterDetails.kottasa] ?? []
                                                 : <String>[]
                                             : filterDetails.kottasaForNationalScl.isNotEmpty
                                             ? filterDetails.kottasaNationalSchools[filterDetails
-                                                    // .kalapaSchool[filterDetails
                                                     .kottasaForNationalScl] ??
                                                 []
                                             : <String>[])
@@ -1111,7 +1109,7 @@ class _EditDetailsScreenState extends State<EditDetailsScreen> {
                                   setState(() {
                                     filterDetails.job == "Provincial School Teacher"
                                         ? filterDetails.school = value ?? ''
-                                        : filterDetails.nationalSchool = value ?? ''; // reset School
+                                        : filterDetails.nationalSchool = value ?? '';
                                     schoolError = null;
                                   });
                                 },
@@ -1207,7 +1205,7 @@ class _EditDetailsScreenState extends State<EditDetailsScreen> {
                           ),
                         ),
 
-                        // District Dropdown
+                        // Subject Dropdown
                         ((filterDetails.scheme != "PRIMARY" && filterDetails.scheme.isNotEmpty) &&
                                 (filterDetails.job == "Provincial School Teacher" ||
                                     filterDetails.job == "National School Teacher"))
@@ -1255,13 +1253,97 @@ class _EditDetailsScreenState extends State<EditDetailsScreen> {
                         Align(
                           alignment: Alignment.centerLeft,
                           child: Padding(
-                            padding: EdgeInsets.only(top: subjectError != null ? 4.0 : 4.0, left: 5.0),
+                            padding: EdgeInsets.only(
+                              top:
+                                  (filterDetails.job == "Provincial School Teacher" ||
+                                          filterDetails.job == "National School Teacher")
+                                      ? subjectError != null
+                                          ? 4.0
+                                          : 4.0
+                                      : gradeError != null
+                                      ? 4.0
+                                      : 4.0,
+                              left: 5.0,
+                            ),
                             child: Text(
-                              subjectError != null ? subjectError! : '',
+                              (filterDetails.job == "Provincial School Teacher" ||
+                                      filterDetails.job == "National School Teacher")
+                                  ? subjectError != null
+                                      ? subjectError!
+                                      : ''
+                                  : gradeError != null
+                                  ? gradeError!
+                                  : '',
                               style: const TextStyle(color: Colors.red, fontSize: 12.0),
                             ),
                           ),
                         ),
+
+                        (filterDetails.job == "Provincial School Teacher" ||
+                                filterDetails.job == "National School Teacher")
+                            ? Column(
+                              children: [
+                                SizedBox(
+                                  height: context.verticalSize(
+                                    (filterDetails.scheme != "PRIMARY" && filterDetails.scheme.isNotEmpty)
+                                        ? subjectError != null
+                                            ? 12
+                                            : 2
+                                        : 0,
+                                  ),
+                                ),
+                                Container(
+                                  height: context.verticalSize(40),
+                                  width: double.infinity,
+                                  padding: const EdgeInsets.symmetric(horizontal: 12),
+                                  decoration: BoxDecoration(
+                                    color: ColorManager.white10,
+                                    borderRadius: BorderRadius.circular(20),
+                                  ),
+                                  child: DropdownButton<String>(
+                                    value: filterDetails.subjectMedium.isNotEmpty ? filterDetails.subjectMedium : null,
+                                    hint: Text(
+                                      "Select Subject Medium",
+                                      style: context.regular14(color: ColorManager.disabledText),
+                                    ),
+                                    items:
+                                        ["Sinhala", "English", "Tamil"]
+                                            .map(
+                                              (medium) => DropdownMenuItem(
+                                                value: medium,
+                                                child: Text(
+                                                  medium,
+                                                  style: context.regular14(color: ColorManager.disabledText),
+                                                ),
+                                              ),
+                                            )
+                                            .toList(),
+                                    onChanged: (value) {
+                                      setState(() {
+                                        filterDetails.subjectMedium = value ?? '';
+                                        subjectMediumError = null;
+                                      });
+                                    },
+                                    dropdownColor: ColorManager.kPrimaryBlack,
+                                    underline: const SizedBox(),
+                                    icon: Icon(Icons.arrow_drop_down, color: ColorManager.disabledText),
+                                    isExpanded: true,
+                                  ),
+                                ),
+                                Align(
+                                  alignment: Alignment.centerLeft,
+                                  child: Padding(
+                                    padding: EdgeInsets.only(top: subjectMediumError != null ? 4.0 : 4.0, left: 5.0),
+                                    child: Text(
+                                      subjectMediumError != null ? subjectMediumError! : '',
+                                      style: const TextStyle(color: Colors.red, fontSize: 12.0),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            )
+                            : SizedBox.shrink(),
+
                         SizedBox(height: context.verticalSize(20)),
                         Align(
                           alignment: Alignment.centerLeft,
@@ -1444,25 +1526,7 @@ class _EditDetailsScreenState extends State<EditDetailsScreen> {
                           controller: acc.noteController,
                           inputType: TextInputType.emailAddress,
                           hintText: 'note',
-                          // enabled: false,
-                          validator: (value) {
-                            // if (auth.noteController.text.isEmpty) {
-                            //   setState(() {
-                            //     idCardError = "ID number is required";
-                            //   });
-                            //   return '';
-                            // } else if (value!.length < 5 || value.length > 20) {
-                            //   setState(() {
-                            //     idCardError = "Enter Valid ID number";
-                            //   });
-                            //   return '';
-                            // }
-                            // setState(() {
-                            //   idCardError = null;
-                            // });
-                            // return null;
-                          },
-                          // errorMessage: idCardError,
+                          validator: (value) {},
                         ),
                         SizedBox(height: context.verticalSize(50)),
                         CenterTextIconButton(
@@ -1488,13 +1552,19 @@ class _EditDetailsScreenState extends State<EditDetailsScreen> {
                                         ? filterDetails.subject != ''
                                         : filterDetails.scheme != '')
                                     : filterDetails.grade != "") &&
+                                ((filterDetails.job == "Provincial School Teacher" ||
+                                        filterDetails.job == "National School Teacher")
+                                    ? filterDetails.subjectMedium != ''
+                                    : true) &&
                                 filterDetails.choice1 != '') {
                               if (hasUnsavedChanges ||
                                   accProvider.appUser?.displayName !=
                                       "${accProvider.firstNameController.text.trim()} ${accProvider.lastNameController.text.trim()}" ||
                                   accProvider.appUser?.phone != accProvider.contactController.text.trim() ||
+                                  accProvider.appUser?.whatsapp != accProvider.whatsappController.text.trim() ||
                                   accProvider.appUser?.note != accProvider.noteController.text.trim() ||
                                   accProvider.appUser?.isPhoneHide != accProvider.isContactVisible ||
+                                  accProvider.appUser?.isWhatsappHide != accProvider.isWhatsappVisible ||
                                   accProvider.appUser?.isSchoolHide != accProvider.isSchoolVisible ||
                                   selectedImage != null) {
                                 print(accProvider.firstNameController.text.isNotEmpty);
@@ -1510,7 +1580,6 @@ class _EditDetailsScreenState extends State<EditDetailsScreen> {
                                 if (shouldSave == true) {
                                   await acc.updateAccount(filterDetails);
                                 } else {
-                                  // User canceled the save action
                                   print('Save action canceled by user.');
                                 }
                               } else {
@@ -1557,6 +1626,17 @@ class _EditDetailsScreenState extends State<EditDetailsScreen> {
                                 subjectError = '';
                               });
                             }
+                            if ((filterDetails.job == "Provincial School Teacher" ||
+                                    filterDetails.job == "National School Teacher") &&
+                                filterDetails.subjectMedium == '') {
+                              setState(() {
+                                subjectMediumError = 'Select your subject medium';
+                              });
+                            } else {
+                              setState(() {
+                                subjectMediumError = null;
+                              });
+                            }
                             if (filterDetails.choice1 == '') {
                               setState(() {
                                 choiceError = 'Select at least 1 choice';
@@ -1569,7 +1649,6 @@ class _EditDetailsScreenState extends State<EditDetailsScreen> {
                           },
                           isGradientColor: true,
                           gradientColors: ColorManager.gradientButtons2,
-                          // isLoading: auth.getisCreatingUser,
                           buttonText: 'Continue',
                         ),
                         SizedBox(height: context.verticalSize(50)),
@@ -1584,9 +1663,7 @@ class _EditDetailsScreenState extends State<EditDetailsScreen> {
             Positioned.fill(
               child: BackdropFilter(
                 filter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0),
-                child: Container(
-                  color: Colors.black.withOpacity(0.5), // Optional overlay
-                ),
+                child: Container(color: Colors.black.withOpacity(0.5)),
               ),
             ),
         ],

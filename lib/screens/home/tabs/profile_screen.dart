@@ -21,22 +21,15 @@ class ProfileScreen extends StatefulWidget {
 
 class _ProfileScreenState extends State<ProfileScreen> {
   final Color dividerColor = const Color(0xffD4D6DD);
-  // final accProvider = Provider.of<AccountProvider>(
-  //   ContextHelper.navigatorKey.currentContext!,
-  //   listen: false,
-  // );
   String _version = '';
 
   @override
   void initState() {
     super.initState();
     _loadVersion();
-    // Fetch users when the screen initializes
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final accountProvider = Provider.of<AccountProvider>(context, listen: false);
-
       accountProvider.refreshCurrentUser();
-      // accProvider;
     });
   }
 
@@ -61,7 +54,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
               textAlign: TextAlign.start,
               style: context.regular14(color: ColorManager.blackMedium.withOpacity(0.8)),
             ),
-
             actions: [
               TextButton(
                 onPressed: () => Navigator.pop(context, false),
@@ -76,58 +68,25 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  // Future<void> launchWhatsApp({
-  //   required String phone,
-  //   String message = "",
-  // }) async {
-  //   final messageEncoded = Uri.encodeComponent(message);
-
-  //   // Try launching the native WhatsApp app
-  //   final whatsappUri = Uri.parse("whatsapp://send?phone=$phone&text=$messageEncoded");
-
-  //   if (await canLaunchUrl(whatsappUri)) {
-  //     await launchUrl(whatsappUri, mode: LaunchMode.externalApplication);
-  //   } else {
-  //     // Fallback to WhatsApp Web
-  //     final fallbackUri = Uri.parse("https://wa.me/$phone?text=$messageEncoded");
-  //     if (await canLaunchUrl(fallbackUri)) {
-  //       await launchUrl(fallbackUri, mode: LaunchMode.externalApplication);
-  //     } else {
-  //       print("Could not launch WhatsApp.");
-  //     }
-  //   }
-  // }
-
   Future<void> contactWhatsApp(String phone, String message) async {
-    // Ensure the phone number is in E.164 format
     if (!phone.startsWith('+')) {
-      phone = '+$phone'; // Add '+' if missing
+      phone = '+$phone';
     }
-
-    // Encode the message
     final encodedMessage = Uri.encodeComponent(message);
-
-    // Create WhatsApp URLs
-    // final uriApp = Uri.parse("whatsapp://send?phone=$phone&text=$encodedMessage");
     final uriApp = Uri.parse("https://api.whatsapp.com/send?phone=$phone&text=$encodedMessage");
     final uriWeb = Uri.parse("https://wa.me/$phone?text=$encodedMessage");
 
     try {
-      // Try opening the WhatsApp app
       if (await canLaunchUrl(uriApp)) {
         print('$uriApp');
         await launchUrl(uriApp, mode: LaunchMode.externalApplication);
         return;
       }
-
-      // Fallback to WhatsApp Web
       if (await canLaunchUrl(uriWeb)) {
         print('$uriWeb');
-        await launchUrl(uriWeb, mode: LaunchMode.platformDefault); // For iOS
+        await launchUrl(uriWeb, mode: LaunchMode.platformDefault);
         return;
       }
-
-      // If both fail, print an error
       print("WhatsApp not available");
     } catch (e) {
       print("Error launching WhatsApp: $e");
@@ -140,7 +99,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
     final accountProvider = Provider.of<AccountProvider>(context);
     return SizedBox(
       width: context.screenWidth,
-      // height: context.screenHeight - 10.0,
       child: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -169,15 +127,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       SizedBox(height: context.verticalSize(10)),
                       Text("Phone", style: context.semiBold14(color: ColorManager.grayText)),
                       SizedBox(height: context.verticalSize(10)),
+                      Text("WhatsApp", style: context.semiBold14(color: ColorManager.grayText)),
+                      SizedBox(height: context.verticalSize(10)),
                       Text("Province", style: context.semiBold14(color: ColorManager.grayText)),
-
                       SizedBox(height: context.verticalSize(10)),
                       Text("District", style: context.semiBold14(color: ColorManager.grayText)),
                       SizedBox(height: context.verticalSize(10)),
                       Text(
                         (accountProvider.appUser?.job == "Provincial School Teacher" ||
                                 accountProvider.appUser?.job == "National School Teacher")
-                            ? "kalapa"
+                            ? "Kalapa"
                             : accountProvider.appUser?.job == "Police Officer"
                             ? "Police Division"
                             : accountProvider.appUser?.job == "Grama Niladari"
@@ -198,8 +157,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       SizedBox(height: context.verticalSize(10)),
                       (accountProvider.appUser?.job == "Provincial School Teacher" ||
                               accountProvider.appUser?.job == "National School Teacher")
-                          ? Text("scheme", style: context.semiBold14(color: ColorManager.grayText))
-                          : Text("grade", style: context.semiBold14(color: ColorManager.grayText)),
+                          ? Text("Scheme", style: context.semiBold14(color: ColorManager.grayText))
+                          : Text("Grade", style: context.semiBold14(color: ColorManager.grayText)),
                       SizedBox(
                         height: context.verticalSize(
                           (accountProvider.appUser?.job == "Provincial School Teacher" ||
@@ -212,6 +171,20 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               accountProvider.appUser?.job == "National School Teacher")
                           ? Text("Subject", style: context.semiBold14(color: ColorManager.grayText))
                           : SizedBox.shrink(),
+
+                      SizedBox(
+                        height: context.verticalSize(
+                          (accountProvider.appUser?.job == "Provincial School Teacher" ||
+                                  accountProvider.appUser?.job == "National School Teacher")
+                              ? 10
+                              : 0,
+                        ),
+                      ),
+                      (accountProvider.appUser?.job == "Provincial School Teacher" ||
+                              accountProvider.appUser?.job == "National School Teacher")
+                          ? Text("Medium", style: context.semiBold14(color: ColorManager.grayText))
+                          : SizedBox.shrink(),
+
                       SizedBox(height: context.verticalSize(10)),
                       Text("Choice 1", style: context.semiBold14(color: ColorManager.grayText)),
                       SizedBox(height: context.verticalSize(10)),
@@ -220,47 +193,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       Text("Choice 3", style: context.semiBold14(color: ColorManager.grayText)),
                       SizedBox(height: context.verticalSize(10)),
                       Text("Note", style: context.semiBold14(color: ColorManager.grayText)),
-
-                      // SizedBox(height: context.verticalSize(40)),
-                      // Text(
-                      //   "Transfer Date",
-                      //   style: context.semiBold14(color: ColorManager.grayText),
-                      // ),
-                      // SizedBox(height: context.verticalSize(10)),
-                      // Text(
-                      //   "Ref No",
-                      //   style: context.semiBold14(color: ColorManager.grayText),
-                      // ),
-                      // SizedBox(height: context.verticalSize(10)),
-                      // Text(
-                      //   "Acc Number",
-                      //   style: context.semiBold14(color: ColorManager.grayText),
-                      // ),
-                      // SizedBox(height: context.verticalSize(10)),
-                      // Text(
-                      //   "Client name",
-                      //   style: context.semiBold14(color: ColorManager.grayText),
-                      // ),
-                      // SizedBox(height: context.verticalSize(10)),
-                      // Text(
-                      //   "Amount",
-                      //   style: context.semiBold14(color: ColorManager.grayText),
-                      // ),
-                      // SizedBox(height: context.verticalSize(10)),
-                      // Text(
-                      //   "Service Provi.",
-                      //   style: context.semiBold14(color: ColorManager.grayText),
-                      // ),
-                      // SizedBox(height: context.verticalSize(10)),
-                      // Text(
-                      //   "IsEnable",
-                      //   style: context.semiBold14(color: ColorManager.grayText),
-                      // ),
-                      // SizedBox(height: context.verticalSize(10)),
-                      // Text(
-                      //   "Photo",
-                      //   style: context.semiBold14(color: ColorManager.grayText),
-                      // ),
                     ],
                   ),
                   Consumer<AccountProvider>(
@@ -279,7 +211,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           ),
                           SizedBox(height: context.verticalSize(10)),
                           Text(
-                            // filter.appUser != null ? ' :  ${filter.appUser!.name}' : ' :  --',
                             " :  ${accProvider.appUser?.displayName ?? "--"}",
                             style: context.semiBold14(color: ColorManager.blackMedium),
                           ),
@@ -303,6 +234,30 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 ),
                                 Text(
                                   (accProvider.appUser?.isPhoneHide == true && accProvider.appUser?.phone != null)
+                                      ? '(Hidden)'
+                                      : '',
+                                  style: context.semiBold14(color: ColorManager.grayText),
+                                ),
+                              ],
+                            ),
+                          ),
+                          SizedBox(height: context.verticalSize(10)),
+                          SizedBox(
+                            width: context.screenWidth * 0.65,
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Expanded(
+                                  child: Text(
+                                    " :  ${(accProvider.appUser?.whatsapp != null && accProvider.appUser!.whatsapp!.isNotEmpty) ? accProvider.appUser?.whatsapp : '--'}",
+                                    style: context.semiBold14(color: ColorManager.blackMedium),
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                                Text(
+                                  (accProvider.appUser?.isWhatsappHide == true &&
+                                          accProvider.appUser?.whatsapp != null &&
+                                          accProvider.appUser!.whatsapp!.isNotEmpty)
                                       ? '(Hidden)'
                                       : '',
                                   style: context.semiBold14(color: ColorManager.grayText),
@@ -393,6 +348,23 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 style: context.semiBold14(color: ColorManager.blackMedium),
                               )
                               : SizedBox.shrink(),
+
+                          SizedBox(
+                            height: context.verticalSize(
+                              (accountProvider.appUser?.job == "Provincial School Teacher" ||
+                                      accountProvider.appUser?.job == "National School Teacher")
+                                  ? 10
+                                  : 0,
+                            ),
+                          ),
+                          (accountProvider.appUser?.job == "Provincial School Teacher" ||
+                                  accountProvider.appUser?.job == "National School Teacher")
+                              ? Text(
+                                " :  ${(accProvider.appUser?.subjectMedium != null && accProvider.appUser?.subjectMedium != "") ? accProvider.appUser?.subjectMedium : "--"}",
+                                style: context.semiBold14(color: ColorManager.blackMedium),
+                              )
+                              : SizedBox.shrink(),
+
                           SizedBox(height: context.verticalSize(10)),
                           Text(
                             " :  ${accProvider.appUser?.choice1 ?? "--"}",
@@ -410,66 +382,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           ),
                           SizedBox(height: context.verticalSize(10)),
                           Text(
-                            " :  ${accProvider.appUser?.note ?? "--"}",
+                            " :  ${(accProvider.appUser?.note != null && accProvider.appUser?.note != "") ? accProvider.appUser?.note : "--"}",
                             style: context.semiBold14(color: ColorManager.blackMedium),
                           ),
-
-                          // SizedBox(height: context.verticalSize(40)),
-                          // Text(
-                          //   " :  ${accProvider.appUser?.transferDate ?? "--"}",
-                          //   style: context.semiBold14(
-                          //     color: ColorManager.blackMedium,
-                          //   ),
-                          // ),
-                          // SizedBox(height: context.verticalSize(10)),
-                          // Text(
-                          //   " :  ${accProvider.appUser?.refNo ?? "--"}",
-                          //   style: context.semiBold14(
-                          //     color: ColorManager.blackMedium,
-                          //   ),
-                          // ),
-                          // SizedBox(height: context.verticalSize(10)),
-                          // Text(
-                          //   " :  ${accProvider.appUser?.accountNo ?? "--"}",
-                          //   style: context.semiBold14(
-                          //     color: ColorManager.blackMedium,
-                          //   ),
-                          // ),
-                          // SizedBox(height: context.verticalSize(10)),
-                          // Text(
-                          //   " :  ${accProvider.appUser?.clientName ?? "--"}",
-                          //   style: context.semiBold14(
-                          //     color: ColorManager.blackMedium,
-                          //   ),
-                          // ),
-                          // SizedBox(height: context.verticalSize(10)),
-                          // Text(
-                          //   " :  ${accProvider.appUser?.amount ?? "--"}",
-                          //   style: context.semiBold14(
-                          //     color: ColorManager.blackMedium,
-                          //   ),
-                          // ),
-                          // SizedBox(height: context.verticalSize(10)),
-                          // Text(
-                          //   " :  ${accProvider.appUser?.serviceProvider ?? "--"}",
-                          //   style: context.semiBold14(
-                          //     color: ColorManager.blackMedium,
-                          //   ),
-                          // ),
-                          // SizedBox(height: context.verticalSize(10)),
-                          // Text(
-                          //   " :  ${accProvider.appUser?.isEnable ?? "--"}",
-                          //   style: context.semiBold14(
-                          //     color: ColorManager.blackMedium,
-                          //   ),
-                          // ),
-                          // SizedBox(height: context.verticalSize(10)),
-                          // Text(
-                          //   " :",
-                          //   style: context.semiBold14(
-                          //     color: ColorManager.blackMedium,
-                          //   ),
-                          // ),
                         ],
                       );
                     },
@@ -487,20 +402,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 Navigator.push(context, MaterialPageRoute(builder: (context) => EditDetailsScreen()));
               },
             ),
-            _buildDivider(),
-            // _buildListTile(
-            //   context,
-            //   titleStyle: context.semiBold14(color: ColorManager.blackMedium),
-            //   title: 'Edit Payment Details',
-            //   onTap: () {
-            //     Navigator.push(
-            //       context,
-            //       MaterialPageRoute(
-            //         builder: (context) => EditPaymentDetailsScreen(),
-            //       ),
-            //     );
-            //   },
-            // ),
             _buildDivider(),
             _buildListTile(
               context,
@@ -525,7 +426,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
             _buildDivider(),
             _buildListTile(
               context,
-              // iconPath: 'assets/images/profile/exit.png',
               title: 'Sign out',
               titleStyle: context.semiBold14(color: ColorManager.blackMedium),
               onTap: () async {
@@ -543,7 +443,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
             _buildDivider(),
             _buildListTile(
               context,
-              // iconPath: 'assets/images/profile/exit.png',
               title: 'Delete account',
               titleStyle: context.semiBold14(color: ColorManager.redExtra),
               onTap: () async {
@@ -563,32 +462,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
             SizedBox(height: context.verticalSize(40)),
             Center(child: Text('VERSION $_version', style: context.semiBold14(color: ColorManager.grayText))),
             SizedBox(height: context.verticalSize(150)),
-
-            // ElevatedButton(
-            //   onPressed: () {
-            //     FirebaseCrashlytics.instance.crash(); // Forces a crash
-            //   },
-            //   child: const Text('Crash App'),
-            // ),
-            // ElevatedButton(
-            //   onPressed: () {
-            //     throw Exception(
-            //       'This is a test non-fatal error!',
-            //     ); // Throws a non-fatal error
-            //   },
-            //   child: const Text('Throw Non-Fatal Error'),
-            // ),
-            // SizedBox(height: context.verticalSize(150)),
           ],
         ),
       ),
-      // List Items
     );
   }
 
   Widget _buildListTile(
     BuildContext context, {
-    // required String iconPath,
     required String title,
     TextStyle? titleStyle,
     Widget? trailingWidget,
@@ -596,11 +477,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }) {
     return ListTile(
       contentPadding: const EdgeInsets.symmetric(vertical: 1, horizontal: 16),
-      // leading: Image.asset(
-      //   iconPath,
-      //   width: 20,
-      //   height: 20,
-      // ),
       title: Text(title, style: titleStyle ?? context.semiBold14(color: ColorManager.blackMedium)),
       trailing: trailingWidget ?? const Icon(Icons.arrow_forward_ios, color: Color(0xff8F9098), size: 12),
       onTap: onTap,

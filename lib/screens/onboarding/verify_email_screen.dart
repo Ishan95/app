@@ -11,11 +11,13 @@ import 'package:url_launcher/url_launcher.dart';
 class VerifyEmailScreen extends StatefulWidget {
   final firebase_auth.User user;
   final bool isSelected;
+  final bool isWhatsappSelected;
   final bool isSchoolSelected;
   final bool isEnable;
   const VerifyEmailScreen({
     required this.user,
     required this.isSelected,
+    required this.isWhatsappSelected,
     required this.isSchoolSelected,
     required this.isEnable,
     super.key,
@@ -59,35 +61,24 @@ class _VerifyEmailScreenState extends State<VerifyEmailScreen> {
   }
 
   Future<void> contactWhatsApp(String phone, String message) async {
-    // Ensure the phone number is in E.164 format
     if (!phone.startsWith('+')) {
-      phone = '+$phone'; // Add '+' if missing
+      phone = '+$phone';
     }
-
-    // Encode the message
     final encodedMessage = Uri.encodeComponent(message);
-
-    // Create WhatsApp URLs
-    // final uriApp = Uri.parse("whatsapp://send?phone=$phone&text=$encodedMessage");
     final uriApp = Uri.parse("https://api.whatsapp.com/send?phone=$phone&text=$encodedMessage");
     final uriWeb = Uri.parse("https://wa.me/$phone?text=$encodedMessage");
 
     try {
-      // 1. Try opening the WhatsApp app
       if (await canLaunchUrl(uriApp)) {
         print('$uriApp');
         await launchUrl(uriApp, mode: LaunchMode.externalApplication);
         return;
       }
-
-      // 2. Fallback to WhatsApp Web
       if (await canLaunchUrl(uriWeb)) {
         print('$uriWeb');
-        await launchUrl(uriWeb, mode: LaunchMode.platformDefault); // For iOS
+        await launchUrl(uriWeb, mode: LaunchMode.platformDefault);
         return;
       }
-
-      // 3. If both fail, print an error
       print("WhatsApp not available");
     } catch (e) {
       print("Error launching WhatsApp: $e");
@@ -160,6 +151,7 @@ class _VerifyEmailScreenState extends State<VerifyEmailScreen> {
     if (verified) {
       final success = await authProvider.createAccount(
         isPhoneHide: widget.isSelected,
+        isWhatsappHide: widget.isWhatsappSelected,
         isSchoolHide: widget.isSchoolSelected,
         isEnable: widget.isEnable,
       );
