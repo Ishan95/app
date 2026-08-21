@@ -9,6 +9,7 @@ import 'package:app/screens/notification/widget/string_extensions.dart';
 import 'package:flutter/material.dart';
 import 'package:app/app/export.dart';
 import 'package:provider/provider.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class PersonCard extends StatefulWidget {
   final PersonDetailsModel personDetails;
@@ -22,6 +23,29 @@ class PersonCard extends StatefulWidget {
 
 class _PersonCardState extends State<PersonCard> {
   bool isExpanded = false;
+
+  Future<void> contactWhatsApp(String phone, String message) async {
+    if (!phone.startsWith('+')) {
+      phone = '+$phone';
+    }
+    final encodedMessage = Uri.encodeComponent(message);
+    final uriApp = Uri.parse("https://api.whatsapp.com/send?phone=$phone&text=$encodedMessage");
+    final uriWeb = Uri.parse("https://wa.me/$phone?text=$encodedMessage");
+
+    try {
+      if (await canLaunchUrl(uriApp)) {
+        await launchUrl(uriApp, mode: LaunchMode.externalApplication);
+        return;
+      }
+      if (await canLaunchUrl(uriWeb)) {
+        await launchUrl(uriWeb, mode: LaunchMode.platformDefault);
+        return;
+      }
+      print("WhatsApp not available");
+    } catch (e) {
+      print("Error launching WhatsApp: $e");
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -65,7 +89,7 @@ class _PersonCardState extends State<PersonCard> {
                           Text(
                             (widget.personDetails.firstName?.length ?? 0) > 20
                                 ? '${widget.personDetails.firstName?.substring(0, 20)}...'
-                                : "${widget.personDetails.firstName} ${widget.personDetails.lastName ?? ""}", //"${(widget.personDetails.name?.length ?? 0) > 20 ? '${widget.personDetails.name?.substring(0, 20)}...' : widget.personDetails.name}",
+                                : "${widget.personDetails.firstName} ${widget.personDetails.lastName ?? ""}",
                             style: context.bold16(color: ColorManager.blackMedium),
                           ),
                           Text(
@@ -155,10 +179,8 @@ class _PersonCardState extends State<PersonCard> {
                 },
                 child: CircleAvatar(
                   backgroundColor: ColorManager.whiteddd,
-                  // radius: 20,
                   radius: 12,
                   child: Icon(
-                    // Icons.filter_list,
                     isExpanded ? Icons.arrow_drop_up : Icons.arrow_drop_down_circle,
                     color: ColorManager.kPrimary,
                     size: 22,
@@ -259,41 +281,60 @@ class _PersonCardState extends State<PersonCard> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text("   Contact :  ", style: context.semiBold14(color: ColorManager.grayText)),
-                              widget.personDetails.uid != currentUserId
-                                  ? ImageFiltered(
-                                    imageFilter: ImageFilter.blur(
-                                      sigmaX: widget.personDetails.isPhoneHide ? 5 : 0,
-                                      sigmaY: widget.personDetails.isPhoneHide ? 5 : 0,
-                                    ),
-                                    child: Text(
-                                      "${widget.personDetails.phone ?? '07********'}    ",
-                                      style: context.semiBold14(color: ColorManager.blackMedium),
-                                      overflow: TextOverflow.visible,
-                                    ),
-                                  )
-                                  : Text(
-                                    "${widget.personDetails.phone ?? '07********'}    ",
-                                    style: context.semiBold14(color: ColorManager.blackMedium),
-                                    overflow: TextOverflow.visible,
-                                  ),
+                              Expanded(
+                                child:
+                                    widget.personDetails.uid != currentUserId
+                                        ? ImageFiltered(
+                                          imageFilter: ImageFilter.blur(
+                                            sigmaX: widget.personDetails.isPhoneHide ? 5 : 0,
+                                            sigmaY: widget.personDetails.isPhoneHide ? 5 : 0,
+                                          ),
+                                          child: Text(
+                                            "${widget.personDetails.phone ?? '07********'}    ",
+                                            style: context.semiBold14(color: ColorManager.blackMedium),
+                                            overflow: TextOverflow.visible,
+                                          ),
+                                        )
+                                        : Text(
+                                          "${widget.personDetails.phone ?? '07********'}    ",
+                                          style: context.semiBold14(color: ColorManager.blackMedium),
+                                          overflow: TextOverflow.visible,
+                                        ),
+                              ),
                               widget.personDetails.isPhoneHide
                                   ? Padding(
                                     padding: const EdgeInsets.only(right: 15.0),
-                                    // child: Tooltip(
-                                    //   message:
-                                    //       "Content hidden. Tap chat icon to request details.",
-                                    //   child: Icon(
-                                    //     Icons.visibility_off,
-                                    //     color: ColorManager.white,
-                                    //     size: 16,
-                                    //   ),
-                                    // ),
                                     child: InfoButtonWithTooltip(
                                       tooltipText: 'This content is hidden. Tap the chat icon to request your details.',
                                       child: Icon(Icons.visibility_off, color: ColorManager.grayText, size: 16),
                                     ),
                                   )
                                   : SizedBox.shrink(),
+
+                              if (widget.personDetails.whatsapp != null && widget.personDetails.whatsapp!.isNotEmpty)
+                                Padding(
+                                  padding: const EdgeInsets.only(left: 8.0, right: 8.0),
+                                  child:
+                                      widget.personDetails.uid == currentUserId
+                                          ? Text(
+                                            "WhatsApp: ${widget.personDetails.whatsapp}",
+                                            style: context.semiBold14(color: ColorManager.blackMedium),
+                                          )
+                                          : InkWell(
+                                            onTap: () {
+                                              contactWhatsApp(
+                                                widget.personDetails.whatsapp!,
+                                                "Hi ${widget.personDetails.firstName}, I found your profile on the transfer app!",
+                                              );
+                                            },
+                                            child: Text(
+                                              "Chat with WhatsApp",
+                                              style: context
+                                                  .semiBold14(color: Colors.green)
+                                                  .copyWith(decoration: TextDecoration.underline),
+                                            ),
+                                          ),
+                                ),
                             ],
                           ),
                           SizedBox(height: context.verticalSize(5)),
@@ -311,7 +352,6 @@ class _PersonCardState extends State<PersonCard> {
                         ? GestureDetector(
                           onTap: () {
                             print("user Uid: ${widget.personDetails.uid}");
-                            // print("user id: ${widget.personDetails.id}");
                             Navigator.push(
                               context,
                               MaterialPageRoute(

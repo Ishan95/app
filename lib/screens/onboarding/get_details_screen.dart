@@ -19,6 +19,7 @@ class GetDetailsScreen extends StatefulWidget {
 class _GetDetailsScreenState extends State<GetDetailsScreen> {
   final informationFormKey = GlobalKey<FormState>();
   bool isSelected = false;
+  bool isWhatsappSelected = false;
   bool isSchoolSelected = false;
   bool isEnable = false;
   String? firstNameError;
@@ -26,10 +27,12 @@ class _GetDetailsScreenState extends State<GetDetailsScreen> {
   String? emailError;
   String? idCardError;
   String? contactError;
+  String? whatsappError;
   String? passwordError;
   String? confirmPasswordError;
   String? schoolError;
   String? subjectError;
+  String? subjectMediumError;
   String? gradeError;
   String? choiceError;
   bool _obscureText = true;
@@ -97,35 +100,24 @@ class _GetDetailsScreenState extends State<GetDetailsScreen> {
   }
 
   Future<void> contactWhatsApp(String phone, String message) async {
-    // Ensure the phone number is in E.164 format
     if (!phone.startsWith('+')) {
-      phone = '+$phone'; // Add '+' if missing
+      phone = '+$phone';
     }
-
-    // Encode the message
     final encodedMessage = Uri.encodeComponent(message);
-
-    // Create WhatsApp URLs
-    // final uriApp = Uri.parse("whatsapp://send?phone=$phone&text=$encodedMessage");
     final uriApp = Uri.parse("https://api.whatsapp.com/send?phone=$phone&text=$encodedMessage");
     final uriWeb = Uri.parse("https://wa.me/$phone?text=$encodedMessage");
 
     try {
-      // 1. Try opening the WhatsApp app
       if (await canLaunchUrl(uriApp)) {
         print('$uriApp');
         await launchUrl(uriApp, mode: LaunchMode.externalApplication);
         return;
       }
-
-      // 2. Fallback to WhatsApp Web
       if (await canLaunchUrl(uriWeb)) {
         print('$uriWeb');
-        await launchUrl(uriWeb, mode: LaunchMode.platformDefault); // For iOS
+        await launchUrl(uriWeb, mode: LaunchMode.platformDefault);
         return;
       }
-
-      // 3. If both fail, print an error
       print("WhatsApp not available");
     } catch (e) {
       print("Error launching WhatsApp: $e");
@@ -258,7 +250,6 @@ class _GetDetailsScreenState extends State<GetDetailsScreen> {
                         controller: auth.emailController,
                         inputType: TextInputType.emailAddress,
                         hintText: 'Email Address',
-                        // enabled: false,
                         validator: (value) {
                           if (auth.emailController.text.isEmpty) {
                             setState(() {
@@ -305,11 +296,7 @@ class _GetDetailsScreenState extends State<GetDetailsScreen> {
                           padding: const EdgeInsets.symmetric(horizontal: 16),
                           child: Text(
                             _selectedDate != null ? '${_selectedDate!.toLocal()}'.split(' ')[0] : 'Birthdate',
-                            style: TextStyle(
-                              color: ColorManager.blackMedium,
-                              fontSize: context.fontSize(14),
-                              fontWeight: FontWeight.w700,
-                            ),
+                            style: TextStyle(color: ColorManager.blackMedium, fontSize: context.fontSize(14)),
                           ),
                         ),
                       ),
@@ -336,7 +323,6 @@ class _GetDetailsScreenState extends State<GetDetailsScreen> {
                         controller: auth.idCardController,
                         inputType: TextInputType.emailAddress,
                         hintText: 'Identity Card Number',
-                        // enabled: false,
                         validator: (value) {
                           if (auth.idCardController.text.isEmpty) {
                             setState(() {
@@ -397,7 +383,6 @@ class _GetDetailsScreenState extends State<GetDetailsScreen> {
                         controller: auth.contactController,
                         inputType: TextInputType.number,
                         hintText: 'Contact Number',
-                        // enabled: false,
                         validator: (value) {
                           if (auth.contactController.text.isEmpty) {
                             setState(() {
@@ -417,6 +402,68 @@ class _GetDetailsScreenState extends State<GetDetailsScreen> {
                         },
                         errorMessage: contactError,
                       ),
+
+                      SizedBox(height: context.verticalSize(10)),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            "WhatsApp Number (Optional)",
+                            style: context.semiBold14(color: ColorManager.blackMedium),
+                          ),
+                          GestureDetector(
+                            onTap: () {
+                              setState(() {
+                                isWhatsappSelected = !isWhatsappSelected;
+                              });
+                            },
+                            child: Row(
+                              children: [
+                                Text(
+                                  "Hide",
+                                  style: context.semiBold14(
+                                    color: isWhatsappSelected ? ColorManager.disabledText : ColorManager.kPrimary,
+                                  ),
+                                ),
+                                SizedBox(width: context.horizontalSize(10)),
+                                Container(
+                                  width: 18,
+                                  height: 18,
+                                  decoration: BoxDecoration(
+                                    color: isWhatsappSelected ? ColorManager.disabledText : Colors.transparent,
+                                    borderRadius: BorderRadius.circular(20),
+                                    border: Border.all(color: ColorManager.disabledText),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: context.verticalSize(8)),
+                      CustomTextField(
+                        radius: 30,
+                        height: context.verticalSize(40),
+                        controller: auth.whatsappController,
+                        inputType: TextInputType.number,
+                        hintText: 'WhatsApp Number',
+                        validator: (value) {
+                          if (value != null && value.isNotEmpty) {
+                            if (value.length < 5 || value.length > 20) {
+                              setState(() {
+                                whatsappError = "Enter Valid WhatsApp number";
+                              });
+                              return '';
+                            }
+                          }
+                          setState(() {
+                            whatsappError = null;
+                          });
+                          return null;
+                        },
+                        errorMessage: whatsappError,
+                      ),
+
                       SizedBox(height: context.verticalSize(20)),
                       Align(
                         alignment: Alignment.centerLeft,
@@ -450,10 +497,10 @@ class _GetDetailsScreenState extends State<GetDetailsScreen> {
                             setState(() {
                               filterDetails.job = value ?? '';
                               filterDetails.province = '';
-                              filterDetails.district = ''; // reset district
-                              filterDetails.kalapa = ''; // reset kalapa
-                              filterDetails.kottasa = ''; // reset kottasa
-                              filterDetails.school = ''; // reset School
+                              filterDetails.district = '';
+                              filterDetails.kalapa = '';
+                              filterDetails.kottasa = '';
+                              filterDetails.school = '';
                               filterDetails.kottasaForNationalScl = '';
                               filterDetails.nationalSchool = '';
                               filterDetails.institutionTypeForNurse = '';
@@ -464,6 +511,7 @@ class _GetDetailsScreenState extends State<GetDetailsScreen> {
                               filterDetails.gramaNiladhariDivision = '';
                               filterDetails.policeDivisions = '';
                               filterDetails.policeStations = '';
+                              filterDetails.subjectMedium = '';
                             });
                           },
                           dropdownColor: ColorManager.kPrimaryBlack,
@@ -538,10 +586,10 @@ class _GetDetailsScreenState extends State<GetDetailsScreen> {
                                   onChanged: (value) {
                                     setState(() {
                                       filterDetails.province = value ?? '';
-                                      filterDetails.district = ''; // reset district
-                                      filterDetails.kalapa = ''; // reset kalapa
-                                      filterDetails.kottasa = ''; // reset kottasa
-                                      filterDetails.school = ''; // reset School
+                                      filterDetails.district = '';
+                                      filterDetails.kalapa = '';
+                                      filterDetails.kottasa = '';
+                                      filterDetails.school = '';
                                       filterDetails.kottasaForNationalScl = '';
                                       filterDetails.nationalSchool = '';
                                       filterDetails.institutionTypeForNurse = '';
@@ -570,7 +618,6 @@ class _GetDetailsScreenState extends State<GetDetailsScreen> {
 
                       SizedBox(height: context.verticalSize(filterDetails.province.isNotEmpty ? 20 : 0)),
 
-                      // District Dropdown
                       filterDetails.province.isNotEmpty
                           ? Container(
                             height: context.verticalSize(40),
@@ -600,9 +647,9 @@ class _GetDetailsScreenState extends State<GetDetailsScreen> {
                               onChanged: (value) {
                                 setState(() {
                                   filterDetails.district = value ?? '';
-                                  filterDetails.kalapa = ''; // reset kalapa
-                                  filterDetails.kottasa = ''; // reset kottasa
-                                  filterDetails.school = ''; // reset School
+                                  filterDetails.kalapa = '';
+                                  filterDetails.kottasa = '';
+                                  filterDetails.school = '';
                                   filterDetails.kottasaForNationalScl = '';
                                   filterDetails.nationalSchool = '';
                                   filterDetails.institutionTypeForNurse = '';
@@ -623,7 +670,7 @@ class _GetDetailsScreenState extends State<GetDetailsScreen> {
                           )
                           : SizedBox.shrink(),
                       SizedBox(height: context.verticalSize(filterDetails.district.isNotEmpty ? 20 : 0)),
-                      // Kalapa Dropdown
+
                       filterDetails.district.isNotEmpty
                           ? Container(
                             height: context.verticalSize(40),
@@ -775,7 +822,6 @@ class _GetDetailsScreenState extends State<GetDetailsScreen> {
                         ),
                       ),
 
-                      // kottasa Dropdown
                       (((filterDetails.job == "Provincial School Teacher" ||
                                       filterDetails.job == "National School Teacher") &&
                                   filterDetails.kalapa.isNotEmpty) ||
@@ -963,15 +1009,10 @@ class _GetDetailsScreenState extends State<GetDetailsScreen> {
                               items:
                                   (filterDetails.job == "Provincial School Teacher"
                                           ? filterDetails.kottasa.isNotEmpty
-                                              ? filterDetails.kottasaSchools[filterDetails
-                                                      // .kalapaSchool[filterDetails
-                                                      .kottasa] ??
-                                                  []
+                                              ? filterDetails.kottasaSchools[filterDetails.kottasa] ?? []
                                               : <String>[]
                                           : filterDetails.kottasaForNationalScl.isNotEmpty
-                                          ? filterDetails.kottasaNationalSchools[filterDetails
-                                                  // .kalapaSchool[filterDetails
-                                                  .kottasaForNationalScl] ??
+                                          ? filterDetails.kottasaNationalSchools[filterDetails.kottasaForNationalScl] ??
                                               []
                                           : <String>[])
                                       .map(
@@ -988,7 +1029,7 @@ class _GetDetailsScreenState extends State<GetDetailsScreen> {
                                 setState(() {
                                   filterDetails.job == "Provincial School Teacher"
                                       ? filterDetails.school = value ?? ''
-                                      : filterDetails.nationalSchool = value ?? ''; // reset School
+                                      : filterDetails.nationalSchool = value ?? '';
                                   schoolError = null;
                                 });
                               },
@@ -1081,7 +1122,7 @@ class _GetDetailsScreenState extends State<GetDetailsScreen> {
                         ),
                       ),
 
-                      // District Dropdown
+                      // Subject Dropdown
                       (filterDetails.scheme != "PRIMARY" &&
                               filterDetails.scheme.isNotEmpty &&
                               (filterDetails.job == "Provincial School Teacher" ||
@@ -1152,6 +1193,72 @@ class _GetDetailsScreenState extends State<GetDetailsScreen> {
                           ),
                         ),
                       ),
+                      SizedBox(
+                        height: context.verticalSize(
+                          (filterDetails.scheme != "PRIMARY" && filterDetails.scheme.isNotEmpty) ||
+                                  filterDetails.grade.isNotEmpty
+                              ? subjectError != null
+                                  ? 12
+                                  : 2
+                              : 0,
+                        ),
+                      ),
+                      (filterDetails.job == "Provincial School Teacher" ||
+                              filterDetails.job == "National School Teacher")
+                          ? Column(
+                            children: [
+                              Container(
+                                height: context.verticalSize(40),
+                                width: double.infinity,
+                                padding: const EdgeInsets.symmetric(horizontal: 12),
+                                decoration: BoxDecoration(
+                                  color: ColorManager.white10,
+                                  borderRadius: BorderRadius.circular(20),
+                                ),
+                                child: DropdownButton<String>(
+                                  value: filterDetails.subjectMedium.isNotEmpty ? filterDetails.subjectMedium : null,
+                                  hint: Text(
+                                    "Select Subject Medium",
+                                    style: context.regular14(color: ColorManager.disabledText),
+                                  ),
+                                  items:
+                                      ["Sinhala", "English", "Tamil"]
+                                          .map(
+                                            (medium) => DropdownMenuItem(
+                                              value: medium,
+                                              child: Text(
+                                                medium,
+                                                style: context.regular14(color: ColorManager.blackMedium),
+                                              ),
+                                            ),
+                                          )
+                                          .toList(),
+                                  onChanged: (value) {
+                                    setState(() {
+                                      filterDetails.subjectMedium = value ?? '';
+                                      subjectMediumError = null;
+                                    });
+                                  },
+                                  dropdownColor: ColorManager.kPrimaryBlack,
+                                  underline: const SizedBox(),
+                                  icon: Icon(Icons.arrow_drop_down, color: ColorManager.disabledText),
+                                  isExpanded: true,
+                                ),
+                              ),
+                              Align(
+                                alignment: Alignment.centerLeft,
+                                child: Padding(
+                                  padding: EdgeInsets.only(top: subjectMediumError != null ? 4.0 : 4.0, left: 5.0),
+                                  child: Text(
+                                    subjectMediumError != null ? subjectMediumError! : '',
+                                    style: const TextStyle(color: Colors.red, fontSize: 12.0),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          )
+                          : SizedBox.shrink(),
+
                       SizedBox(height: context.verticalSize(20)),
                       Align(
                         alignment: Alignment.centerLeft,
@@ -1325,7 +1432,6 @@ class _GetDetailsScreenState extends State<GetDetailsScreen> {
                         controller: auth.noteController,
                         inputType: TextInputType.emailAddress,
                         hintText: 'note',
-                        // enabled: false,
                         validator: (value) {},
                       ),
                       SizedBox(height: context.verticalSize(8)),
@@ -1440,7 +1546,6 @@ class _GetDetailsScreenState extends State<GetDetailsScreen> {
                             caseSensitive: false,
                           ).hasMatch(email);
 
-                          // Trigger popup if email is empty OR if it is NOT a @gmail.com address
                           if (email.isNotEmpty && !isGmail) {
                             final shouldSave = await _saveAlertDialog(
                               context,
@@ -1478,6 +1583,10 @@ class _GetDetailsScreenState extends State<GetDetailsScreen> {
                                       ? filterDetails.subject != ''
                                       : filterDetails.scheme != '')
                                   : filterDetails.grade != "") &&
+                              ((filterDetails.job == "Provincial School Teacher" ||
+                                      filterDetails.job == "National School Teacher")
+                                  ? filterDetails.subjectMedium != ''
+                                  : true) &&
                               filterDetails.choice1 != '') {
                             auth.filterDetails = filterDetails;
                             try {
@@ -1493,6 +1602,7 @@ class _GetDetailsScreenState extends State<GetDetailsScreen> {
                                       (_) => VerifyEmailScreen(
                                         user: user!,
                                         isSelected: isSelected,
+                                        isWhatsappSelected: isWhatsappSelected,
                                         isSchoolSelected: isSchoolSelected,
                                         isEnable: isEnable,
                                       ),
@@ -1549,6 +1659,17 @@ class _GetDetailsScreenState extends State<GetDetailsScreen> {
                               subjectError = '';
                             });
                           }
+                          if ((filterDetails.job == "Provincial School Teacher" ||
+                                  filterDetails.job == "National School Teacher") &&
+                              filterDetails.subjectMedium == '') {
+                            setState(() {
+                              subjectMediumError = 'Select your subject medium';
+                            });
+                          } else {
+                            setState(() {
+                              subjectMediumError = null;
+                            });
+                          }
                           if (filterDetails.choice1 == '') {
                             setState(() {
                               choiceError = 'Select at least 1 choice';
@@ -1561,7 +1682,7 @@ class _GetDetailsScreenState extends State<GetDetailsScreen> {
                         },
                         isGradientColor: true,
                         gradientColors: ColorManager.gradientButtons2,
-                        // isLoading: auth.getisCreatingUser,
+                        isLoading: auth.isLoading,
                         buttonText: 'Continue',
                       ),
                     ],

@@ -14,8 +14,7 @@ class AccountProvider extends ChangeNotifier {
   TextEditingController firstNameController = TextEditingController();
   TextEditingController lastNameController = TextEditingController();
   TextEditingController contactController = TextEditingController();
-  // TextEditingController passwordController = TextEditingController();
-  // TextEditingController confirmPasswordController = TextEditingController();
+  TextEditingController whatsappController = TextEditingController();
   TextEditingController noteController = TextEditingController();
 
   TextEditingController refNoController = TextEditingController();
@@ -25,6 +24,7 @@ class AccountProvider extends ChangeNotifier {
   TextEditingController serviceProviderController = TextEditingController();
 
   bool isContactVisible = false;
+  bool isWhatsappVisible = false;
   bool isSchoolVisible = false;
   String emailAddress = '';
 
@@ -33,8 +33,7 @@ class AccountProvider extends ChangeNotifier {
     firstNameController.dispose();
     lastNameController.dispose();
     contactController.dispose();
-    // passwordController.dispose();
-    // confirmPasswordController.dispose();
+    whatsappController.dispose();
     noteController.dispose();
     super.dispose();
   }
@@ -45,7 +44,6 @@ class AccountProvider extends ChangeNotifier {
   firebase_auth.User? _firebaseUser;
   firebase_auth.User? get firebaseUser => _firebaseUser;
 
-  //  Change this type to PersonDetailsModel
   PersonDetailsModel? _appUser;
   PersonDetailsModel? get appUser => _appUser;
 
@@ -61,10 +59,9 @@ class AccountProvider extends ChangeNotifier {
       _errorMessage = null;
 
       if (_firebaseUser != null) {
-        //  Fetch and set the PersonDetailsModel when auth state changes
         await _fetchAndSetPersonDetailsModel(_firebaseUser!.uid);
       } else {
-        _appUser = null; // Clear combined profile on logout
+        _appUser = null;
       }
       notifyListeners();
     });
@@ -85,9 +82,7 @@ class AccountProvider extends ChangeNotifier {
     await _fetchAndSetPersonDetailsModel(user.uid);
   }
 
-  //  NEW: Helper to fetch and set the PersonDetailsModel
   Future<void> _fetchAndSetPersonDetailsModel(String uid) async {
-    // We need _firebaseUser to be non-null here to construct PersonDetailsModel
     _isLoading = true;
     notifyListeners();
 
@@ -97,28 +92,26 @@ class AccountProvider extends ChangeNotifier {
     }
 
     try {
-      DocumentSnapshot userProfileDoc =
-          await _firestore.collection('users').doc(uid).get();
+      DocumentSnapshot userProfileDoc = await _firestore.collection('users').doc(uid).get();
       if (userProfileDoc.exists) {
         _appUser = PersonDetailsModel.fromAuthAndFirestore(
           firebaseUser: _firebaseUser!,
           firestoreData: userProfileDoc.data() as Map<String, dynamic>,
         );
         List<String> parts = (_appUser?.displayName ?? "").split(' ');
-        print("_appUser?.isEnable");
-        print(_appUser?.isEnable);
-        print("_appUser?.isEnable");
+
         firstNameController.text = parts[0];
         lastNameController.text = parts.length > 1 ? parts[1] : '';
-        contactController.text =
-            _appUser?.phone != null ? _appUser!.phone.toString() : '';
+        contactController.text = _appUser?.phone != null ? _appUser!.phone.toString() : '';
+
+        whatsappController.text = _appUser?.whatsapp != null ? _appUser!.whatsapp.toString() : '';
         isContactVisible = _appUser?.isPhoneHide ?? false;
+        isWhatsappVisible = _appUser?.isWhatsappHide ?? false;
+
         isSchoolVisible = _appUser?.isSchoolHide ?? false;
         noteController.text = _appUser?.note ?? '';
         emailAddress = _appUser?.authEmail ?? '';
       } else {
-        // Handle case where Firestore profile might not exist (e.g., old user, or error)
-        // You might create a basic PersonDetailsModel with only Auth data here
         _appUser = PersonDetailsModel(
           uid: _firebaseUser!.uid,
           authEmail: _firebaseUser!.email ?? '',
@@ -127,13 +120,9 @@ class AccountProvider extends ChangeNotifier {
           createdAtAuth: _firebaseUser!.metadata.creationTime,
           lastSignInTimeAuth: _firebaseUser!.metadata.lastSignInTime,
         );
-        print(
-          "Firestore profile not found for UID: $uid. Using only Auth data.",
-        );
       }
     } on FirebaseException catch (e) {
       _errorMessage = "Failed to load user profile: ${e.message}";
-      // Fallback to Auth-only data if Firestore fetch fails
       _appUser = PersonDetailsModel(
         uid: _firebaseUser!.uid,
         authEmail: _firebaseUser!.email ?? '',
@@ -142,9 +131,7 @@ class AccountProvider extends ChangeNotifier {
         createdAtAuth: _firebaseUser!.metadata.creationTime,
         lastSignInTimeAuth: _firebaseUser!.metadata.lastSignInTime,
       );
-      print("Error fetching Firestore profile for UID $uid: ${e.message}");
     } catch (e) {
-      print("General error fetching Firestore profile for UID $uid: $e");
       _errorMessage = "An unexpected error occurred loading your profile.";
       _appUser = PersonDetailsModel(
         uid: _firebaseUser!.uid,
@@ -160,10 +147,7 @@ class AccountProvider extends ChangeNotifier {
     }
   }
 
-  Future<void> updateAuthProfile({
-    String? newDisplayName,
-    String? newPhotoURL,
-  }) async {
+  Future<void> updateAuthProfile({String? newDisplayName, String? newPhotoURL}) async {
     _isLoading = true;
     _errorMessage = null;
     notifyListeners();
@@ -176,53 +160,17 @@ class AccountProvider extends ChangeNotifier {
     }
 
     try {
-      await _firebaseUser!.updateProfile(
-        displayName: newDisplayName,
-        photoURL: newPhotoURL,
-      );
-      await _firebaseUser!.reload(); // Reload to get the latest profile data
-      _firebaseUser = _auth.currentUser; // Update the internal _firebaseUser
+      await _firebaseUser!.updateProfile(displayName: newDisplayName, photoURL: newPhotoURL);
+      await _firebaseUser!.reload();
+      _firebaseUser = _auth.currentUser;
 
-      // Re-fetch/rebuild the _appUser (now PersonDetailsModel)
       await _fetchAndSetPersonDetailsModel(_firebaseUser!.uid);
 
-      print("Auth profile updated successfully.");
-      _errorMessage = null; // Clear error on success
+      _errorMessage = null;
     } on firebase_auth.FirebaseAuthException catch (e) {
-      print("Error updating Auth profile: ${e.code} - ${e.message}");
       _errorMessage = "Failed to update profile: ${e.message}";
     } catch (e) {
-      print("General error updating Auth profile: $e");
       _errorMessage = "An unexpected error occurred while updating profile.";
-    } finally {
-      _isLoading = false;
-      notifyListeners();
-    }
-  }
-
-  //  Placeholder for Phone Number Update (more complex due to verification)
-  Future<void> updatePhoneNumber(String newPhoneNumber) async {
-    _isLoading = true;
-    _errorMessage = null;
-    notifyListeners();
-
-    if (_firebaseUser == null) {
-      _errorMessage = "No user logged in to update phone number.";
-      _isLoading = false;
-      notifyListeners();
-      return;
-    }
-
-    try {
-      // Implement phone number verification flow here.
-      // ... (as described previously)
-      _errorMessage = "Phone number update requires a full verification flow.";
-    } on firebase_auth.FirebaseAuthException catch (e) {
-      print("Error initiating phone number update: ${e.code} - ${e.message}");
-      _errorMessage = "Failed to initiate phone update: ${e.message}";
-    } catch (e) {
-      print("General error initiating phone number update: $e");
-      _errorMessage = "An unexpected error occurred.";
     } finally {
       _isLoading = false;
       notifyListeners();
@@ -247,20 +195,23 @@ class AccountProvider extends ChangeNotifier {
 
       Map<String, dynamic> updatedData = {};
 
-      // Compare and add only changed Firestore fields
-      String currentDisplayName =
-          "${firstNameController.text.trim()} ${lastNameController.text.trim()}";
-      String originalDisplayName =
-          "${_appUser!.firstName} ${_appUser!.lastName}";
+      String currentDisplayName = "${firstNameController.text.trim()} ${lastNameController.text.trim()}";
+      String originalDisplayName = "${_appUser!.firstName} ${_appUser!.lastName}";
       String originalDisplayNameInAuth = currentUser.displayName ?? '';
 
-      // Check if name has changed (composed from first and last names)
       if (currentDisplayName != originalDisplayName) {
         updatedData['name'] = currentDisplayName;
       }
 
       if (contactController.text.trim() != _appUser!.phone) {
         updatedData['phone'] = contactController.text.trim();
+      }
+
+      if (whatsappController.text.trim() != _appUser!.whatsapp) {
+        updatedData['whatsapp'] = whatsappController.text.trim();
+      }
+      if (isWhatsappVisible != (_appUser?.isWhatsappHide ?? false)) {
+        updatedData['isWhatsappHide'] = isWhatsappVisible;
       }
 
       if (isContactVisible != (_appUser?.isPhoneHide ?? false)) {
@@ -271,18 +222,14 @@ class AccountProvider extends ChangeNotifier {
         updatedData['isSchoolHide'] = isSchoolVisible;
       }
       if (editDetails.job != "" && _appUser!.job != editDetails.job) {
-              updatedData['job'] = editDetails.job;
+        updatedData['job'] = editDetails.job;
       }
-      if (editDetails.province != "" &&
-          _appUser!.province != editDetails.province) {
-        updatedData['province'] =
-            editDetails.province; // Replace with province from controller
+      if (editDetails.province != "" && _appUser!.province != editDetails.province) {
+        updatedData['province'] = editDetails.province;
       }
 
-      if (editDetails.district != "" &&
-          _appUser!.district != editDetails.district) {
-        updatedData['district'] =
-            editDetails.district; // Replace with district from controller
+      if (editDetails.district != "" && _appUser!.district != editDetails.district) {
+        updatedData['district'] = editDetails.district;
       }
 
       if (editDetails.kalapa != "" && _appUser!.kalapa != editDetails.kalapa) {
@@ -297,7 +244,8 @@ class AccountProvider extends ChangeNotifier {
         updatedData['school'] = editDetails.school;
       }
 
-      if (editDetails.kottasaForNationalScl != "" && _appUser!.kottasaForNationalScl != editDetails.kottasaForNationalScl) {
+      if (editDetails.kottasaForNationalScl != "" &&
+          _appUser!.kottasaForNationalScl != editDetails.kottasaForNationalScl) {
         updatedData['kottasaForNationalScl'] = editDetails.kottasaForNationalScl;
       }
 
@@ -305,7 +253,8 @@ class AccountProvider extends ChangeNotifier {
         updatedData['nationalSchool'] = editDetails.nationalSchool;
       }
 
-      if (editDetails.institutionTypeForNurse != "" && _appUser!.institutionTypeForNurse != editDetails.institutionTypeForNurse) {
+      if (editDetails.institutionTypeForNurse != "" &&
+          _appUser!.institutionTypeForNurse != editDetails.institutionTypeForNurse) {
         updatedData['institutionTypeForNurse'] = editDetails.institutionTypeForNurse;
       }
 
@@ -313,7 +262,8 @@ class AccountProvider extends ChangeNotifier {
         updatedData['officeForNurse'] = editDetails.officeForNurse;
       }
 
-      if (editDetails.institutionTypeForMA != "" && _appUser!.institutionTypeForMA != editDetails.institutionTypeForMA) {
+      if (editDetails.institutionTypeForMA != "" &&
+          _appUser!.institutionTypeForMA != editDetails.institutionTypeForMA) {
         updatedData['institutionTypeForMA'] = editDetails.institutionTypeForMA;
       }
 
@@ -329,11 +279,13 @@ class AccountProvider extends ChangeNotifier {
         updatedData['policeStations'] = editDetails.policeStations;
       }
 
-      if (editDetails.divisionalSecretariat != "" && _appUser!.divisionalSecretariat != editDetails.divisionalSecretariat) {
+      if (editDetails.divisionalSecretariat != "" &&
+          _appUser!.divisionalSecretariat != editDetails.divisionalSecretariat) {
         updatedData['divisionalSecretariat'] = editDetails.divisionalSecretariat;
       }
 
-      if (editDetails.gramaNiladhariDivision != "" && _appUser!.gramaNiladhariDivision != editDetails.gramaNiladhariDivision) {
+      if (editDetails.gramaNiladhariDivision != "" &&
+          _appUser!.gramaNiladhariDivision != editDetails.gramaNiladhariDivision) {
         updatedData['gramaNiladhariDivision'] = editDetails.gramaNiladhariDivision;
       }
 
@@ -343,67 +295,51 @@ class AccountProvider extends ChangeNotifier {
 
       updatedData['subject'] = editDetails.subject;
 
+      if (editDetails.subjectMedium != "" && _appUser!.subjectMedium != editDetails.subjectMedium) {
+        updatedData['subjectMedium'] = editDetails.subjectMedium;
+      }
+
       if (editDetails.grade != "" && _appUser!.grade != editDetails.grade) {
         updatedData['grade'] = editDetails.grade;
       }
 
-      if (editDetails.choice1 != "" &&
-          _appUser!.choice1 != editDetails.choice1) {
+      if (editDetails.choice1 != "" && _appUser!.choice1 != editDetails.choice1) {
         updatedData['choice1'] = editDetails.choice1;
       }
 
       updatedData['choice2'] = editDetails.choice2;
-
       updatedData['choice3'] = editDetails.choice3;
 
       if (noteController.text.trim() != _appUser!.note) {
         updatedData['note'] = noteController.text.trim();
       }
 
-      // Add a server timestamp for when the document was last updated
       updatedData['updatedAt'] = FieldValue.serverTimestamp();
 
       if (updatedData.isNotEmpty) {
-        await _firestore
-            .collection('users')
-            .doc(currentUser.uid)
-            .update(updatedData);
-        print("User data updated in Firestore for UID: ${currentUser.uid}");
-      } else {
-        print("No changes detected for Firestore update.");
+        await _firestore.collection('users').doc(currentUser.uid).update(updatedData);
       }
 
-      // Update Auth displayName if it has changed
       if (currentDisplayName != originalDisplayNameInAuth) {
         await currentUser.updateProfile(displayName: currentDisplayName);
-        print("Auth displayName updated.");
         await currentUser.reload();
         currentUser = _auth.currentUser;
         _firebaseUser = currentUser;
       }
 
       _errorMessage = null;
-      // After update, you might want to refresh _appUser or specific controllers
-      // by re-fetching the user data or manually updating _appUser's properties.
-      await _fetchAndSetPersonDetailsModel(
-        currentUser?.uid ?? '',
-      ); // Re-fetch to ensure _appUser is up-to-date
+      await _fetchAndSetPersonDetailsModel(currentUser?.uid ?? '');
       Navigator.of(ContextHelper.navigatorKey.currentContext!).pop();
     } catch (e) {
       _errorMessage = e.toString();
-      print("Error updating accountt: $_errorMessage");
     } finally {
       _isLoading = false;
       notifyListeners();
     }
   }
 
-  Future<void> addPaymentDetails(
-    DateTime transferDate,
-    File? selectedImage,
-  ) async {
+  Future<void> addPaymentDetails(DateTime transferDate, File? selectedImage) async {
     if (_appUser == null) {
-      print("No user data to update.");
       return;
     }
 
@@ -427,43 +363,8 @@ class AccountProvider extends ChangeNotifier {
       updatedData['serviceProvider'] = serviceProviderController.text.trim();
       updatedData['isEnable'] = true;
 
-      // if (selectedImage != null) {
-      //   // Create a unique file path for the image in Cloud Storage
-      //   // Recommended structure: users/<user_uid>/payment_images/<timestamp>_<original_filename>
-      //   final String fileName = selectedImage.path.split('/').last;
-      //   final String uniqueFileName = '${DateTime.now().millisecondsSinceEpoch}_$fileName';
-      //   print(await selectedImage.exists());
-
-      //   final firebase_storage.Reference storageRef = firebase_storage.FirebaseStorage.instance
-      //       .ref()
-      //       .child('users')
-      //       .child(currentUser.uid)
-      //       .child('payment_images')
-      //       .child(uniqueFileName);
-
-      //   // Upload the file
-      //   final firebase_storage.UploadTask uploadTask = storageRef.putFile(selectedImage);
-
-      //   // Await the completion of the upload and get the snapshot
-      //   // final firebase_storage.TaskSnapshot snapshot = await uploadTask.whenComplete(() {});
-      //   final firebase_storage.TaskSnapshot snapshot = await uploadTask;
-
-      //   // Get the download URL of the uploaded image
-      //   final String downloadUrl = await snapshot.ref.getDownloadURL();
-
-      //   // Add the download URL to the data you'll save in Firestore
-      //   updatedData['paymentImageUrl'] = downloadUrl;
-      //   print("Payment image uploaded successfully to: $downloadUrl");
-      // }
-
       if (updatedData.isNotEmpty) {
-        await _firestore
-            .collection('users')
-            .doc(currentUser.uid)
-            .update(updatedData);
-        print("User data updated in Firestore for UID: ${currentUser.uid}");
-      } else {
-        print("No changes detected for Firestore update.");
+        await _firestore.collection('users').doc(currentUser.uid).update(updatedData);
       }
 
       _errorMessage = null;
@@ -471,45 +372,29 @@ class AccountProvider extends ChangeNotifier {
       Navigator.of(ContextHelper.navigatorKey.currentContext!).pop();
     } catch (e) {
       _errorMessage = e.toString();
-      print("Error updating account: $_errorMessage");
     } finally {
       _isLoading = false;
       notifyListeners();
     }
   }
 
-  Future<void> changePassword({
-    required String currentPassword,
-    required String newPassword,
-  }) async {
+  Future<void> changePassword({required String currentPassword, required String newPassword}) async {
     _isLoading = true;
     final user = FirebaseAuth.instance.currentUser;
 
     if (user == null) {
-    _isLoading = false;
+      _isLoading = false;
       throw Exception('No user is currently logged in.');
     }
 
     try {
-      // Reauthenticate the user
-      final credential = EmailAuthProvider.credential(
-        email: user.email!,
-        password: currentPassword,
-      );
+      final credential = EmailAuthProvider.credential(email: user.email!, password: currentPassword);
       await user.reauthenticateWithCredential(credential);
-
-      // Update the password
       await user.updatePassword(newPassword);
-    _isLoading = false;
+      _isLoading = false;
     } on FirebaseAuthException catch (e) {
-    _isLoading = false;
+      _isLoading = false;
       throw Exception(e.message ?? 'Failed to change password.');
     }
   }
-
-  //   Future<void> updateUserProfile(PersonDetailsModel user) async {
-  //   await _firestore.collection('users').doc(user.uid).update(user.toFirestore());
-  //   _appUser = user;
-  //   notifyListeners();
-  // }
 }

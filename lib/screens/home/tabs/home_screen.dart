@@ -84,7 +84,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       onPressed: () async {
                         await filter.getAllUserDetails();
                         await filter.reapplySavedFilters();
-                      }, //filter.getAllUserDetails,
+                      },
                       child: const Text('Retry'),
                     ),
                   ],
@@ -96,12 +96,6 @@ class _HomeScreenState extends State<HomeScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 SizedBox(height: context.verticalSize(50)),
-                // Center(
-                //   child: Text(
-                //     'Filter',
-                //     style: context.semiBold20(color: ColorManager.blackMedium),
-                //   ),
-                // ),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -115,14 +109,8 @@ class _HomeScreenState extends State<HomeScreen> {
                           SizedBox(width: context.horizontalSize(10)),
                           CircleAvatar(
                             backgroundColor: ColorManager.bgForButton,
-                            // radius: 20,
                             radius: 10,
-                            child: Icon(
-                              // Icons.filter_list,
-                              Icons.arrow_right,
-                              color: ColorManager.kPrimary,
-                              size: 22,
-                            ),
+                            child: Icon(Icons.arrow_right, color: ColorManager.kPrimary, size: 22),
                           ),
                         ],
                       ),
@@ -143,11 +131,9 @@ class _HomeScreenState extends State<HomeScreen> {
                     : Expanded(
                       child: ListView.builder(
                         padding: EdgeInsets.zero,
-                        // itemCount: filter.filteredUsersData.length,
                         itemCount: displayedUsers.length,
                         itemBuilder: (context, index) {
                           final user = displayedUsers[index];
-                          // print(user.uid);
                           final currentUser = firebase_auth.FirebaseAuth.instance.currentUser;
                           return Padding(
                             padding: const EdgeInsets.only(bottom: 10.0),
@@ -163,10 +149,11 @@ class _HomeScreenState extends State<HomeScreen> {
                                 firstName: user.firstName ?? '--',
                                 lastName: user.lastName ?? '',
                                 authEmail: user.authEmail,
-                                // email: "${user['email'] ?? '--'}",
                                 age: user.age ?? 0,
                                 phone: user.phone ?? "",
+                                whatsapp: user.whatsapp ?? "",
                                 isPhoneHide: user.isPhoneHide,
+                                isWhatsappHide: user.isWhatsappHide,
                                 isSchoolHide: user.isSchoolHide,
                                 job: user.job ?? '--',
                                 province: user.province ?? '--',
@@ -186,6 +173,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                 nationalSchool: user.nationalSchool ?? '--',
                                 scheme: user.scheme ?? '--',
                                 subject: user.subject ?? '--',
+                                subjectMedium: user.subjectMedium ?? '--',
                                 grade: user.grade ?? '--',
                                 choice1: user.choice1 ?? '--',
                                 choice2: user.choice2 ?? '--',

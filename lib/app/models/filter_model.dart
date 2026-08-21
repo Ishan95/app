@@ -18,6 +18,7 @@ class FilterModel {
   String gramaNiladhariDivision;
   String scheme;
   String subject;
+  String subjectMedium;
   String grade;
   String choice1;
   String choice2;
@@ -60,6 +61,7 @@ class FilterModel {
     this.gramaNiladhariDivision = '',
     this.scheme = '',
     this.subject = '',
+    this.subjectMedium = '',
     this.grade = '',
     this.choice1 = '',
     this.choice2 = '',
@@ -188,7 +190,7 @@ class FilterModel {
       "Kalutara": ["Kalutara", "Beruwala", "Dodangoda", "Panadura"],
       "Horana": ["Horana", "Bandaragama", "Bulathsinhala"],
       "Mathugama": ["Matugama", "Agalawatta", "Palindanuwara", "Walallawita"],
-      
+
       // Central Province
       "Kandy": ["Gangawata Korale", "Pathahewaheta"],
       "Katugasthota": ["Akurana", "Galagedara", "Harispattuwa", "Hatharaliyadda", "Poojapitiya"],
@@ -892,7 +894,7 @@ class FilterModel {
     "MALWANA AL MUBARAK P.V. - Mixed - Tamil",
     "DHARANAGAMA P.V. - Mixed - Sinhala"
   ],
-  
+
   "Kelaniya": [
     "KELANIYA ST. PAUL'S BALIKA M.V. - Girls - Sinhala",
     "SRI SUMANGALA M.V. - Mixed - Sinhala/English",
@@ -9020,7 +9022,7 @@ class FilterModel {
 ],
 
 
-// Uva Province 
+// Uva Province
 // Badulla Education Zone
 "Badulla": [
     "AL-ADHAN MAHA VIDYALAYA - Mixed - Tamil/English",
@@ -11184,7 +11186,7 @@ class FilterModel {
       "Kalutara": ["Kalutara", "Beruwala", "Dodangoda", "Panadura"],
       "Horana": ["Horana", "Bandaragama", "Bulathsinhala"],
       "Mathugama": ["Matugama"],
-      
+
       // Central Province
       "Kandy": ["Gangawata Korale", "Pathahewaheta"],
       "Katugasthota": ["Akurana", "Galagedara", "Harispattuwa", "Hatharaliyadda", "Poojapitiya"],
@@ -11337,7 +11339,7 @@ class FilterModel {
   ],
 
   // Piliyandala Education zone
-  
+
   "Dehiwala": [
     "DEHIWALA PRESBYTERIAN B.V - Girls - Sinhala/English"
   ],
@@ -12111,7 +12113,7 @@ class FilterModel {
     "POLONNARUWA MUSLIM CENTRAL COLLEGE - Mixed - Tamil"
   ],
 
-// Uva Province 
+// Uva Province
 // Badulla Education Zone
 "Badulla": [
     "BADULLA DHARMADUTHA NATIONAL COLLEGE - Boys - Sinhala/English",
@@ -12516,7 +12518,7 @@ this.districtInstitutionTypeForNurse = const {
       ],
     },
     this.institutionTypeOfficesForNurse = const {
-      //  Colombo 
+      //  Colombo
       "National Hospital Colombo": [
         "The National Hospital of Sri Lanka (Colombo)",
       ],
@@ -12612,7 +12614,7 @@ this.districtInstitutionTypeForNurse = const {
         "Port Health Office – Colombo",
       ],
 
-      //  Gampaha 
+      //  Gampaha
       "Teaching Hospital Gampaha": [
         "Teaching Hospital Colombo North Ragama"
       ],
@@ -12693,7 +12695,7 @@ this.districtInstitutionTypeForNurse = const {
         "Chest Clinic",
       ],
 
-      //  Kalutara 
+      //  Kalutara
       "Teaching Hospital Kalutara": [
         "Teaching Hospital Kalutara"
       ],
@@ -12761,7 +12763,7 @@ this.districtInstitutionTypeForNurse = const {
         "Geekiyanakanda Estate Hospital",
       ],
 
-      //  Kandy 
+      //  Kandy
       "National Hospital Kandy": ["National Hospital – Kandy"],
       "Teaching Hospital Kandy": [
         "Teaching Hospital Peradeniya",
@@ -12894,7 +12896,7 @@ this.districtInstitutionTypeForNurse = const {
         "STD/AIDS Clinic-Kandy",
       ],
 
-      //  Matale 
+      //  Matale
       "District General Hospital Matale": [
         "District General Hospital – Matale",
       ],
@@ -12959,7 +12961,7 @@ this.districtInstitutionTypeForNurse = const {
         "STD/AIDS Clinic-Matale",
       ],
 
-      //  Nuwara Eliya 
+      //  Nuwara Eliya
       "District General Hospital Nuwara Eliya": [
         "District General Hospital – Nuwara Eliya",
       ],
@@ -13038,7 +13040,7 @@ this.districtInstitutionTypeForNurse = const {
         "STD/AIDS Clinic- Nuwara-Eliya",
       ],
 
-      //  Galle 
+      //  Galle
       "National Hospital Galle": [
         "Teaching Hospital Karapitiya (National Hospital)",
       ],
@@ -13129,7 +13131,7 @@ this.districtInstitutionTypeForNurse = const {
         "Port Health Office",
       ],
 
-      //  Matara 
+      //  Matara
       "District General Hospital Matara": [
         "District General Hospital – Matara",
       ],
@@ -13203,7 +13205,7 @@ this.districtInstitutionTypeForNurse = const {
         "STD/AIDS Clinic",
       ],
 
-      //  Hambantota 
+      //  Hambantota
       "District General Hospital Hambantota": [
         "District General Hospital – Hambanthota",
       ],
@@ -13270,7 +13272,7 @@ this.districtInstitutionTypeForNurse = const {
         "STD/AIDS Clinic",
       ],
 
-      //  Jaffna 
+      //  Jaffna
       "Teaching Hospital Jaffna": ["Teaching Hospital – Jaffna"],
       "Base Hospital Jaffna": [
         "Base Hospital-Point Pedro",
@@ -13353,7 +13355,7 @@ this.districtInstitutionTypeForNurse = const {
         "Psycosocial Unit- Jaffna",
       ],
 
-      //  Kilinochchi 
+      //  Kilinochchi
       "District General Hospital Kilinochchi": [
         "District General Hospital – Kilinochchi",
       ],
@@ -13385,7 +13387,7 @@ this.districtInstitutionTypeForNurse = const {
         "Regional Medical Supplies Division-Kilinochchi",
       ],
 
-      //  Mannar 
+      //  Mannar
       "District General Hospital Mannar": [
         "District General Hospital – Mannar",
       ],
@@ -13427,7 +13429,7 @@ this.districtInstitutionTypeForNurse = const {
         "STD/AIDS Clinic-Mannar",
       ],
 
-      //  Mullaitivu 
+      //  Mullaitivu
       "District General Hospital Mullaitivu": [
         "District General Hospital – Mullaitivu",
       ],
@@ -13465,7 +13467,7 @@ this.districtInstitutionTypeForNurse = const {
         "Chest Clinic-Mullativu",
       ],
 
-      //  Vavuniya 
+      //  Vavuniya
       "District General Hospital Vavuniya": [
         "District General Hospital – Vavuniya",
       ],
@@ -13503,7 +13505,7 @@ this.districtInstitutionTypeForNurse = const {
         "STD/AIDS Clinic-Vavuniya",
       ],
 
-      //  Trincomalee 
+      //  Trincomalee
       "District General Hospital Trincomalee": [
         "District General Hospital – Trincomalee",
       ],
@@ -13572,7 +13574,7 @@ this.districtInstitutionTypeForNurse = const {
         "Bio Medical Engineering Unit–Trincomalee",
       ],
 
-      //  Batticaloa 
+      //  Batticaloa
       "Teaching Hospital Batticaloa": ["Teaching Hospital Batticaloa"],
       "District General Hospital Batticaloa": [
         "District General Hospital Batticaloa",
@@ -13645,7 +13647,7 @@ this.districtInstitutionTypeForNurse = const {
         "Regional Medical Supplies Division-Batticaloa",
       ],
 
-      //  Ampara 
+      //  Ampara
       "District General Hospital Ampara": ["District General Hospital Ampara"],
       "Base Hospital Ampara": [
         "Base Hospital Akkaraipattu",
@@ -13740,7 +13742,7 @@ this.districtInstitutionTypeForNurse = const {
         "Ayurvedic Unit -Kalmunai",
       ],
 
-      //  Kurunegala 
+      //  Kurunegala
       "Teaching Hospital Kurunegala": [
         "Teaching Hospital – Kurunegala",
         "Teaching Hospital – Kuliyapitiya",
@@ -13882,7 +13884,7 @@ this.districtInstitutionTypeForNurse = const {
         "Suwamadura Dental",
       ],
 
-      //  Puttalam 
+      //  Puttalam
       "District General Hospital Puttalam": [
         "District General Hospital Chilaw",
       ],
@@ -13933,7 +13935,7 @@ this.districtInstitutionTypeForNurse = const {
         "Regional Anti Rabies Division",
       ],
 
-      //  Anuradhapura 
+      //  Anuradhapura
       "Teaching Hospital Anuradhapura": ["Teaching Hospital – Anuradhapura"],
       "Base Hospital Anuradhapura": [
         "Base Hospital – Kebithigollewa",
@@ -14028,7 +14030,7 @@ this.districtInstitutionTypeForNurse = const {
         "STD/AIDS Clinic – Anuradhapura",
       ],
 
-      //  Polonnaruwa 
+      //  Polonnaruwa
       "District General Hospital Polonnaruwa": [
         "District General Hospital – Polonnaruwa",
       ],
@@ -14083,7 +14085,7 @@ this.districtInstitutionTypeForNurse = const {
         "Divisional Pharmacist",
       ],
 
-      //  Badulla 
+      //  Badulla
       "Provincial General Hospital Badulla": [
         "Provincial General Hospital Badulla",
       ],
@@ -14180,7 +14182,7 @@ this.districtInstitutionTypeForNurse = const {
         "Pharmacist",
       ],
 
-      //  Monaragala 
+      //  Monaragala
       "District General Hospital Monaragala": [
         "District General Hospital – Monaragala",
       ],
@@ -14239,7 +14241,7 @@ this.districtInstitutionTypeForNurse = const {
         "Regional Malaria Officer",
       ],
 
-      //  Ratnapura 
+      //  Ratnapura
       "Teaching Hospital Ratnapura": ["Teaching Hospital Ratnapura"],
       "District General Hospital Ratnapura": ["District General Hospital"],
       "Base Hospital Ratnapura": [
@@ -14320,7 +14322,7 @@ this.districtInstitutionTypeForNurse = const {
         "Chest Clinic",
       ],
 
-      //  Kegalle 
+      //  Kegalle
       "Teaching Hospital Kegalle": ["District General Hospital – Kegalle"],
       "District General Hospital Kegalle": [
         "District General Hospital – Kegalle",
@@ -34480,56 +34482,235 @@ this.districtInstitutionTypeForMA = const {
     //     this.kalapaSchool = const {}
     this.schemeSubjects = const {
       "AL": [
-        "Combined Mathematics",
-        "Physics",
-        "Chemistry",
-        "Biology",
-        "Agricultural Science",
-        "Information & Communication Technology",
-        "Economics",
-        "Business Studies",
+        "2nd Language Sinhala",
+        "2nd Language Tamil",
         "Accounting",
+        "Agricultural Science",
+        "Agriculture & Food Technology",
+        "Appreciation of Literary (Arabic)",
+        "Appreciation of Literary (English)",
+        "Appreciation of Literary (Sinhala)",
+        "Appreciation of Literary (Tamil)",
+        "Arabic",
+        "Art",
+        "Art & Craft",
+        "Art & Designing",
+        "Bio System Technology",
+        "Biology",
+        "Buddhism",
+        "Buddhist Civilization",
+        "Business and Accountancy Studies",
+        "Business Statistics",
+        "Business Studies",
+        "Chemistry",
+        "Chinese",
+        "Christian Civilization",
+        "Christianity",
+        "Civic Education",
+        "Civic Studies",
+        "Combined Mathematics",
+        "Communication and Media Studies",
+        "Dance",
+        "Dancing (Baratha)",
+        "Dancing (Traditional)",
+        "Design & Technology",
+        "Drama & Theatre",
+        "Eastern Music",
+        "Economics",
+        "Engineering Technology",
+        "English",
+        "French",
+        "GIT",
+        "General English",
         "Geography",
+        "German",
+        "Greek and Roman Civilization",
+        "Health & Physical Education",
+        "Health & Social Care",
+        "Higher Maths",
+        "Hindi",
+        "Hindu Civilization",
+        "Hinduism",
         "History",
-        "Political Science",
+        "History (Indian / Europe / Contemporary)",
+        "Home Economics",
+        "Information & Communication Technology",
+        "Islam",
+        "Islam Civilization",
+        "Japanese",
+        "Karnatac Music",
+        "Korean",
         "Logic & Scientific Method",
+        "Malay",
+        "Mathematics",
         "Media & Communication Studies",
+        "Music",
+        "Pali",
+        "Physics",
+        "Political Science",
+        "Practical & Technical Skills",
+        "Roman Catholic",
+        "Russian",
+        "Sanskrit",
+        "Science",
+        "Science for Technology",
         "Sinhala",
         "Tamil",
-        "English",
-        "Buddhism",
-        "Hinduism",
-        "Islam",
-        "Christianity",
-        "Art",
-        "Drama & Theatre",
-        "Music",
-        "Dance",
+        "Western Music",
+        "13 Year Education - Building Construction",
+        "Agri Technology",
+        "Aluminum Fabrication Studies",
+        "Applied Horticultural Studies",
+        "Aquatic Bioresources Technology",
+        "Aquatic Resource Studies",
+        "Automobile Studies",
+        "B. Education",
+        "Bio Resources Technology",
+        "Child Psychology & Care",
+        "Civil Technology",
+        "Computer Hardware & Networking (Web Designing and Software Development)",
+        "Construction Studies",
+        "Counseling",
+        "Electrical & Electronic Studies",
+        "Electrical, Electronic and Information Technology",
+        "Electronic Typing & Short Hand",
+        "Entrepreneurship Studies",
+        "Event Management",
+        "Fashion Designing",
+        "Food Processing Studies",
+        "Food Technology",
+        "Graphic Design",
+        "Interior Designing",
+        "Landscaping",
+        "Livestock Product Studies",
+        "Manufacturing",
+        "Mechanical Technology",
+        "Metal Fabrication Studies",
+        "Performing Arts",
+        "Physical Education & Sports",
+        "Plantation Product Studies",
+        "Social Science",
+        "Special Education",
+        "Textile & Apparel Studies",
+        "Tourism & Hospitality",
+        "Other",
       ],
       "OL": [
-        "Mathematics",
-        "Science",
-        "History",
-        "Geography",
+        "2nd Language Sinhala",
+        "2nd Language Tamil",
+        "Accounting",
+        "Agricultural Science",
+        "Agriculture & Food Technology",
+        "Appreciation of Literary (Arabic)",
+        "Appreciation of Literary (English)",
+        "Appreciation of Literary (Sinhala)",
+        "Appreciation of Literary (Tamil)",
+        "Arabic",
+        "Art",
+        "Art & Craft",
+        "Art & Designing",
+        "Bio System Technology",
+        "Biology",
+        "Buddhism",
+        "Buddhist Civilization",
+        "Business & Accounting Studies",
+        "Business And Accountancy Studies",
+        "Business Statistics",
+        "Business Studies",
+        "Chemistry",
+        "Chinese",
+        "Christian Civilization",
+        "Christianity",
         "Civic Education",
+        "Civic Studies",
+        "Combined Mathematics",
+        "Communication and Media Studies",
+        "Dance",
+        "Dancing (Baratha)",
+        "Dancing (Traditional)",
+        "Design & Technology",
+        "Drama & Theatre",
+        "Eastern Music",
+        "Economics",
+        "Engineering Technology",
+        "English",
+        "French",
+        "G 6-11 Sectional Head",
+        "GIT",
+        "General English",
+        "Geography",
+        "German",
+        "Greek and Roman Civilization",
+        "Health & Physical Education",
+        "Health & Social Care",
+        "Higher Maths",
+        "Hindi",
+        "Hindu Civilization",
+        "Hinduism",
+        "History",
+        "History (Indian / Europe / Contemporary)",
+        "Home Economics",
+        "Information & Communication Technology",
+        "Islam",
+        "Islam Civilization",
+        "Japanese",
+        "Karnatac Music",
+        "Korean",
+        "Logic & Scientific Method",
+        "Malay",
+        "Mathematics",
+        "Media & Communication Studies",
+        "Music",
+        "Pali",
+        "Physics",
+        "Political Science",
+        "Practical & Technical Skills",
+        "Roman Catholic",
+        "Russian",
+        "Sanskrit",
+        "Science",
+        "Science for Technology",
+        "Sectional Head",
         "Sinhala",
         "Tamil",
-        "English",
-        "Buddhism",
-        "Hinduism",
-        "Islam",
-        "Christianity",
-        "Business & Accounting Studies",
-        "Information & Communication Technology",
-        "Agriculture & Food Technology",
-        "Health & Physical Education",
-        "Art",
-        "Music",
-        "Dance",
-        "Drama & Theatre",
-        "Design & Technology",
-        "Home Economics",
-        "Communication & Media Studies",
+        "Western Music",
+        "13 Year Education - Building Construction",
+        "Agri Technology",
+        "Aluminum Fabrication Studies",
+        "Applied Horticultural Studies",
+        "Aquatic Bioresources Technology",
+        "Aquatic Resource Studies",
+        "Automobile Studies",
+        "B. Education",
+        "Bio Resources Technology",
+        "Child Psychology & Care",
+        "Civil Technology",
+        "Computer Hardware & Networking (Web Designing and Software Development)",
+        "Construction Studies",
+        "Counseling",
+        "Electrical & Electronic Studies",
+        "Electrical, Electronic and Information Technology",
+        "Electronic Typing & Short Hand",
+        "Entrepreneurship Studies",
+        "Event Management",
+        "Fashion Designing",
+        "Food Processing Studies",
+        "Food Technology",
+        "Graphic Design",
+        "Interior Designing",
+        "Landscaping",
+        "Livestock Product Studies",
+        "Manufacturing",
+        "Mechanical Technology",
+        "Metal Fabrication Studies",
+        "Performing Arts",
+        "Physical Education & Sports",
+        "Plantation Product Studies",
+        "Social Science",
+        "Special Education",
+        "Textile & Apparel Studies",
+        "Tourism & Hospitality",
+        "Other",
       ],
       "PRIMARY": [
         "Mathematics",
@@ -34542,6 +34723,9 @@ this.districtInstitutionTypeForMA = const {
         "Basic Science",
         "Civic & Value Education",
         "Computer Awareness / ICT (basic, in some schools)",
+        "Primary",
+        "Primary English",
+        "Aesthetic Tea. Rq (only for Primary) Schools where no. of Students > 100",
       ],
     },
     this.gradeList = const ['Grade III', 'Grade II', 'Grade I'],
@@ -34569,6 +34753,7 @@ this.districtInstitutionTypeForMA = const {
       gramaNiladhariDivision: this.gramaNiladhariDivision,
       scheme: this.scheme,
       subject: this.subject,
+      subjectMedium: this.subjectMedium,
       grade: this.grade,
       provinceDistricts: Map<String, List<String>>.from(this.provinceDistricts),
       districtKalapas: Map<String, List<String>>.from(this.districtKalapas),
@@ -34612,6 +34797,7 @@ this.districtInstitutionTypeForMA = const {
         gramaNiladhariDivision == other.gramaNiladhariDivision &&
         scheme == other.scheme &&
         subject == other.subject &&
+        subjectMedium == other.subjectMedium &&
         grade == other.grade &&
         choice1 == other.choice1 &&
         choice2 == other.choice2 &&
