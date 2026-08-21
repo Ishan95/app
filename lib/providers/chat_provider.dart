@@ -130,7 +130,7 @@ class ChatProvider extends ChangeNotifier {
   //   }
   // }
 
-  // --- SEND MESSAGE ---
+  //  SEND MESSAGE
   Future<void> sendMessage({
     required String receiverId,
     required String message,
@@ -191,7 +191,7 @@ class ChatProvider extends ChangeNotifier {
         );
   }
 
-  // --- GET MESSAGES (Real-time Stream) ---
+  //  GET MESSAGES (Real-time Stream)
   Stream<List<Message>> getMessages(String userId, String otherUserId) {
     final String chatRoomId = _getChatRoomId(userId, otherUserId);
 
@@ -206,7 +206,7 @@ class ChatProvider extends ChangeNotifier {
             .toList());
   }
 
-  // --- GET CHATS LIST FOR A USER (Real-time Stream for ContactScreen's "Chats" tab) ---
+  //  GET CHATS LIST FOR A USER (Real-time Stream for ContactScreen's "Chats" tab)
   Stream<List<ChatModel>> getChats(String? userID) {
     if (userID == null || userID.isEmpty) {
       return Stream.value([]); // Return an empty stream if userID is invalid
@@ -223,7 +223,7 @@ class ChatProvider extends ChangeNotifier {
             .toList());
   }
 
-  // --- DELETE CHAT ---
+  //  DELETE CHAT
   Future<void> deleteChat(String userId, String chatRoomId) async {
     // Delete the chat metadata from the user's chatList
     await _firebaseFireStore
@@ -241,7 +241,7 @@ class ChatProvider extends ChangeNotifier {
     // For now, this just removes it from the current user's `chatList` view.
   }
 
-  // --- MUTE CHAT ---
+  //  MUTE CHAT
   Future<void> muteChat(String userID, String chatRoomId, bool isMute) async {
     await _firebaseFireStore
         .collection("users_chat_metadata")
@@ -251,7 +251,7 @@ class ChatProvider extends ChangeNotifier {
         .update({"is_mute": isMute});
   }
 
-  // --- GET CONTACT LIST (if fetching from Firestore directly) ---
+  //  GET CONTACT LIST (if fetching from Firestore directly)
   // The original getContactList was commented out and seemed to be doing something with 'response.data["data"]'
   // which hints at an API call. If you're fetching contacts from Firestore users collection,
   // this is a basic example. Adjust as per your actual user data structure.

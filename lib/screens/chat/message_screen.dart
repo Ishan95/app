@@ -21,8 +21,7 @@ class MessageScreen extends StatefulWidget {
 
 class _MessageScreenState extends State<MessageScreen> {
   final TextEditingController _messageController = TextEditingController();
-  ScrollController _scrollController =
-      ScrollController(); // To scroll to the bottom
+  ScrollController _scrollController = ScrollController(); // To scroll to the bottom
 
   // Get current user's UID (you'll need your AuthenticationProvider for this)
   String? _currentUserId; // To be initialized in initState
@@ -31,8 +30,7 @@ class _MessageScreenState extends State<MessageScreen> {
   void initState() {
     super.initState();
     // Fetch current user's ID from your AuthenticationProvider
-    _currentUserId =
-        Provider.of<FiltterProvider>(context, listen: false).firebaseUser?.uid;
+    _currentUserId = Provider.of<FiltterProvider>(context, listen: false).firebaseUser?.uid;
 
     // Listen for new messages and scroll to bottom
     // This is handled by the StreamBuilder and the ScrollController
@@ -50,7 +48,7 @@ class _MessageScreenState extends State<MessageScreen> {
     super.dispose();
   }
 
-  // --- Build individual message item ---
+  //  Build individual message item
   Widget _buildMessageItem(Message message, String currentUserId) {
     bool isCurrentUser = message.senderId == currentUserId;
 
@@ -60,32 +58,25 @@ class _MessageScreenState extends State<MessageScreen> {
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
         margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
         decoration: BoxDecoration(
-          color: isCurrentUser ? Colors.blue.shade600 : Colors.grey.shade700,
+          color: isCurrentUser ? ColorManager.kPrimary : ColorManager.whiteddd,
           borderRadius: BorderRadius.only(
             topLeft: const Radius.circular(16),
             topRight: const Radius.circular(16),
-            bottomLeft:
-                isCurrentUser
-                    ? const Radius.circular(16)
-                    : const Radius.circular(2),
-            bottomRight:
-                isCurrentUser
-                    ? const Radius.circular(2)
-                    : const Radius.circular(16),
+            bottomLeft: isCurrentUser ? const Radius.circular(16) : const Radius.circular(2),
+            bottomRight: isCurrentUser ? const Radius.circular(2) : const Radius.circular(16),
           ),
         ),
         child: Column(
-          crossAxisAlignment:
-              isCurrentUser ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+          crossAxisAlignment: isCurrentUser ? CrossAxisAlignment.end : CrossAxisAlignment.start,
           children: [
             Text(
               message.message,
-              style: context.regular16(color: ColorManager.white),
+              style: context.regular16(color: isCurrentUser ? ColorManager.white : ColorManager.blackMedium),
             ),
             const SizedBox(height: 4),
             Text(
               DateFormat('hh:mm a').format(message.time.toDate()),
-              style: context.regular12(color: ColorManager.white75),
+              style: context.regular12(color: isCurrentUser ? ColorManager.white75 : ColorManager.grayText),
             ),
           ],
         ),
@@ -99,13 +90,9 @@ class _MessageScreenState extends State<MessageScreen> {
     final now = DateTime.now();
     final yesterday = now.subtract(const Duration(days: 1));
 
-    if (date.year == now.year &&
-        date.month == now.month &&
-        date.day == now.day) {
+    if (date.year == now.year && date.month == now.month && date.day == now.day) {
       formattedDate = "Today";
-    } else if (date.year == yesterday.year &&
-        date.month == yesterday.month &&
-        date.day == yesterday.day) {
+    } else if (date.year == yesterday.year && date.month == yesterday.month && date.day == yesterday.day) {
       formattedDate = "Yesterday";
     } else {
       formattedDate = DateFormat('MMMM d, yyyy').format(date);
@@ -116,14 +103,8 @@ class _MessageScreenState extends State<MessageScreen> {
       child: Center(
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-          decoration: BoxDecoration(
-            color: Colors.grey.shade800,
-            borderRadius: BorderRadius.circular(12),
-          ),
-          child: Text(
-            formattedDate,
-            style: context.regular12(color: ColorManager.white),
-          ),
+          decoration: BoxDecoration(color: ColorManager.kPrimaryBlack, borderRadius: BorderRadius.circular(12)),
+          child: Text(formattedDate, style: context.regular12(color: ColorManager.grayText)),
         ),
       ),
     );
@@ -131,29 +112,34 @@ class _MessageScreenState extends State<MessageScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final ChatProvider chatProvider = Provider.of<ChatProvider>(
-      context,
-      listen: false,
-    );
+    final ChatProvider chatProvider = Provider.of<ChatProvider>(context, listen: false);
     final accProvider = Provider.of<AccountProvider>(context, listen: false);
     // Ensure we have both current user and contact to chat
     if (_currentUserId == null || widget.contact == null) {
       return Scaffold(
-        appBar: AppBar(title: const Text('Error')),
-        body: const Center(
-          child: Text('Cannot load chat. Missing user ID or contact.'),
+        appBar: AppBar(
+          title: Text('Error', style: TextStyle(color: ColorManager.blackMedium)),
+          backgroundColor: ColorManager.white,
+          iconTheme: IconThemeData(color: ColorManager.blackMedium),
+        ),
+        body: Center(
+          child: Text(
+            'Cannot load chat. Missing user ID or contact.',
+            style: TextStyle(color: ColorManager.blackMedium),
+          ),
         ),
       );
     }
 
     return Scaffold(
-      backgroundColor: ColorManager.black,
+      backgroundColor: ColorManager.white,
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(100),
         child: AppBar(
-          backgroundColor: ColorManager.black,
+          backgroundColor: ColorManager.white,
+          elevation: 0.5,
           leading: IconButton(
-            icon: Icon(Icons.arrow_back, color: ColorManager.white),
+            icon: Icon(Icons.arrow_back, color: ColorManager.blackMedium),
             onPressed: () => Navigator.pop(context),
           ),
           centerTitle: true,
@@ -166,26 +152,19 @@ class _MessageScreenState extends State<MessageScreen> {
                   // Use widget.contact?.profileImage if available, else a placeholder
                   // backgroundImage: widget.contact?.profileImage != null && widget.contact!.profileImage!.isNotEmpty
                   //     ? NetworkImage(widget.contact!.profileImage!) : const AssetImage('assets/images/default_user.png'),
-                  backgroundColor: ColorManager.blue, // Placeholder background
+                  backgroundColor: ColorManager.kPrimary,
                   child:
                       widget.contact?.name?.isNotEmpty == true
                           ? Text(
                             "${widget.contact!.name?[0].toUpperCase()}",
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 24,
-                            ),
+                            style: const TextStyle(color: Colors.white, fontSize: 24),
                           )
                           : const Icon(Icons.person, color: Colors.white),
                 ),
                 const SizedBox(height: 6),
                 Text(
                   widget.contact?.name ?? "Unknown User",
-                  style: TextStyle(
-                    color: ColorManager.white,
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                  ),
+                  style: TextStyle(color: ColorManager.blackMedium, fontSize: 18, fontWeight: FontWeight.bold),
                 ),
               ],
             ),
@@ -196,28 +175,14 @@ class _MessageScreenState extends State<MessageScreen> {
         children: [
           Expanded(
             child: StreamBuilder<List<Message>>(
-              stream: chatProvider.getMessages(
-                _currentUserId!,
-                widget.contact!.id,
-              ),
+              stream: chatProvider.getMessages(_currentUserId!, widget.contact!.id),
               builder: (context, snapshot) {
                 if (snapshot.hasError) {
-                  return Center(
-                    child: Text(
-                      "Error: ${snapshot.error}",
-                      style: TextStyle(color: ColorManager.red),
-                    ),
-                  );
-                } else if (snapshot.connectionState ==
-                    ConnectionState.waiting) {
+                  return Center(child: Text("Error: ${snapshot.error}", style: TextStyle(color: ColorManager.red)));
+                } else if (snapshot.connectionState == ConnectionState.waiting) {
                   return const Center(child: CircularProgressIndicator());
                 } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                  return Center(
-                    child: Text(
-                      "Say hello!",
-                      style: TextStyle(color: ColorManager.white10),
-                    ),
-                  );
+                  return Center(child: Text("Say hello!", style: TextStyle(color: ColorManager.grayText)));
                 }
 
                 // If data exists, display messages
@@ -253,8 +218,7 @@ class _MessageScreenState extends State<MessageScreen> {
                     }
                     return Column(
                       children: [
-                        if (showDateHeader)
-                          _buildDateHeader(message.time.toDate()),
+                        if (showDateHeader) _buildDateHeader(message.time.toDate()),
                         _buildMessageItem(message, _currentUserId!),
                       ],
                     );
@@ -266,46 +230,40 @@ class _MessageScreenState extends State<MessageScreen> {
           SafeArea(
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-              color: ColorManager.black,
+              color: ColorManager.white,
               child: Row(
-      children: [
-        Expanded(
-          child: Container(
-            decoration: BoxDecoration(
-              color: ColorManager.gray, // Slightly lighter than background
-              borderRadius: BorderRadius.circular(25),
-            ),
-            child: TextField(
-              controller: _messageController,
-              style: TextStyle(color: ColorManager.black),
-              autocorrect: false, 
-              enableSuggestions: false,
-              keyboardType: TextInputType.multiline,
-              maxLines: null, // Allows the box to expand as the user types
-              decoration: InputDecoration(
-                hintText: 'Message...',
-                hintStyle: TextStyle(color: ColorManager.black),
-                contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                border: InputBorder.none,
+                children: [
+                  Expanded(
+                    child: Container(
+                      decoration: BoxDecoration(color: ColorManager.whiteddd, borderRadius: BorderRadius.circular(25)),
+                      child: TextField(
+                        controller: _messageController,
+                        style: TextStyle(color: ColorManager.blackMedium),
+                        autocorrect: false,
+                        enableSuggestions: false,
+                        keyboardType: TextInputType.multiline,
+                        maxLines: null, // Allows the box to expand as the user types
+                        decoration: InputDecoration(
+                          hintText: 'Message...',
+                          hintStyle: TextStyle(color: ColorManager.grayText),
+                          contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                          border: InputBorder.none,
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  // Round Send Button
+                  GestureDetector(
+                    onTap: () => _sendMessage(chatProvider: chatProvider, accProvider: accProvider),
+                    child: CircleAvatar(
+                      radius: 22,
+                      backgroundColor: ColorManager.kPrimary,
+                      child: Icon(Icons.send, color: ColorManager.white, size: 20),
+                    ),
+                  ),
+                ],
               ),
-            ),
-          ),
-        ),
-        const SizedBox(width: 8),
-        // Round Send Button
-        GestureDetector(
-          onTap: () => _sendMessage(
-            chatProvider: chatProvider,
-            accProvider: accProvider,
-          ),
-          child: CircleAvatar(
-            radius: 22,
-            backgroundColor: ColorManager.blue, // Use your primary action color
-            child: Icon(Icons.send, color: ColorManager.white, size: 20),
-          ),
-        ),
-      ],
-    ),
               // child: Column(
               //   mainAxisSize: MainAxisSize.min,
               //   children: [
@@ -364,10 +322,7 @@ class _MessageScreenState extends State<MessageScreen> {
     );
   }
 
-  void _sendMessage({
-    required ChatProvider chatProvider,
-    required AccountProvider accProvider,
-  }) {
+  void _sendMessage({required ChatProvider chatProvider, required AccountProvider accProvider}) {
     print("Sending ID: ${_currentUserId}");
     print("Contact ID: ${widget.contact?.id}");
     print("Message: ${_messageController.text.trim()}");

@@ -11,8 +11,7 @@ class NotificationScreen extends StatefulWidget {
   State<NotificationScreen> createState() => _NotificationScreenState();
 }
 
-class _NotificationScreenState extends State<NotificationScreen>
-    with TickerProviderStateMixin {
+class _NotificationScreenState extends State<NotificationScreen> with TickerProviderStateMixin {
   TabController? _tabController;
   int selectIndex = 0;
 
@@ -47,84 +46,56 @@ class _NotificationScreenState extends State<NotificationScreen>
           //   );
           // }
           return Column(
-        children: [
-          SizedBox(
-            height: context.verticalSize(40),
-          ),
-          Center(
-            child: Text(
-              "Notifications",
-              style: context.semiBold20(color: Colors.white),
-            ),
-          ),
-          SizedBox(
-            height: context.verticalSize(20),
-          ),
-          Padding(
-            padding: context.padding(horizontal: 24, vertical: 16),
-            child: Container(
-              height: context.verticalSize(50),
-              decoration: BoxDecoration(
-                  color: ColorManager.white10,
-                  borderRadius: BorderRadius.circular(25.0)),
-              child: TabBar(
-                onTap: (value) => setState(() {}),
-                controller: _tabController,
-                labelColor: ColorManager.black,
-                labelStyle: context.bold12(color: ColorManager.black),
-                labelPadding: EdgeInsets.zero,
-                indicatorSize: TabBarIndicatorSize.tab,
-                dividerColor: Colors.transparent,
-                indicatorColor: ColorManager.white,
-                indicator: BoxDecoration(
-                    gradient: LinearGradient(
-                      colors: ColorManager.gradientButtons2,
-                      begin: const Alignment(1.00, -0.00),
-                      end: const Alignment(-1, 0),
+            children: [
+              SizedBox(height: context.verticalSize(40)),
+              Center(child: Text("Notifications", style: context.semiBold20(color: ColorManager.blackMedium))),
+              SizedBox(height: context.verticalSize(20)),
+              Padding(
+                padding: context.padding(horizontal: 24, vertical: 16),
+                child: Container(
+                  height: context.verticalSize(50),
+                  decoration: BoxDecoration(color: ColorManager.white10, borderRadius: BorderRadius.circular(25.0)),
+                  child: TabBar(
+                    onTap: (value) => setState(() {}),
+                    controller: _tabController,
+                    labelColor: ColorManager.white,
+                    labelStyle: context.bold12(color: ColorManager.black),
+                    labelPadding: EdgeInsets.zero,
+                    indicatorSize: TabBarIndicatorSize.tab,
+                    dividerColor: Colors.transparent,
+                    indicatorColor: ColorManager.kPrimary,
+                    indicator: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: ColorManager.gradientButtons2,
+                        begin: const Alignment(1.00, -0.00),
+                        end: const Alignment(-1, 0),
+                      ),
+                      borderRadius: BorderRadius.circular(40.0),
                     ),
-                    borderRadius: BorderRadius.circular(40.0)),
-                unselectedLabelColor: ColorManager.disabledText,
-                tabs: const [
-                  Tab(
-                    text: "New",
+                    unselectedLabelColor: ColorManager.disabledText,
+                    tabs: const [Tab(text: "New"), Tab(text: "Read")],
                   ),
-                  Tab(
-                    text: "Read",
-                  ),
-                ],
+                ),
               ),
-            ),
-          ),
-          SizedBox(
-            height: context.verticalSize(10),
-          ),
-          _tabController!.index == 0
-              ? Padding(
-                  padding: context.padding(horizontal: 24),
-                  // child: 
-                )
-              : SizedBox.shrink(),
-          SizedBox(
-            height: context.verticalSize(10),
-          ),
-          Expanded(
-            child: Padding(
-              padding: context.padding(horizontal: 15),
-              child: TabBarView(
-                controller: _tabController,
-                children: const [
-                  TabView(index: 1),
-                  TabView(index: 2),
-                ],
+              SizedBox(height: context.verticalSize(10)),
+              _tabController!.index == 0
+                  ? Padding(
+                    padding: context.padding(horizontal: 24),
+                    // child:
+                  )
+                  : SizedBox.shrink(),
+              SizedBox(height: context.verticalSize(10)),
+              Expanded(
+                child: Padding(
+                  padding: context.padding(horizontal: 15),
+                  child: TabBarView(controller: _tabController, children: const [TabView(index: 1), TabView(index: 2)]),
+                ),
               ),
-            ),
-          ),
-          SizedBox(
-            height: context.verticalSize(50),
-          ),
-        ],
-      );
-        })
+              SizedBox(height: context.verticalSize(50)),
+            ],
+          );
+        },
+      ),
     );
   }
 }

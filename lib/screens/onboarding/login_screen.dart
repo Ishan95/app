@@ -26,49 +26,46 @@ class _LoginScreenState extends State<LoginScreen> {
   String? passwordError;
 
   String? emailError;
-    
+
   Future<void> contactWhatsApp(String phone, String message) async {
-  // Ensure the phone number is in E.164 format
-  if (!phone.startsWith('+')) {
-    phone = '+$phone'; // Add '+' if missing
-  }
-
-  // Encode the message
-  final encodedMessage = Uri.encodeComponent(message);
-
-  // Create WhatsApp URLs
-  // final uriApp = Uri.parse("whatsapp://send?phone=$phone&text=$encodedMessage");
-  final uriApp = Uri.parse("https://api.whatsapp.com/send?phone=$phone&text=$encodedMessage");
-  final uriWeb = Uri.parse("https://wa.me/$phone?text=$encodedMessage");
-
-  try {
-    // 1. Try opening the WhatsApp app
-    if (await canLaunchUrl(uriApp)) {
-      print('$uriApp');
-      await launchUrl(uriApp, mode: LaunchMode.externalApplication);
-      return;
+    // Ensure the phone number is in E.164 format
+    if (!phone.startsWith('+')) {
+      phone = '+$phone'; // Add '+' if missing
     }
 
-    // 2. Fallback to WhatsApp Web
-    if (await canLaunchUrl(uriWeb)) {
-      print('$uriWeb');
-      await launchUrl(uriWeb, mode: LaunchMode.platformDefault); // For iOS
-      return;
-    }
+    // Encode the message
+    final encodedMessage = Uri.encodeComponent(message);
 
-    // 3. If both fail, print an error
-    print("WhatsApp not available");
-  } catch (e) {
-    print("Error launching WhatsApp: $e");
+    // Create WhatsApp URLs
+    // final uriApp = Uri.parse("whatsapp://send?phone=$phone&text=$encodedMessage");
+    final uriApp = Uri.parse("https://api.whatsapp.com/send?phone=$phone&text=$encodedMessage");
+    final uriWeb = Uri.parse("https://wa.me/$phone?text=$encodedMessage");
+
+    try {
+      // 1. Try opening the WhatsApp app
+      if (await canLaunchUrl(uriApp)) {
+        print('$uriApp');
+        await launchUrl(uriApp, mode: LaunchMode.externalApplication);
+        return;
+      }
+
+      // 2. Fallback to WhatsApp Web
+      if (await canLaunchUrl(uriWeb)) {
+        print('$uriWeb');
+        await launchUrl(uriWeb, mode: LaunchMode.platformDefault); // For iOS
+        return;
+      }
+
+      // 3. If both fail, print an error
+      print("WhatsApp not available");
+    } catch (e) {
+      print("Error launching WhatsApp: $e");
+    }
   }
-}
 
   @override
   Widget build(BuildContext context) {
-    final authProvider = Provider.of<AuthenticationProvider>(
-      context,
-      listen: false,
-    );
+    final authProvider = Provider.of<AuthenticationProvider>(context, listen: false);
     return Scaffold(
       resizeToAvoidBottomInset: false,
       backgroundColor: ColorManager.kPrimaryBlack,
@@ -84,28 +81,15 @@ class _LoginScreenState extends State<LoginScreen> {
                 children: [
                   Align(
                     alignment: Alignment.center,
-                    child: Text(
-                      "Welcome",
-                      style: context.semiBold20(
-                        color: ColorManager.white,
-                        fontSize: 30,
-                      ),
-                    ),
+                    child: Text("Welcome", style: context.semiBold20(color: ColorManager.blackMedium, fontSize: 30)),
                   ),
                   SizedBox(height: context.verticalSize(6)),
                   Align(
                     alignment: Alignment.center,
-                    child: Text(
-                      "Log in to your account below",
-                      style: context.regular14(color: ColorManager.white),
-                    ),
+                    child: Text("Log in to your account below", style: context.regular14(color: ColorManager.grayText)),
                   ),
                   SizedBox(height: context.verticalSize(90)),
-                  Text(
-                    'Email',
-                    textAlign: TextAlign.left,
-                    style: context.semiBold14(color: ColorManager.grayText),
-                  ),
+                  Text('Email', textAlign: TextAlign.left, style: context.semiBold14(color: ColorManager.grayText)),
                   SizedBox(height: context.verticalSize(6)),
                   CustomTextField(
                     radius: 30,
@@ -119,9 +103,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           emailError = "Email is required";
                         });
                         return '';
-                      } else if (!RegExp(
-                        r'^[^@]+@[^@]+\.[^@]+',
-                      ).hasMatch(value!)) {
+                      } else if (!RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(value!)) {
                         setState(() {
                           emailError = "Enter a valid email address";
                         });
@@ -135,11 +117,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     errorMessage: emailError,
                   ),
                   SizedBox(height: context.verticalSize(2)),
-                  Text(
-                    "Password",
-                    textAlign: TextAlign.left,
-                    style: context.semiBold14(color: ColorManager.grayText),
-                  ),
+                  Text("Password", textAlign: TextAlign.left, style: context.semiBold14(color: ColorManager.grayText)),
                   SizedBox(height: context.verticalSize(6)),
                   CustomTextField(
                     radius: 30,
@@ -163,10 +141,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     },
                     errorMessage: passwordError,
                     suffixIcon: IconButton(
-                      icon: Icon(
-                        _obscureText ? Icons.visibility_off : Icons.visibility,
-                        color: Colors.grey,
-                      ),
+                      icon: Icon(_obscureText ? Icons.visibility_off : Icons.visibility, color: Colors.grey),
                       onPressed: () {
                         setState(() {
                           _obscureText = !_obscureText;
@@ -180,9 +155,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       Navigator.push(
                         context,
                         MaterialPageRoute<void>(
-                          builder:
-                              (BuildContext context) =>
-                                  const GetDetailsScreen(isSignupEmail: true),
+                          builder: (BuildContext context) => const GetDetailsScreen(isSignupEmail: true),
                         ),
                       );
                     },
@@ -191,39 +164,32 @@ class _LoginScreenState extends State<LoginScreen> {
                         children: [
                           TextSpan(
                             text: "Don\'t have an account?    ",
-                            style: context.regular12(
-                              color: ColorManager.grayText,
-                            ),
+                            style: context.regular12(color: ColorManager.grayText),
                           ),
-                          TextSpan(
-                            text: "Create a new account",
-                            style: context.bold12(color: ColorManager.white),
-                          ),
+                          TextSpan(text: "Create a new account", style: context.bold12(color: ColorManager.kPrimary)),
                         ],
                       ),
                     ),
                   ),
                   SizedBox(height: context.verticalSize(10)),
-                  auth.currentDeviceID != "" ? Row(
-                    children: [
-                      GestureDetector(
-                          child: Icon(
-                            _obscureDeviceID ? Icons.visibility_off : Icons.visibility,
-                            color: Colors.grey,
+                  auth.currentDeviceID != ""
+                      ? Row(
+                        children: [
+                          GestureDetector(
+                            child: Icon(_obscureDeviceID ? Icons.visibility_off : Icons.visibility, color: Colors.grey),
+                            onTap: () {
+                              setState(() {
+                                _obscureDeviceID = !_obscureDeviceID;
+                              });
+                            },
                           ),
-                          onTap: () {
-                            setState(() {
-                              _obscureDeviceID = !_obscureDeviceID;
-                            });
-                          },
-                        ),
-                  SizedBox(width: context.horizontalSize(10)),
-                        !_obscureDeviceID ? Text(
-                      auth.currentDeviceID,
-                      style: context.regular14(color: ColorManager.white),
-                    ) : SizedBox.shrink(),
-                    ],
-                  ) : SizedBox.shrink(),
+                          SizedBox(width: context.horizontalSize(10)),
+                          !_obscureDeviceID
+                              ? Text(auth.currentDeviceID, style: context.regular14(color: ColorManager.blackMedium))
+                              : SizedBox.shrink(),
+                        ],
+                      )
+                      : SizedBox.shrink(),
                   SizedBox(height: context.verticalSize(100)),
                   CenterTextIconButton(
                     onPress: () async {
@@ -237,17 +203,12 @@ class _LoginScreenState extends State<LoginScreen> {
                       if (authProvider.user != null && success) {
                         Navigator.pushAndRemoveUntil(
                           context,
-                          MaterialPageRoute<void>(
-                            builder: (BuildContext context) => Home(index: 0),
-                          ),
+                          MaterialPageRoute<void>(builder: (BuildContext context) => Home(index: 0)),
                           (route) => false,
                         );
                       } else {
                         if (mounted) {
-                          toastErrorMessage(
-                            auth.errorMessage ??
-                                'Login failed. Please try again.',
-                          );
+                          toastErrorMessage(auth.errorMessage ?? 'Login failed. Please try again.');
                         }
                       }
                     },
@@ -259,24 +220,16 @@ class _LoginScreenState extends State<LoginScreen> {
                   Center(
                     child: GestureDetector(
                       onTap: () {
-                        contactWhatsApp(
-                          "94713905383",
-                          "Hello, I need assistance with my account.",
-                        );
+                        contactWhatsApp("94713905383", "Hello, I need assistance with my account.");
                       },
                       child: RichText(
                         text: TextSpan(
                           children: [
                             TextSpan(
                               text: "Can't Log In or Create an Account?    ",
-                              style: context.regular12(
-                                color: ColorManager.grayText,
-                              ),
+                              style: context.regular12(color: ColorManager.grayText),
                             ),
-                            TextSpan(
-                              text: "Need Help?",
-                              style: context.bold12(color: ColorManager.white),
-                            ),
+                            TextSpan(text: "Need Help?", style: context.bold12(color: ColorManager.kPrimary)),
                           ],
                         ),
                       ),

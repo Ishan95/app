@@ -5,28 +5,23 @@ import 'package:app/app/export.dart';
 class PhotoPreview extends StatelessWidget {
   final String imagePath;
   final bool isOnboard;
-  
+
   const PhotoPreview({super.key, required this.imagePath, this.isOnboard = false});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: ColorManager.kPrimaryBlack,
+      backgroundColor: ColorManager.white,
       appBar: AppBar(
-        backgroundColor: ColorManager.kPrimaryBlack,
-        title: Text(
-          'Take a photo',
-          style: context.semiBold20(color: ColorManager.white),
-        ),
+        backgroundColor: ColorManager.white,
+        elevation: 0.5,
+        title: Text('Take a photo', style: context.semiBold20(color: ColorManager.blackMedium)),
         centerTitle: true,
         leading: IconButton(
           onPressed: () {
             Navigator.of(context).pop();
           },
-          icon: Icon(
-            Icons.arrow_back,
-            color: ColorManager.white,
-          ),
+          icon: Icon(Icons.arrow_back, color: ColorManager.blackMedium),
         ),
       ),
       body: Column(
@@ -57,23 +52,17 @@ class PhotoPreview extends StatelessWidget {
                     // width: 88, // Set width
                     height: 40, // Set height
                     child: ElevatedButton.icon(
-                      onPressed: () =>
-                          Navigator.pop(context), // Redo button action
-                      icon: const Icon(Icons.refresh,
-                          color: Colors.black, size: 20), // Adjust icon size
+                      onPressed: () => Navigator.pop(context), // Redo button action
+                      icon: const Icon(Icons.refresh, color: Colors.white, size: 20),
                       label: const Text(
                         "Redo",
-                        style: TextStyle(
-                            color: Colors.black,
-                            fontSize: 16), // Adjust text size
+                        style: TextStyle(color: Colors.white, fontSize: 16), // Adjust text size
                       ),
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: ColorManager.kPrimaryWarm,
+                        backgroundColor: ColorManager.kPrimary,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(30),
-                          side: BorderSide(
-                              color: ColorManager.kPrimaryBlack,
-                              width: 7), // **Black Border**
+                          side: BorderSide(color: ColorManager.white, width: 4),
                         ),
                       ),
                     ),
@@ -81,16 +70,18 @@ class PhotoPreview extends StatelessWidget {
                 ),
 
                 /// **Instruction Text**
-                isOnboard ? const SizedBox() : Positioned(
-                  bottom: 90, // Adjusted for better placement
-                  left: 15,
-                  right: 15,
-                  child: Text(
-                    "Before submitting your request, please make \nsure that the photo shows the charging station in its entirety",
-                    textAlign: TextAlign.center,
-                    style: context.medium16(color: ColorManager.white),
-                  ),
-                ),
+                isOnboard
+                    ? const SizedBox()
+                    : Positioned(
+                      bottom: 90, // Adjusted for better placement
+                      left: 15,
+                      right: 15,
+                      child: Text(
+                        "Before submitting your request, please make \nsure that the photo shows the charging station in its entirety",
+                        textAlign: TextAlign.center,
+                        style: context.medium16(color: ColorManager.blackMedium),
+                      ),
+                    ),
               ],
             ),
           ),

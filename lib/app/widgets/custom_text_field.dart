@@ -4,29 +4,30 @@ import 'package:flutter/services.dart';
 import '../export.dart';
 
 class CustomTextField extends StatelessWidget {
-  const CustomTextField(
-      {super.key,
-      required this.controller,
-      required this.validator,
-      this.obscure,
-      this.inputType,
-      this.width,
-      this.radius,
-      this.context,
-      this.hintText,
-      this.hintTextStyle,
-      this.errorMessage,
-      this.interactiveSelection,
-      this.emailBgColor,
-      this.isEmailBgColor = false,
-      this.txtColor = Colors.white,
-      this.height = 40,
-      this.onChanged,
-      this.numberMaxLength,
-      this.inputFormatters,
-      this.suffixIcon,
-      this.enabled = true,
-      this.minLine = 1});
+  const CustomTextField({
+    super.key,
+    required this.controller,
+    required this.validator,
+    this.obscure,
+    this.inputType,
+    this.width,
+    this.radius,
+    this.context,
+    this.hintText,
+    this.hintTextStyle,
+    this.errorMessage,
+    this.interactiveSelection,
+    this.emailBgColor,
+    this.isEmailBgColor = false,
+    this.txtColor,
+    this.height = 40,
+    this.onChanged,
+    this.numberMaxLength,
+    this.inputFormatters,
+    this.suffixIcon,
+    this.enabled = true,
+    this.minLine = 1,
+  });
 
   final bool? obscure;
   final BuildContext? context;
@@ -41,7 +42,7 @@ class CustomTextField extends StatelessWidget {
   final bool? interactiveSelection;
   final bool isEmailBgColor;
   final Color? emailBgColor;
-  final Color txtColor;
+  final Color? txtColor;
   final double height;
   final int? numberMaxLength;
   // final VoidCallback onChanged;
@@ -60,22 +61,11 @@ class CustomTextField extends StatelessWidget {
         Container(
           alignment: Alignment.center,
           // height: context.verticalSize(height),
-          constraints: BoxConstraints(
-            minHeight: context.verticalSize(height),
-          ),
+          constraints: BoxConstraints(minHeight: context.verticalSize(height)),
           decoration: ShapeDecoration(
             color: isEmailBgColor ? emailBgColor : ColorManager.white101,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(radius ?? 10),
-            ),
-            shadows: const [
-              BoxShadow(
-                color: Color(0x19070424),
-                blurRadius: 1,
-                offset: Offset(1, 1),
-                spreadRadius: 0,
-              )
-            ],
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(radius ?? 10)),
+            shadows: const [BoxShadow(color: Color(0x19070424), blurRadius: 1, offset: Offset(1, 1), spreadRadius: 0)],
           ),
           child: TextFormField(
             enabled: enabled,
@@ -88,15 +78,11 @@ class CustomTextField extends StatelessWidget {
             controller: controller,
             textInputAction: TextInputAction.done,
             inputFormatters: inputFormatters,
-            style: context.regular14(
-              color: txtColor,
-            ),
+            style: context.regular14(color: txtColor ?? ColorManager.blackMedium),
             maxLines: minLine,
             // minLines: 1,
             cursorColor: ColorManager.grayText,
-            textAlignVertical: hintText == null
-                ? TextAlignVertical.top
-                : TextAlignVertical.center,
+            textAlignVertical: hintText == null ? TextAlignVertical.top : TextAlignVertical.center,
             decoration: InputDecoration(
               isDense: true,
               // constraints: BoxConstraints(
@@ -104,11 +90,11 @@ class CustomTextField extends StatelessWidget {
               // ),
               // contentPadding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
               constraints: BoxConstraints(
-                minHeight:
-                    context.verticalSize(height), // you can keep this as is
+                minHeight: context.verticalSize(height),
               ),
               hintText: hintText,
-              hintStyle: hintTextStyle ??
+              hintStyle:
+                  hintTextStyle ??
                   TextStyle(
                     fontFamily: FontManager.fontFamily,
                     fontWeight: regular,
@@ -143,19 +129,13 @@ class CustomTextField extends StatelessWidget {
         Align(
           alignment: Alignment.centerLeft,
           child: Padding(
-            padding: EdgeInsets.only(
-              top: errorMessage != null ? 4.0 : 4.0,
-              left: 5.0,
-            ),
+            padding: EdgeInsets.only(top: errorMessage != null ? 4.0 : 4.0, left: 5.0),
             child: Text(
               errorMessage != null ? errorMessage! : '',
-              style: const TextStyle(
-                color: Colors.red,
-                fontSize: 12.0,
-              ),
+              style: const TextStyle(color: Colors.red, fontSize: 12.0),
             ),
           ),
-        )
+        ),
       ],
     );
   }

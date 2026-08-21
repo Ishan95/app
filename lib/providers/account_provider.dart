@@ -45,7 +45,7 @@ class AccountProvider extends ChangeNotifier {
   firebase_auth.User? _firebaseUser;
   firebase_auth.User? get firebaseUser => _firebaseUser;
 
-  // --- Change this type to PersonDetailsModel ---
+  //  Change this type to PersonDetailsModel
   PersonDetailsModel? _appUser;
   PersonDetailsModel? get appUser => _appUser;
 
@@ -61,7 +61,7 @@ class AccountProvider extends ChangeNotifier {
       _errorMessage = null;
 
       if (_firebaseUser != null) {
-        // --- Fetch and set the PersonDetailsModel when auth state changes ---
+        //  Fetch and set the PersonDetailsModel when auth state changes
         await _fetchAndSetPersonDetailsModel(_firebaseUser!.uid);
       } else {
         _appUser = null; // Clear combined profile on logout
@@ -85,7 +85,7 @@ class AccountProvider extends ChangeNotifier {
     await _fetchAndSetPersonDetailsModel(user.uid);
   }
 
-  // --- NEW: Helper to fetch and set the PersonDetailsModel ---
+  //  NEW: Helper to fetch and set the PersonDetailsModel
   Future<void> _fetchAndSetPersonDetailsModel(String uid) async {
     // We need _firebaseUser to be non-null here to construct PersonDetailsModel
     _isLoading = true;
@@ -200,7 +200,7 @@ class AccountProvider extends ChangeNotifier {
     }
   }
 
-  // --- Placeholder for Phone Number Update (more complex due to verification) ---
+  //  Placeholder for Phone Number Update (more complex due to verification)
   Future<void> updatePhoneNumber(String newPhoneNumber) async {
     _isLoading = true;
     _errorMessage = null;

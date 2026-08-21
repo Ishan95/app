@@ -16,8 +16,7 @@ class EditPaymentDetailsScreen extends StatefulWidget {
   const EditPaymentDetailsScreen({super.key});
 
   @override
-  State<EditPaymentDetailsScreen> createState() =>
-      _EditPaymentDetailsScreenState();
+  State<EditPaymentDetailsScreen> createState() => _EditPaymentDetailsScreenState();
 }
 
 class _EditPaymentDetailsScreenState extends State<EditPaymentDetailsScreen> {
@@ -33,9 +32,7 @@ class _EditPaymentDetailsScreenState extends State<EditPaymentDetailsScreen> {
   String? _dateErrorText;
 
   Future<void> _pickImage() async {
-    final pickedFile = await ImagePicker().pickImage(
-      source: ImageSource.gallery,
-    );
+    final pickedFile = await ImagePicker().pickImage(source: ImageSource.gallery);
     if (pickedFile != null) {
       final croppedFile = await ImageCropper().cropImage(
         sourcePath: pickedFile.path,
@@ -68,14 +65,9 @@ class _EditPaymentDetailsScreenState extends State<EditPaymentDetailsScreen> {
       builder:
           (context) => AlertDialog(
             title: const Text('Remove photo?'),
-            content: const Text(
-              'Are you sure you want to remove the uploaded photo?',
-            ),
+            content: const Text('Are you sure you want to remove the uploaded photo?'),
             actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context),
-                child: const Text('Cancel'),
-              ),
+              TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel')),
               TextButton(
                 onPressed: () {
                   setState(() {
@@ -110,17 +102,15 @@ class _EditPaymentDetailsScreenState extends State<EditPaymentDetailsScreen> {
     return Scaffold(
       backgroundColor: ColorManager.kPrimaryBlack,
       appBar: AppBar(
-        backgroundColor: ColorManager.kPrimaryBlack,
-        title: Text(
-          "Edit Payment Information",
-          style: context.semiBold20(color: ColorManager.white),
-        ),
+        backgroundColor: ColorManager.white,
+        elevation: 0.5,
+        title: Text("Edit Payment Information", style: context.semiBold20(color: ColorManager.blackMedium)),
         centerTitle: true,
         leading: GestureDetector(
           onTap: () {
             Navigator.of(context).pop();
           },
-          child: Icon(Icons.arrow_back, color: ColorManager.white),
+          child: Icon(Icons.arrow_back, color: ColorManager.blackMedium),
         ),
       ),
       body: Stack(
@@ -134,12 +124,7 @@ class _EditPaymentDetailsScreenState extends State<EditPaymentDetailsScreen> {
                     return SizedBox(
                       width: MediaQuery.of(context).size.width,
                       height: MediaQuery.of(context).size.height,
-                      child: Center(
-                        child: SpinKitFadingCircle(
-                          color: ColorManager.kPrimary,
-                          size: 40,
-                        ),
-                      ),
+                      child: Center(child: SpinKitFadingCircle(color: ColorManager.kPrimary, size: 40)),
                     );
                   }
                   return Form(
@@ -148,53 +133,42 @@ class _EditPaymentDetailsScreenState extends State<EditPaymentDetailsScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         SizedBox(height: context.verticalSize(20)),
-                        Text(
-                          "Transfer Date",
-                          style: context.semiBold14(color: ColorManager.white),
-                        ),
+                        Text("Transfer Date", style: context.semiBold14(color: ColorManager.blackMedium)),
                         SizedBox(height: context.verticalSize(8)),
                         InkWell(
-                        onTap: () => _selectDate(context),
-                        child: Container(
-                          width: double.infinity,
-                          height: context.verticalSize(40),
-                          decoration: BoxDecoration(
-                            color: ColorManager.white101,
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                          alignment: Alignment.centerLeft,
-                          padding: const EdgeInsets.symmetric(horizontal: 16),
-                          child: Text(
-                            _selectedDate != null
-                                ? '${_selectedDate!.toLocal()}'.split(' ')[0]
-                                : 'Transfer Date',
-                            style: TextStyle(
-                              color: ColorManager.disabledText,
-                              fontSize: context.fontSize(14),
-                              fontWeight: FontWeight.w700,
+                          onTap: () => _selectDate(context),
+                          child: Container(
+                            width: double.infinity,
+                            height: context.verticalSize(40),
+                            decoration: BoxDecoration(
+                              color: ColorManager.whiteddd,
+                              borderRadius: BorderRadius.circular(20),
                             ),
-                          ),
-                        ),
-                      ),
-                      if (_dateErrorText != null)
-                        Align(
-                          alignment: Alignment.centerLeft,
-                          child: Padding(
-                            padding: const EdgeInsets.only(top: 4, left: 8),
+                            alignment: Alignment.centerLeft,
+                            padding: const EdgeInsets.symmetric(horizontal: 16),
                             child: Text(
-                              _dateErrorText!,
+                              _selectedDate != null ? '${_selectedDate!.toLocal()}'.split(' ')[0] : 'Transfer Date',
                               style: TextStyle(
-                                color: Colors.red,
-                                fontSize: context.fontSize(12),
+                                color: _selectedDate != null ? ColorManager.blackMedium : ColorManager.grayText,
+                                fontSize: context.fontSize(14),
+                                fontWeight: FontWeight.w700,
                               ),
                             ),
                           ),
                         ),
+                        if (_dateErrorText != null)
+                          Align(
+                            alignment: Alignment.centerLeft,
+                            child: Padding(
+                              padding: const EdgeInsets.only(top: 4, left: 8),
+                              child: Text(
+                                _dateErrorText!,
+                                style: TextStyle(color: Colors.red, fontSize: context.fontSize(12)),
+                              ),
+                            ),
+                          ),
                         SizedBox(height: context.verticalSize(20)),
-                        Text(
-                          "Ref No",
-                          style: context.semiBold14(color: ColorManager.white),
-                        ),
+                        Text("Ref No", style: context.semiBold14(color: ColorManager.blackMedium)),
                         SizedBox(height: context.verticalSize(8)),
                         CustomTextField(
                           radius: 30,
@@ -216,10 +190,7 @@ class _EditPaymentDetailsScreenState extends State<EditPaymentDetailsScreen> {
                           },
                           errorMessage: refNoError,
                         ),
-                        Text(
-                          "Account Number",
-                          style: context.semiBold14(color: ColorManager.white),
-                        ),
+                        Text("Account Number", style: context.semiBold14(color: ColorManager.blackMedium)),
                         SizedBox(height: context.verticalSize(8)),
                         CustomTextField(
                           radius: 30,
@@ -241,10 +212,7 @@ class _EditPaymentDetailsScreenState extends State<EditPaymentDetailsScreen> {
                           },
                           errorMessage: accountNumberError,
                         ),
-                        Text(
-                          "Sender Name",
-                          style: context.semiBold14(color: ColorManager.white),
-                        ),
+                        Text("Sender Name", style: context.semiBold14(color: ColorManager.blackMedium)),
                         SizedBox(height: context.verticalSize(8)),
                         CustomTextField(
                           radius: 30,
@@ -271,10 +239,7 @@ class _EditPaymentDetailsScreenState extends State<EditPaymentDetailsScreen> {
                           },
                           errorMessage: nameError,
                         ),
-                        Text(
-                          "Amount",
-                          style: context.semiBold14(color: ColorManager.white),
-                        ),
+                        Text("Amount", style: context.semiBold14(color: ColorManager.blackMedium)),
                         SizedBox(height: context.verticalSize(8)),
                         CustomTextField(
                           radius: 30,
@@ -297,10 +262,7 @@ class _EditPaymentDetailsScreenState extends State<EditPaymentDetailsScreen> {
                           errorMessage: amountError,
                         ),
 
-                        Text(
-                          "Service Provider",
-                          style: context.semiBold14(color: ColorManager.white),
-                        ),
+                        Text("Service Provider", style: context.semiBold14(color: ColorManager.blackMedium)),
                         SizedBox(height: context.verticalSize(8)),
                         CustomTextField(
                           radius: 30,
@@ -335,13 +297,10 @@ class _EditPaymentDetailsScreenState extends State<EditPaymentDetailsScreen> {
                                 width: context.screenWidth,
                                 height: context.verticalSize(200),
                                 decoration: BoxDecoration(
-                                  color: Colors.grey[800],
+                                  color: ColorManager.whiteddd,
                                   image:
                                       selectedImage != null
-                                          ? DecorationImage(
-                                            image: FileImage(selectedImage!),
-                                            fit: BoxFit.cover,
-                                          )
+                                          ? DecorationImage(image: FileImage(selectedImage!), fit: BoxFit.cover)
                                           : null,
                                   borderRadius: BorderRadius.circular(12),
                                 ),
@@ -353,32 +312,22 @@ class _EditPaymentDetailsScreenState extends State<EditPaymentDetailsScreen> {
                                   left: context.screenWidth * 0.4,
                                   child: GestureDetector(
                                     onTap: () {
-                                      setState(
-                                        () => _isBottomSheetVisible = true,
-                                      );
+                                      setState(() => _isBottomSheetVisible = true);
                                       ConfirmationAlert.showConfirmationAlert(
                                         context: context,
                                         title: 'Choose photo source',
                                         message: "Camera",
-                                        messageColor:
-                                            ColorManager.kAleartTextColor,
+                                        messageColor: ColorManager.kAleartTextColor,
                                         onTap2: () {
-                                          setState(
-                                            () => _isBottomSheetVisible = false,
-                                          );
+                                          setState(() => _isBottomSheetVisible = false);
                                           Navigator.of(context)
                                               .push(
                                                 MaterialPageRoute(
                                                   builder:
-                                                      (
-                                                        context,
-                                                      ) => CustomCameraNw(
-                                                        onImageSelected: (
-                                                          File image,
-                                                        ) {
+                                                      (context) => CustomCameraNw(
+                                                        onImageSelected: (File image) {
                                                           setState(() {
-                                                            selectedImage =
-                                                                image; // Update parent state
+                                                            selectedImage = image; // Update parent state
                                                           });
                                                         },
                                                       ),
@@ -393,38 +342,24 @@ class _EditPaymentDetailsScreenState extends State<EditPaymentDetailsScreen> {
                                               });
                                         },
                                         actionText: "Select from gallery",
-                                        actionColor:
-                                            ColorManager.kAleartTextColor,
+                                        actionColor: ColorManager.kAleartTextColor,
                                         isCancelVisible: true,
-                                        cancelColor:
-                                            ColorManager.kAleartCancelTextColor,
+                                        cancelColor: ColorManager.kAleartCancelTextColor,
                                         onTap: () {
-                                          setState(
-                                            () => _isBottomSheetVisible = false,
-                                          );
-                                          print(
-                                            '&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&77777778899999',
-                                          );
+                                          setState(() => _isBottomSheetVisible = false);
+                                          print('&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&77777778899999');
                                           _pickImage();
                                         },
                                         cancelOnTap: () {
-                                          setState(
-                                            () => _isBottomSheetVisible = false,
-                                          );
+                                          setState(() => _isBottomSheetVisible = false);
                                           Navigator.pop(context);
                                         },
                                         onDismiss: () {
-                                          setState(
-                                            () => _isBottomSheetVisible = false,
-                                          );
+                                          setState(() => _isBottomSheetVisible = false);
                                         },
                                       );
                                     },
-                                    child: Icon(
-                                      Icons.add_circle,
-                                      size: 28,
-                                      color: ColorManager.gray,
-                                    ),
+                                    child: Icon(Icons.add_circle, size: 28, color: ColorManager.kPrimary),
                                     // SvgPicture.asset(
                                     //   Assets.editProfileAddSVG,
                                     // ),
@@ -437,7 +372,7 @@ class _EditPaymentDetailsScreenState extends State<EditPaymentDetailsScreen> {
                         CenterTextIconButton(
                           onPress: () async {
                             if (informationFormKey.currentState!.validate()) {
-                            print('###########################');
+                              print('###########################');
                               await acc.addPaymentDetails(_selectedDate!.toLocal(), selectedImage);
                             }
                           },
@@ -457,10 +392,7 @@ class _EditPaymentDetailsScreenState extends State<EditPaymentDetailsScreen> {
           if (_isBottomSheetVisible)
             Positioned.fill(
               child: BackdropFilter(
-                filter: ImageFilter.blur(
-                  sigmaX: 5.0,
-                  sigmaY: 5.0,
-                ), // Set blur amount here
+                filter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0),
                 child: Container(
                   color: Colors.black.withOpacity(0.5), // Optional overlay
                 ),

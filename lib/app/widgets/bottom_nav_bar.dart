@@ -12,7 +12,7 @@ class BottomNavBar extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: ColorManager.black.withOpacity(0.91),
+        color: ColorManager.white,
         borderRadius: const BorderRadius.only(
             topLeft: Radius.circular(20), topRight: Radius.circular(20)),
         boxShadow: const [
@@ -40,11 +40,11 @@ class BottomNavBar extends StatelessWidget {
                       behavior: HitTestBehavior.translucent,
                       child: Column(
                         children: [
-                          Icon(Icons.home, color: ColorManager.white),
+                          Icon(Icons.home, color: ColorManager.grayText),
                           SizedBox(height: context.verticalSize(4)),
                           Text(
                             'Home',
-                            style: context.regular12(color: ColorManager.white),
+                            style: context.regular12(color: ColorManager.grayText),
                           ),
                           SizedBox(height: context.verticalSize(4)),
                         ],
@@ -58,11 +58,11 @@ class BottomNavBar extends StatelessWidget {
                       behavior: HitTestBehavior.translucent,
                       child: Column(
                         children: [
-                          Icon(Icons.notifications, color: ColorManager.white),
+                          Icon(Icons.notifications, color: ColorManager.grayText),
                           SizedBox(height: context.verticalSize(4)),
                           Text(
                             'Notifications',
-                            style: context.regular12(color: ColorManager.white),
+                            style: context.regular12(color: ColorManager.grayText),
                           ),
                           SizedBox(height: context.verticalSize(4)),
                         ],
@@ -83,7 +83,7 @@ class BottomNavBar extends StatelessWidget {
                   //         SizedBox(height: context.verticalSize(2)),
                   //         Text(
                   //           'Vehicles',
-                  //           style: context.regular12(color: ColorManager.white),
+                  //           style: context.regular12(color: ColorManager.grayText),
                   //         ),
                   //       ],
                   //     ),
@@ -96,11 +96,11 @@ class BottomNavBar extends StatelessWidget {
                       behavior: HitTestBehavior.translucent,
                       child: Column(
                         children: [
-                          Icon(Icons.chat, color: ColorManager.white),
+                          Icon(Icons.chat, color: ColorManager.grayText),
                           SizedBox(height: context.verticalSize(4)),
                           Text(
                             'Chat',
-                            style: context.regular12(color: ColorManager.white),
+                            style: context.regular12(color: ColorManager.grayText),
                           ),
                           SizedBox(height: context.verticalSize(4)),
                         ],
@@ -114,11 +114,11 @@ class BottomNavBar extends StatelessWidget {
                       behavior: HitTestBehavior.translucent,
                       child: Column(
                         children: [
-                          Icon(Icons.person, color: ColorManager.white),
+                          Icon(Icons.person, color: ColorManager.grayText),
                           SizedBox(height: context.verticalSize(4)),
                           Text(
                             'Account',
-                            style: context.regular12(color: ColorManager.white),
+                            style: context.regular12(color: ColorManager.grayText),
                           ),
                           SizedBox(height: context.verticalSize(4)),
                         ],

@@ -21,8 +21,10 @@ class _PersonNotificationCardState extends State<PersonNotificationCard> {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        border: Border.all(color: ColorManager.white),
+        color: ColorManager.white,
+        border: Border.all(color: ColorManager.lightGray),
         borderRadius: BorderRadius.circular(15.0),
+        boxShadow: const [BoxShadow(color: Color(0x0A000000), blurRadius: 10, offset: Offset(0, 4))],
       ),
       child: Padding(
         padding: const EdgeInsets.all(8.0),
@@ -35,10 +37,9 @@ class _PersonNotificationCardState extends State<PersonNotificationCard> {
                   width: context.horizontalSize(60),
                   height: context.horizontalSize(60),
                   child: ClipOval(
-                    child: Icon(
-                      Icons.person,
-                      size: context.horizontalSize(60),
-                      color: ColorManager.white,
+                    child: Container(
+                      color: ColorManager.whiteddd,
+                      child: Icon(Icons.person, size: context.horizontalSize(40), color: ColorManager.grayText),
                     ),
                   ),
                 ),
@@ -51,12 +52,14 @@ class _PersonNotificationCardState extends State<PersonNotificationCard> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(
-                            (widget.personDetails.firstName?.length ?? 0) > 20 ? '${widget.personDetails.firstName?.substring(0, 20)}...' : "${widget.personDetails.firstName} ${widget.personDetails.lastName}",
-                            style: context.bold16(color: ColorManager.white),
+                            (widget.personDetails.firstName?.length ?? 0) > 20
+                                ? '${widget.personDetails.firstName?.substring(0, 20)}...'
+                                : "${widget.personDetails.firstName} ${widget.personDetails.lastName}",
+                            style: context.bold16(color: ColorManager.blackMedium),
                           ),
                           Text(
                             "${widget.personDetails.district}",
-                            style: context.regular12(color: ColorManager.white),
+                            style: context.regular12(color: ColorManager.grayText),
                           ),
                         ],
                       ),
@@ -64,56 +67,66 @@ class _PersonNotificationCardState extends State<PersonNotificationCard> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Card(
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(20),
-                            ),
-                            color: ColorManager.white10,
+                            elevation: 0,
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                            color: ColorManager.whiteddd,
                             child: Padding(
                               padding: const EdgeInsets.all(8.0),
                               child: Text(
-                                (widget.personDetails.job == "Provincial School Teacher" || widget.personDetails.job == "National School Teacher") ? (widget.personDetails.scheme == "PRIMARY")
+                                (widget.personDetails.job == "Provincial School Teacher" ||
+                                        widget.personDetails.job == "National School Teacher")
+                                    ? (widget.personDetails.scheme == "PRIMARY")
                                         ? "Primary"
-                                        : (widget.personDetails.subject?.length ?? 0) > 35 ? '${widget.personDetails.subject?.substring(0, 35)}...' : widget.personDetails.subject ?? "" : "${widget.personDetails.grade}",
-                                style: context.regular12(
-                                  color: ColorManager.white,
-                                ),
+                                        : (widget.personDetails.subject?.length ?? 0) > 35
+                                        ? '${widget.personDetails.subject?.substring(0, 35)}...'
+                                        : widget.personDetails.subject ?? ""
+                                    : "${widget.personDetails.grade}",
+                                style: context.regular12(color: ColorManager.blackMedium),
                               ),
                             ),
                           ),
                           Card(
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(20),
-                            ),
-                            color: ColorManager.white10,
+                            elevation: 0,
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                            color: ColorManager.whiteddd,
                             child: Padding(
                               padding: const EdgeInsets.all(8.0),
                               child: Text(
-                                (widget.personDetails.job == "Provincial School Teacher" || widget.personDetails.job == "National School Teacher") ? "${widget.personDetails.scheme}" : widget.personDetails.job == "Nurse" ? "${widget.personDetails.institutionTypeForNurse?.toShortInstitutionType()}" : widget.personDetails.job == "Management Assistant" ? "${widget.personDetails.institutionTypeForMA?.toShortInstitutionType()}" : "${widget.personDetails.institutionTypeForMA}",
-                                style: context.regular12(
-                                  color: ColorManager.white,
-                                ),
+                                (widget.personDetails.job == "Provincial School Teacher" ||
+                                        widget.personDetails.job == "National School Teacher")
+                                    ? "${widget.personDetails.scheme}"
+                                    : widget.personDetails.job == "Nurse"
+                                    ? "${widget.personDetails.institutionTypeForNurse?.toShortInstitutionType()}"
+                                    : widget.personDetails.job == "Management Assistant"
+                                    ? "${widget.personDetails.institutionTypeForMA?.toShortInstitutionType()}"
+                                    : "${widget.personDetails.institutionTypeForMA}",
+                                style: context.regular12(color: ColorManager.blackMedium),
                               ),
                             ),
                           ),
                         ],
                       ),
-                      isExpanded ? Text(
-                        "Transaction Requesting for(District) -",
-                        style: context.regular12(color: ColorManager.white),
-                        overflow: TextOverflow.visible,
-                      ) : SizedBox.shrink(),
-                      isExpanded ?
-                      Text(
-                        "  1. ${widget.personDetails.choice1} (1st Choice)",
-                        style: context.semiBold14(color: ColorManager.white),
-                        overflow: TextOverflow.visible,
-                      ) : SizedBox.shrink(),
-                      isExpanded ?
-                      Text(
-                        "  2. ${widget.personDetails.choice2},  ${widget.personDetails.choice3} (2nd & 3rd Choice)",
-                        style: context.regular12(color: ColorManager.white),
-                        overflow: TextOverflow.visible,
-                      ) : SizedBox.shrink(),
+                      isExpanded
+                          ? Text(
+                            "Transaction Requesting for(District) -",
+                            style: context.regular12(color: ColorManager.grayText),
+                            overflow: TextOverflow.visible,
+                          )
+                          : SizedBox.shrink(),
+                      isExpanded
+                          ? Text(
+                            "  1. ${widget.personDetails.choice1} (1st Choice)",
+                            style: context.semiBold14(color: ColorManager.blackMedium),
+                            overflow: TextOverflow.visible,
+                          )
+                          : SizedBox.shrink(),
+                      isExpanded
+                          ? Text(
+                            "  2. ${widget.personDetails.choice2},  ${widget.personDetails.choice3} (2nd & 3rd Choice)",
+                            style: context.regular12(color: ColorManager.blackMedium),
+                            overflow: TextOverflow.visible,
+                          )
+                          : SizedBox.shrink(),
                     ],
                   ),
                 ),
@@ -128,15 +141,13 @@ class _PersonNotificationCardState extends State<PersonNotificationCard> {
                   });
                 },
                 child: CircleAvatar(
-                  backgroundColor: ColorManager.greenPrimary.withOpacity(0.8),
+                  backgroundColor: ColorManager.whiteddd,
                   // radius: 20,
                   radius: 12,
                   child: Icon(
                     // Icons.filter_list,
-                    isExpanded
-                        ? Icons.arrow_drop_up
-                        : Icons.arrow_drop_down_circle,
-                    color: ColorManager.kPrimaryBlack,
+                    isExpanded ? Icons.arrow_drop_up : Icons.arrow_drop_down_circle,
+                    color: ColorManager.kPrimary,
                     size: 22,
                   ),
                 ),
@@ -155,23 +166,28 @@ class _PersonNotificationCardState extends State<PersonNotificationCard> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                               "   ${(widget.personDetails.job == "Provincial School Teacher" || widget.personDetails.job == "National School Teacher") ? "School" : "Office"} :  ",
-                                style: context.semiBold14(
-                                  color: ColorManager.white,
-                                ),
+                                "   ${(widget.personDetails.job == "Provincial School Teacher" || widget.personDetails.job == "National School Teacher") ? "School" : "Office"} :  ",
+                                style: context.semiBold14(color: ColorManager.grayText),
                               ),
                               ImageFiltered(
                                 imageFilter: ImageFilter.blur(
-                                  sigmaX:
-                                      widget.personDetails.isSchoolHide ? 5 : 0,
-                                  sigmaY:
-                                      widget.personDetails.isSchoolHide ? 5 : 0,
+                                  sigmaX: widget.personDetails.isSchoolHide ? 5 : 0,
+                                  sigmaY: widget.personDetails.isSchoolHide ? 5 : 0,
                                 ),
                                 child: Text(
-                                  (widget.personDetails.job == "Provincial School Teacher" || widget.personDetails.job == "National School Teacher") ? (widget.personDetails.school?.length ?? 0) > 25 ? '${widget.personDetails.school?.substring(0, 25)}...' : "${widget.personDetails.school ?? '*****************'}    " : widget.personDetails.job == "Nurse" ? (widget.personDetails.officeForNurse?.length ?? 0) > 25 ? '${widget.personDetails.officeForNurse?.substring(0, 25)}...' : "${widget.personDetails.officeForNurse ?? '*****************'}    " : (widget.personDetails.officeForMA?.length ?? 0) > 25 ? '${widget.personDetails.officeForMA?.substring(0, 25)}...' : "${widget.personDetails.officeForMA ?? '*****************'}    ",
-                                  style: context.semiBold14(
-                                    color: ColorManager.white,
-                                  ),
+                                  (widget.personDetails.job == "Provincial School Teacher" ||
+                                          widget.personDetails.job == "National School Teacher")
+                                      ? (widget.personDetails.school?.length ?? 0) > 25
+                                          ? '${widget.personDetails.school?.substring(0, 25)}...'
+                                          : "${widget.personDetails.school ?? '*****************'}    "
+                                      : widget.personDetails.job == "Nurse"
+                                      ? (widget.personDetails.officeForNurse?.length ?? 0) > 25
+                                          ? '${widget.personDetails.officeForNurse?.substring(0, 25)}...'
+                                          : "${widget.personDetails.officeForNurse ?? '*****************'}    "
+                                      : (widget.personDetails.officeForMA?.length ?? 0) > 25
+                                      ? '${widget.personDetails.officeForMA?.substring(0, 25)}...'
+                                      : "${widget.personDetails.officeForMA ?? '*****************'}    ",
+                                  style: context.semiBold14(color: ColorManager.blackMedium),
                                   overflow: TextOverflow.visible,
                                 ),
                               ),
@@ -188,13 +204,8 @@ class _PersonNotificationCardState extends State<PersonNotificationCard> {
                                     //   ),
                                     // ),
                                     child: InfoButtonWithTooltip(
-                                      tooltipText:
-                                          'This content is hidden. Tap the chat icon to request your details.',
-                                      child: Icon(
-                                        Icons.visibility_off,
-                                        color: ColorManager.white,
-                                        size: 16,
-                                      ),
+                                      tooltipText: 'This content is hidden. Tap the chat icon to request your details.',
+                                      child: Icon(Icons.visibility_off, color: ColorManager.grayText, size: 16),
                                     ),
                                   )
                                   : SizedBox.shrink(),
@@ -204,31 +215,18 @@ class _PersonNotificationCardState extends State<PersonNotificationCard> {
                           Row(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text(
-                                "   Contact :  ",
-                                style: context.semiBold14(
-                                  color: ColorManager.white,
+                              Text("   Contact :  ", style: context.semiBold14(color: ColorManager.grayText)),
+                              ImageFiltered(
+                                imageFilter: ImageFilter.blur(
+                                  sigmaX: widget.personDetails.isPhoneHide ? 5 : 0,
+                                  sigmaY: widget.personDetails.isPhoneHide ? 5 : 0,
+                                ),
+                                child: Text(
+                                  "${widget.personDetails.phone ?? '07********'}    ",
+                                  style: context.semiBold14(color: ColorManager.blackMedium),
+                                  overflow: TextOverflow.visible,
                                 ),
                               ),
-                               ImageFiltered(
-                                  imageFilter: ImageFilter.blur(
-                                    sigmaX:
-                                        widget.personDetails.isPhoneHide
-                                            ? 5
-                                            : 0,
-                                    sigmaY:
-                                        widget.personDetails.isPhoneHide
-                                            ? 5
-                                            : 0,
-                                  ),
-                                  child: Text(
-                                    "${widget.personDetails.phone ?? '07********'}    ",
-                                    style: context.semiBold14(
-                                      color: ColorManager.white,
-                                    ),
-                                    overflow: TextOverflow.visible,
-                                  ),
-                                ),
                               widget.personDetails.isPhoneHide
                                   ? Padding(
                                     padding: const EdgeInsets.only(right: 15.0),
@@ -242,24 +240,21 @@ class _PersonNotificationCardState extends State<PersonNotificationCard> {
                                     //   ),
                                     // ),
                                     child: InfoButtonWithTooltip(
-                                      tooltipText:
-                                          'This content is hidden. Tap the chat icon to request your details.',
-                                      child: Icon(
-                                        Icons.visibility_off,
-                                        color: ColorManager.white,
-                                        size: 16,
-                                      ),
+                                      tooltipText: 'This content is hidden. Tap the chat icon to request your details.',
+                                      child: Icon(Icons.visibility_off, color: ColorManager.grayText, size: 16),
                                     ),
                                   )
                                   : SizedBox.shrink(),
                             ],
                           ),
                           SizedBox(height: context.verticalSize(5)),
-                          Text(
-                            " * ${widget.personDetails.note}",
-                            style: context.regular12(color: ColorManager.white),
-                            overflow: TextOverflow.visible,
-                          ),
+                          widget.personDetails.note != ""
+                              ? Text(
+                                " * ${widget.personDetails.note}",
+                                style: context.regular12(color: ColorManager.grayText),
+                                overflow: TextOverflow.visible,
+                              )
+                              : SizedBox.shrink(),
                         ],
                       ),
                     ),
@@ -268,7 +263,7 @@ class _PersonNotificationCardState extends State<PersonNotificationCard> {
                       behavior: HitTestBehavior.translucent,
                       child: Padding(
                         padding: const EdgeInsets.all(5.0),
-                        child: Icon(Icons.chat, color: ColorManager.white),
+                        child: Icon(Icons.chat, color: ColorManager.kPrimary),
                       ),
                     ),
                   ],

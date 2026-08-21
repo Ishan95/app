@@ -210,7 +210,7 @@ class AuthenticationProvider extends ChangeNotifier {
         );
         _errorMessage = null;
 
-        // --- Populate _appUser with the newly created PersonDetailsModel ---
+        //  Populate _appUser with the newly created PersonDetailsModel
         _appUser = PersonDetailsModel.fromAuthAndFirestore(
           firebaseUser: newUser,
           firestoreData: firestoreData,
@@ -414,7 +414,7 @@ class AuthenticationProvider extends ChangeNotifier {
 
   String currentDeviceID = "";
 
-  // --- LOGIN Function ---
+  //  LOGIN Function
   Future<bool> signIn({required String email, required String password}) async {
     _isLoading = true;
     _errorMessage = null;
@@ -442,7 +442,7 @@ class AuthenticationProvider extends ChangeNotifier {
       print("savedDevice: $savedDevice");
       // _isLoading = false;
 
-      if (savedDevice == null) {
+      if (savedDevice == null || savedDevice == '') {
         // First ever login → register device
         await _firestore.collection('users').doc(uid).update({
           'deviceId': currentDevice,

@@ -34,15 +34,15 @@ class FiltterProvider extends ChangeNotifier {
   List<PersonDetailsModel> _filteredUsersData = []; // Change type
   List<PersonDetailsModel> get filteredUsersData => _filteredUsersData;
 
-  // // --- New: Store all user data ---
+  // //  New: Store all user data
   // List<Map<String, dynamic>> _allUsersData = [];
   // List<Map<String, dynamic>> get allUsersData => _allUsersData;
 
-  // // --- New: Store filtered user data for display ---
+  // //  New: Store filtered user data for display
   // List<Map<String, dynamic>> _filteredUsersData = [];
   // List<Map<String, dynamic>> get filteredUsersData => _filteredUsersData;
 
-  // --- Modified: getAllUserDetails now populates the internal list ---
+  //  Modified: getAllUserDetails now populates the internal list
 
   FiltterProvider() {
     _auth.authStateChanges().listen((firebase_auth.User? user) async {
@@ -50,7 +50,7 @@ class FiltterProvider extends ChangeNotifier {
       _errorMessage = null;
 
       if (_firebaseUser != null) {
-        // --- Fetch and set the PersonDetailsModel when auth state changes ---
+        //  Fetch and set the PersonDetailsModel when auth state changes
         await _fetchAndSetPersonDetailsModel(_firebaseUser!.uid);
       } else {
         _appUser = null; // Clear combined profile on logout
@@ -164,7 +164,7 @@ class FiltterProvider extends ChangeNotifier {
     }
   }
 
-  // --- New: Filtering method ---
+  //  New: Filtering method
   void filterUsers(String query) {
     if (query.isEmpty) {
       _filteredUsersData = List.from(_allUsersData);
