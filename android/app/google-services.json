@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "609068416384",
+    "project_id": "official-mutual-transfer--gov",
+    "storage_bucket": "official-mutual-transfer--gov.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:609068416384:android:e847da6c118db820c91565",
+        "android_client_info": {
+          "package_name": "lk.transfer.multiservice"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB1L5XHXq5slD_HgBOnl8itW5DtpzA-Qbc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
