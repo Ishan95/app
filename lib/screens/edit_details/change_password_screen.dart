@@ -18,32 +18,26 @@ class ChangePasswordScreen extends StatefulWidget {
 
 class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
   final informationFormKey = GlobalKey<FormState>();
-  final TextEditingController currentPasswordController =
-      TextEditingController();
+  final TextEditingController currentPasswordController = TextEditingController();
   final TextEditingController newPasswordController = TextEditingController();
-  final TextEditingController confirmPasswordController =
-      TextEditingController();
+  final TextEditingController confirmPasswordController = TextEditingController();
   String? errorMessage;
   String? errorNewPasswordMessage;
   String? errorConfirmPasswordMessage;
   bool _obscureCurrentPassword = true;
   bool _obscureNewPassword = true;
   bool _obscureTextConfirmPassword = true;
-  final accProvider = Provider.of<AccountProvider>(
-    ContextHelper.navigatorKey.currentContext!,
-    listen: false,
-  );
+  final accProvider = Provider.of<AccountProvider>(ContextHelper.navigatorKey.currentContext!, listen: false);
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: ColorManager.kPrimaryBlack,
       appBar: AppBar(
-        title: Text(
-          'Change Password',
-          style: context.semiBold20(color: ColorManager.white),
-        ),
-        backgroundColor: ColorManager.kPrimaryBlack,
+        title: Text('Change Password', style: context.semiBold20(color: ColorManager.blackMedium)),
+        backgroundColor: ColorManager.white,
+        elevation: 0.5,
+        iconTheme: IconThemeData(color: ColorManager.blackMedium),
       ),
       body: Padding(
         padding: context.padding(horizontal: 24),
@@ -55,10 +49,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
               SizedBox(height: context.verticalSize(20)),
               Align(
                 alignment: Alignment.centerLeft,
-                child: Text(
-                  "Current Password",
-                  style: context.semiBold14(color: ColorManager.grayText),
-                ),
+                child: Text("Current Password", style: context.semiBold14(color: ColorManager.blackMedium)),
               ),
               SizedBox(height: context.verticalSize(4)),
               CustomTextField(
@@ -81,12 +72,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                 },
                 errorMessage: errorMessage,
                 suffixIcon: IconButton(
-                  icon: Icon(
-                    _obscureCurrentPassword
-                        ? Icons.visibility_off
-                        : Icons.visibility,
-                    color: Colors.grey,
-                  ),
+                  icon: Icon(_obscureCurrentPassword ? Icons.visibility_off : Icons.visibility, color: Colors.grey),
                   onPressed: () {
                     setState(() {
                       _obscureCurrentPassword = !_obscureCurrentPassword;
@@ -97,10 +83,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
               SizedBox(height: context.verticalSize(4)),
               Align(
                 alignment: Alignment.centerLeft,
-                child: Text(
-                  "New Password",
-                  style: context.semiBold14(color: ColorManager.grayText),
-                ),
+                child: Text("New Password", style: context.semiBold14(color: ColorManager.blackMedium)),
               ),
               SizedBox(height: context.verticalSize(4)),
               CustomTextField(
@@ -118,33 +101,27 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                   } else if (value.length < 8) {
                     setState(() {
                       errorNewPasswordMessage =
-                          "New Password must be 8+ characters and include a number, uppercase letter, and special character";
+                          "Password must be 8+ characters, include a number, uppercase letter & special character";
                     });
                     return '';
                   } else if (value.length > 64) {
                     setState(() {
-                      errorNewPasswordMessage =
-                          "New Password must be 8–64 characters long";
+                      errorNewPasswordMessage = "New Password must be 8–64 characters long";
                     });
                     return '';
                   } else if (!RegExp(r'^(?=.*[A-Z])').hasMatch(value)) {
                     setState(() {
-                      errorNewPasswordMessage =
-                          "Must include at least one uppercase letter";
+                      errorNewPasswordMessage = "Must include at least one uppercase letter";
                     });
                     return '';
                   } else if (!RegExp(r'^(?=.*\d)').hasMatch(value)) {
                     setState(() {
-                      errorNewPasswordMessage =
-                          "Must include at least one number";
+                      errorNewPasswordMessage = "Must include at least one number";
                     });
                     return '';
-                  } else if (!RegExp(
-                    r'^(?=.*[!@#\$&*~%^()_\-+=<>?])',
-                  ).hasMatch(value)) {
+                  } else if (!RegExp(r'^(?=.*[!@#\$&*~%^()_\-+=<>?])').hasMatch(value)) {
                     setState(() {
-                      errorNewPasswordMessage =
-                          "Must include at least one special character";
+                      errorNewPasswordMessage = "Must include at least one special character";
                     });
                     return '';
                   }
@@ -155,12 +132,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                 },
                 errorMessage: errorNewPasswordMessage,
                 suffixIcon: IconButton(
-                  icon: Icon(
-                    _obscureNewPassword
-                        ? Icons.visibility_off
-                        : Icons.visibility,
-                    color: Colors.grey,
-                  ),
+                  icon: Icon(_obscureNewPassword ? Icons.visibility_off : Icons.visibility, color: Colors.grey),
                   onPressed: () {
                     setState(() {
                       _obscureNewPassword = !_obscureNewPassword;
@@ -171,10 +143,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
               SizedBox(height: context.verticalSize(10)),
               Align(
                 alignment: Alignment.centerLeft,
-                child: Text(
-                  "Confirm Password",
-                  style: context.semiBold14(color: ColorManager.grayText),
-                ),
+                child: Text("Confirm Password", style: context.semiBold14(color: ColorManager.blackMedium)),
               ),
               SizedBox(height: context.verticalSize(4)),
               CustomTextField(
@@ -186,8 +155,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                 validator: (value) {
                   if (confirmPasswordController.text.isEmpty) {
                     setState(() {
-                      errorConfirmPasswordMessage =
-                          "Confirm Password is required";
+                      errorConfirmPasswordMessage = "Confirm Password is required";
                     });
                     return '';
                   } else if (value != newPasswordController.text) {
@@ -203,16 +171,10 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                 },
                 errorMessage: errorConfirmPasswordMessage,
                 suffixIcon: IconButton(
-                  icon: Icon(
-                    _obscureTextConfirmPassword
-                        ? Icons.visibility_off
-                        : Icons.visibility,
-                    color: Colors.grey,
-                  ),
+                  icon: Icon(_obscureTextConfirmPassword ? Icons.visibility_off : Icons.visibility, color: Colors.grey),
                   onPressed: () {
                     setState(() {
-                      _obscureTextConfirmPassword =
-                          !_obscureTextConfirmPassword;
+                      _obscureTextConfirmPassword = !_obscureTextConfirmPassword;
                     });
                   },
                 ),
@@ -224,10 +186,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                   final newPassword = newPasswordController.text.trim();
                   if (informationFormKey.currentState!.validate()) {
                     try {
-                      await accProvider.changePassword(
-                        currentPassword: currentPassword,
-                        newPassword: newPassword,
-                      );
+                      await accProvider.changePassword(currentPassword: currentPassword, newPassword: newPassword);
                       Navigator.pop(context);
                       toastSuccessMessage('Password changed successfully.');
                     } catch (e) {

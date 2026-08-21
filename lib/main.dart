@@ -1,4 +1,3 @@
-// ignore: unused_import
 import 'dart:io';
 import 'package:app/app/utils/color_manager.dart';
 import 'package:app/app/utils/context_helper.dart';
@@ -9,7 +8,6 @@ import 'package:app/providers/auth_provider.dart';
 import 'package:app/providers/chat_provider.dart';
 import 'package:app/providers/filtter_provider.dart';
 import 'package:app/providers/service_providers/firebase_service.dart';
-import 'package:app/screens/edit_details/edit_details_screen.dart';
 import 'package:app/screens/home/home.dart';
 import 'package:app/screens/onboarding/splash_screen.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -21,8 +19,7 @@ import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 
 RemoteMessage? _initialMessage;
 
-final RouteObserver<ModalRoute<void>> routeObserver =
-    RouteObserver<ModalRoute<void>>();
+final RouteObserver<ModalRoute<void>> routeObserver = RouteObserver<ModalRoute<void>>();
 
 @pragma('vm:entry-point')
 Future<void> handleBackgroundMessage(RemoteMessage remoteMessage) async {
@@ -39,18 +36,16 @@ void main() async {
 
   FirebaseService.getFcmToken();
   FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterFatalError;
-  
+
   HttpOverrides.global = MyHttpOverrides();
 
   SystemChrome.setSystemUIOverlayStyle(
     SystemUiOverlayStyle(
-      systemNavigationBarColor: ColorManager.kLightGreen,
-      systemNavigationBarIconBrightness: Brightness.light,
+      systemNavigationBarColor: ColorManager.white,
+      systemNavigationBarIconBrightness: Brightness.dark,
     ),
   );
-  SystemChrome.setPreferredOrientations([
-    DeviceOrientation.portraitUp,
-  ]).then(
+  SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]).then(
     (value) => runApp(
       MultiProvider(
         providers: [
@@ -81,9 +76,7 @@ class _MyAppState extends State<MyApp> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (_initialMessage != null) {
         ContextHelper.navigatorKey.currentState?.pushAndRemoveUntil(
-          MaterialPageRoute(
-            builder: (_) => const Home(index: 1),
-          ),
+          MaterialPageRoute(builder: (_) => const Home(index: 1)),
           (route) => false,
         );
         _initialMessage = null;
@@ -93,37 +86,31 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
-    return LayoutBuilder(builder: (context, constraints) {
-
-      return MaterialApp(
-        navigatorObservers: [routeObserver],
-        debugShowCheckedModeBanner: false,
-        navigatorKey: ContextHelper.navigatorKey,
-        scrollBehavior: const MyScrollBehavior(),
-        title: 'App',
-        theme: ThemeData(
-          colorScheme: ColorScheme.fromSeed(
-            seedColor: ColorManager.kPrimaryBlack,
-            primary: ColorManager.kPrimaryBlack,
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        return MaterialApp(
+          navigatorObservers: [routeObserver],
+          debugShowCheckedModeBanner: false,
+          navigatorKey: ContextHelper.navigatorKey,
+          scrollBehavior: const MyScrollBehavior(),
+          title: 'App',
+          theme: ThemeData(
+            colorScheme: ColorScheme.fromSeed(seedColor: ColorManager.kPrimary, primary: ColorManager.kPrimary),
+            useMaterial3: false,
+            textTheme: Typography.blackMountainView,
+            dialogTheme: const DialogThemeData(surfaceTintColor: Colors.transparent),
           ),
-          useMaterial3: false,
-          textTheme: Typography.blackMountainView,
-          dialogTheme: const DialogThemeData(
-              surfaceTintColor: Colors.transparent,
-            ),
-        ),
-        home: const SplashScreen(),
-      );
-    });
+          home: const SplashScreen(),
+        );
+      },
+    );
   }
 }
-
 
 class MyHttpOverrides extends HttpOverrides {
   @override
   HttpClient createHttpClient(SecurityContext? context) {
     return super.createHttpClient(context)
-      ..badCertificateCallback =
-          (X509Certificate cert, String host, int port) => true;
+      ..badCertificateCallback = (X509Certificate cert, String host, int port) => true;
   }
 }

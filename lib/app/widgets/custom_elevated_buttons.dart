@@ -19,31 +19,28 @@ class CenterTextIconButton extends StatelessWidget {
   final double leftPadding;
   final double rightPadding;
 
-  const CenterTextIconButton(
-      {super.key,
-      required this.buttonText,
-      this.iconData,
-      this.mainAlignment,
-      this.crossAlignment,
-      required this.onPress,
-      this.iconPosition = ButtonPosition.RIGHT,
-      this.isLoading = false,
-      // this.buttonColors = false,
-      this.gradientColors,
-      this.color,
-      this.isGradientColor = true,
-      this.textColor,
-      this.leftPadding = 20,
-      this.rightPadding = 4,
-      });
+  const CenterTextIconButton({
+    super.key,
+    required this.buttonText,
+    this.iconData,
+    this.mainAlignment,
+    this.crossAlignment,
+    required this.onPress,
+    this.iconPosition = ButtonPosition.RIGHT,
+    this.isLoading = false,
+    // this.buttonColors = false,
+    this.gradientColors,
+    this.color,
+    this.isGradientColor = true,
+    this.textColor,
+    this.leftPadding = 20,
+    this.rightPadding = 4,
+  });
 
   @override
   Widget build(BuildContext context) {
     if (isLoading) {
-      return SpinKitFadingCircle(
-        color: ColorManager.kPrimary,
-        size: 40,
-      );
+      return SpinKitFadingCircle(color: ColorManager.kPrimary, size: 40);
     }
     return InkWell(
       highlightColor: Colors.transparent,
@@ -54,11 +51,14 @@ class CenterTextIconButton extends StatelessWidget {
         width: context.horizontalSize(380),
         height: context.verticalSize(44),
         decoration: BoxDecoration(
-          gradient: isGradientColor ? LinearGradient(
-            colors: gradientColors ?? ColorManager.gradientButtons2,
-            begin: const Alignment(1.00, -0.00),
-            end: const Alignment(-1, 0),
-          ) : null,
+          gradient:
+              isGradientColor
+                  ? LinearGradient(
+                    colors: gradientColors ?? ColorManager.gradientButtons2,
+                    begin: const Alignment(1.00, -0.00),
+                    end: const Alignment(-1, 0),
+                  )
+                  : null,
           color: isGradientColor ? null : color,
           borderRadius: BorderRadius.circular(50),
         ),
@@ -67,19 +67,12 @@ class CenterTextIconButton extends StatelessWidget {
           crossAxisAlignment: crossAlignment ?? CrossAxisAlignment.center,
           children: [
             if (iconPosition == ButtonPosition.LEFT)
-              iconData != null
-                  ? SvgPicture.asset(iconData ?? '')
-                  : const SizedBox.shrink(),
+              iconData != null ? SvgPicture.asset(iconData ?? '') : const SizedBox.shrink(),
             if (iconPosition == ButtonPosition.LEFT) const SizedBox(width: 8),
-            Text(
-              buttonText,
-              style: context.semiBold18(color: textColor ?? ColorManager.blackMedium),
-            ),
+            Text(buttonText, style: context.semiBold18(color: textColor ?? ColorManager.white)),
             if (iconPosition == ButtonPosition.RIGHT) const SizedBox(width: 6),
             if (iconPosition == ButtonPosition.RIGHT)
-              iconData != null
-                  ? SvgPicture.asset(iconData ?? '')
-                  : const SizedBox.shrink(),
+              iconData != null ? SvgPicture.asset(iconData ?? '') : const SizedBox.shrink(),
           ],
         ),
       ),
@@ -116,13 +109,10 @@ class FilterButton extends StatelessWidget {
         // height: context.verticalSize(s44),
         decoration: BoxDecoration(
           gradient: LinearGradient(
-            colors: isSelected
-                ? ColorManager.gradientButtons
-                : [
-                    ColorManager.bgForButton,
-                    ColorManager.bgForButton,
-                    ColorManager.bgForButton,
-                  ],
+            colors:
+                isSelected
+                    ? ColorManager.gradientButtons
+                    : [ColorManager.bgForButton, ColorManager.bgForButton, ColorManager.bgForButton],
             begin: const Alignment(1.00, -0.00),
             end: const Alignment(-1, 0),
           ),
@@ -131,19 +121,9 @@ class FilterButton extends StatelessWidget {
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            SvgPicture.asset(
-              icon,
-              color: ColorManager.blackMedium,
-            ),
+            SvgPicture.asset(icon, color: isSelected ? ColorManager.white : ColorManager.grayText),
             const SizedBox(width: 8),
-            Text(
-              text,
-              style: context.semiBold14(
-                color: isSelected
-                    ? ColorManager.blackMedium
-                    : ColorManager.disabledText,
-              ),
-            ),
+            Text(text, style: context.semiBold14(color: isSelected ? ColorManager.white : ColorManager.grayText)),
           ],
         ),
       ),

@@ -98,7 +98,7 @@
 //           Center(
 //             child: Text(
 //               'Chats',
-//               style: context.semiBold20(color: Colors.white),
+//               style: context.semiBold20(color: ColorManager.blackMedium),
 //             ),
 //           ),
 //           SizedBox(
@@ -119,7 +119,7 @@
 //                 labelPadding: EdgeInsets.zero,
 //                 indicatorSize: TabBarIndicatorSize.tab,
 //                 dividerColor: Colors.transparent,
-//                 indicatorColor: ColorManager.white,
+//                 indicatorColor: ColorManager.kPrimary,
 //                 indicator: BoxDecoration(
 //                     gradient: LinearGradient(
 //                       colors: ColorManager.gradientButtons2,
@@ -302,7 +302,7 @@
 //                 //             child: Text(
 //                 //               "No contacts available",
 //                 //               style: TextStyle(
-//                 //                   color: Colors.white54, fontSize: 16),
+//                 //                   color: Colors.black54, fontSize: 16),
 //                 //             ),
 //                 //           ),
 //                 //   ),
@@ -349,8 +349,7 @@ class ChatScreen extends StatefulWidget {
   State<ChatScreen> createState() => _ChatScreenState();
 }
 
-class _ChatScreenState extends State<ChatScreen>
-    with SingleTickerProviderStateMixin {
+class _ChatScreenState extends State<ChatScreen> with SingleTickerProviderStateMixin {
   late TabController _tabController;
 
   @override
@@ -380,7 +379,7 @@ class _ChatScreenState extends State<ChatScreen>
     super.dispose();
   }
 
-  // --- Navigation to MessageScreen from a ChatCard ---
+  //  Navigation to MessageScreen from a ChatCard
   void _onChatTapped(ChatModel chatItem) {
     // You need to fetch the full Contact object for the chat partner
     // This assumes you have access to a list of all users/contacts.
@@ -394,27 +393,18 @@ class _ChatScreenState extends State<ChatScreen>
       status: '', // You'd fetch this if available
     );
 
-    Navigator.of(context).push(
-      MaterialPageRoute(builder: (context) => MessageScreen(contact: contact)),
-    );
+    Navigator.of(context).push(MaterialPageRoute(builder: (context) => MessageScreen(contact: contact)));
   }
 
-  // --- Navigation to MessageScreen from a ContactCard ---
+  //  Navigation to MessageScreen from a ContactCard
   void _onContactTapped(Contact contact) {
-    Navigator.of(context).push(
-      MaterialPageRoute(builder: (context) => MessageScreen(contact: contact)),
-    );
+    Navigator.of(context).push(MaterialPageRoute(builder: (context) => MessageScreen(contact: contact)));
   }
 
   @override
   Widget build(BuildContext context) {
-    final FiltterProvider filterProvider = Provider.of<FiltterProvider>(
-      context,
-      listen: false,
-    );
-    final ChatProvider chatProvider = Provider.of<ChatProvider>(
-      context,
-    ); // Listen to changes for contactsList
+    final FiltterProvider filterProvider = Provider.of<FiltterProvider>(context, listen: false);
+    final ChatProvider chatProvider = Provider.of<ChatProvider>(context); // Listen to changes for contactsList
 
     final String? currentUserId = filterProvider.firebaseUser?.uid;
 
@@ -424,12 +414,7 @@ class _ChatScreenState extends State<ChatScreen>
       child: Column(
         children: [
           SizedBox(height: context.verticalSize(60)),
-          Center(
-            child: Text(
-              'Chats',
-              style: context.semiBold20(color: ColorManager.white),
-            ),
-          ),
+          Center(child: Text('Chats', style: context.semiBold20(color: ColorManager.blackMedium))),
           SizedBox(height: context.verticalSize(20)),
           // Padding(
           //   padding: context.padding(horizontal: 24, vertical: 16),
@@ -447,7 +432,7 @@ class _ChatScreenState extends State<ChatScreen>
           //       labelPadding: EdgeInsets.zero,
           //       indicatorSize: TabBarIndicatorSize.tab,
           //       dividerColor: Colors.transparent,
-          //       indicatorColor: ColorManager.white,
+          //       indicatorColor: ColorManager.kPrimary,
           //       indicator: BoxDecoration(
           //         gradient: LinearGradient(
           //           colors: ColorManager.gradientButtons2,
@@ -465,196 +450,165 @@ class _ChatScreenState extends State<ChatScreen>
             // child: TabBarView(
             //   controller: _tabController,
             //   children: [
-                // --- CHATS TAB ---
-                child: Padding(
-                    padding: context.padding(horizontal: 24),
-                    child:
-                        currentUserId != null
-                            ? StreamBuilder<List<ChatModel>>(
-                              stream: chatProvider.getChats(currentUserId),
-                              builder: (context, snapshot) {
-                                if (snapshot.hasError) {
-                                  return Center(
-                                    child: Text(
-                                      "Error: ${snapshot.error}",
-                                      style: const TextStyle(color: Colors.red),
-                                    ),
-                                  );
-                                } else if (snapshot.connectionState ==
-                                    ConnectionState.waiting) {
-                                  return const Center(
-                                    child: CircularProgressIndicator(),
-                                  );
-                                } else if (!snapshot.hasData ||
-                                    snapshot.data!.isEmpty) {
-                                  return Center(
-                                    child: Text(
-                                      "No active chats.",
-                                      style: TextStyle(
-                                        color: ColorManager.white75,
-                                      ),
-                                    ),
-                                  );
-                                }
+            //  CHATS TAB
+            child: Padding(
+              padding: context.padding(horizontal: 24),
+              child:
+                  currentUserId != null
+                      ? StreamBuilder<List<ChatModel>>(
+                        stream: chatProvider.getChats(currentUserId),
+                        builder: (context, snapshot) {
+                          if (snapshot.hasError) {
+                            return Center(
+                              child: Text("Error: ${snapshot.error}", style: const TextStyle(color: Colors.red)),
+                            );
+                          } else if (snapshot.connectionState == ConnectionState.waiting) {
+                            return const Center(child: CircularProgressIndicator());
+                          } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                            return Center(
+                              child: Text("No active chats.", style: TextStyle(color: ColorManager.grayText)),
+                            );
+                          }
 
-                                return ListView.builder(
-                                  shrinkWrap: true,
-                                  physics: const NeverScrollableScrollPhysics(),
-                                  itemCount: snapshot.data!.length,
-                                  padding: EdgeInsets.zero,
-                                  itemBuilder: (context, index) {
-                                    final chatItem = snapshot.data![index];
-                                    return Slidable(
-                                      // Re-enabled Slidable
-                                      key: ValueKey(
-                                        chatItem.chatRoomId,
-                                      ), // Use unique key
-                                      endActionPane: ActionPane(
-                                        motion: const DrawerMotion(),
-                                        children: [
-                                          SlidableAction(
-                                            onPressed:
-                                                (context) =>
-                                                    chatProvider.muteChat(
-                                                      currentUserId,
-                                                      chatItem.chatRoomId,
-                                                      !chatItem.isMute,
-                                                    ),
-                                            backgroundColor: Colors.orange,
-                                            foregroundColor: Colors.white,
-                                            icon:
-                                                chatItem.isMute
-                                                    ? Icons.volume_up
-                                                    : Icons.volume_off,
-                                            label:
-                                                chatItem.isMute
-                                                    ? 'UnMute'
-                                                    : 'Mute',
+                          return ListView.builder(
+                            shrinkWrap: true,
+                            physics: const NeverScrollableScrollPhysics(),
+                            itemCount: snapshot.data!.length,
+                            padding: EdgeInsets.zero,
+                            itemBuilder: (context, index) {
+                              final chatItem = snapshot.data![index];
+                              return Slidable(
+                                // Re-enabled Slidable
+                                key: ValueKey(chatItem.chatRoomId), // Use unique key
+                                endActionPane: ActionPane(
+                                  motion: const DrawerMotion(),
+                                  children: [
+                                    SlidableAction(
+                                      onPressed:
+                                          (context) => chatProvider.muteChat(
+                                            currentUserId,
+                                            chatItem.chatRoomId,
+                                            !chatItem.isMute,
                                           ),
-                                          SlidableAction(
-                                            onPressed:
-                                                (context) =>
-                                                    chatProvider.deleteChat(
-                                                      currentUserId,
-                                                      chatItem.chatRoomId,
-                                                    ),
-                                            backgroundColor: Colors.red,
-                                            foregroundColor: Colors.white,
-                                            icon: Icons.delete,
-                                            label: 'Delete',
-                                          ),
-                                        ],
-                                      ),
-                                      child: ChatCard(
-                                        name: chatItem.name,
-                                        lastMessage: chatItem.message,
-                                        time: DateFormat(
-                                          'MMM d, hh:mm a',
-                                        ).format(chatItem.time.toDate()),
-                                        profileImage:
-                                            "", // You'd fetch this from the actual contact
-                                        onTap: () => _onChatTapped(chatItem),
-                                        isMute: chatItem.isMute,
-                                      ),
-                                    );
-                                  },
-                                );
-                              },
-                            )
-                            : Center(
-                              child: Text(
-                                "Please login to see chats.",
-                                style: TextStyle(color: ColorManager.white10),
-                              ),
-                            ),
-                  ),
-                ),
+                                      backgroundColor: Colors.orange,
+                                      foregroundColor: Colors.white,
+                                      icon: chatItem.isMute ? Icons.volume_up : Icons.volume_off,
+                                      label: chatItem.isMute ? 'UnMute' : 'Mute',
+                                    ),
+                                    SlidableAction(
+                                      onPressed:
+                                          (context) => chatProvider.deleteChat(currentUserId, chatItem.chatRoomId),
+                                      backgroundColor: Colors.red,
+                                      foregroundColor: Colors.white,
+                                      icon: Icons.delete,
+                                      label: 'Delete',
+                                    ),
+                                  ],
+                                ),
+                                child: ChatCard(
+                                  name: chatItem.name,
+                                  lastMessage: chatItem.message,
+                                  time: DateFormat('MMM d, hh:mm a').format(chatItem.time.toDate()),
+                                  profileImage: "", // You'd fetch this from the actual contact
+                                  onTap: () => _onChatTapped(chatItem),
+                                  isMute: chatItem.isMute,
+                                ),
+                              );
+                            },
+                          );
+                        },
+                      )
+                      : Center(
+                        child: Text("Please login to see chats.", style: TextStyle(color: ColorManager.grayText)),
+                      ),
+            ),
+          ),
 
-                // --- CONTACTS TAB ---
-                // SafeArea(
-                //   child: Padding(
-                //     padding: context.padding(horizontal: 24),
-                //     child:
-                //         chatProvider.isLoading
-                //             ? Center(
-                //               child: SpinKitFadingCircle(
-                //                 color: ColorManager.kPrimary,
-                //                 size: 40,
-                //               ),
-                //             )
-                //             : chatProvider.contactsList.isNotEmpty
-                //             ? ListView.builder(
-                //               itemCount:
-                //                   chatProvider
-                //                       .contactsList
-                //                       .length, // Removed +1 for "Find People Nearby" unless you add it back
-                //               itemBuilder: (context, index) {
-                //                 final contact =
-                //                     chatProvider.contactsList[index];
-                //                 return Slidable(
-                //                   // Re-enabled Slidable
-                //                   key: ValueKey(contact.id), // Use unique key
-                //                   endActionPane: ActionPane(
-                //                     motion: const DrawerMotion(),
-                //                     children: [
-                //                       SlidableAction(
-                //                         onPressed: (context) {
-                //                           // Handle contact specific action, e.g., block, delete from list
-                //                           print(
-                //                             'Delete contact action for ${contact.name}',
-                //                           );
-                //                         },
-                //                         backgroundColor: Colors.red,
-                //                         foregroundColor: Colors.white,
-                //                         icon: Icons.delete,
-                //                         label: 'Delete',
-                //                       ),
-                //                     ],
-                //                   ),
-                //                   child: Padding(
-                //                     padding: context.padding(right: 10),
-                //                     child: ContactCardNew(
-                //                       // Assuming ContactCardNew is your widget for contacts
-                //                       name: contact.name ?? "",
-                //                       role: contact.role ?? "",
-                //                       profileImage: contact.profileImage,
-                //                       onTap: () => _onContactTapped(contact),
-                //                     ),
-                //                   ),
-                //                 );
-                //               },
-                //             )
-                //             : ListView.builder(
-                //         padding: EdgeInsets.zero,
-                //         itemCount: filterProvider.filteredUsersData.length,
-                //         itemBuilder: (context, index) {
-                //           final user = filterProvider.filteredUsersData[index];
-                //           // return ChatCard(
-                //           //               name: "${user.firstName}",
-                //           //               lastMessage: "",
-                //           //               time: DateFormat(
-                //           //                 'hh:mm a',
-                //           //               ).format(chatItem.time.toDate()),
-                //           //               profileImage:
-                //           //                   "", // You'd fetch this from the actual contact
-                //           //               onTap: () => _onChatTapped(ChatModel(name: "${user.firstName}", message: "", chatPartnerId: user.uid, time: Timestamp(0, 0), isMute: false, chatRoomId: chatRoomId)),
-                //           //               // isMute: chatItem.isMute,
-                //           //             );
-                //         },
-                //       ),
-                //       // Center(
-                //       //         child: Text(
-                //       //           "No contacts available",
-                //       //           style: TextStyle(
-                //       //             color: ColorManager.white10,
-                //       //             fontSize: 16,
-                //       //           ),
-                //       //         ),
-                //       //       ),
-                //   ),
-                // ),
-            //   ],
-            // ),
+          //  CONTACTS TAB
+          // SafeArea(
+          //   child: Padding(
+          //     padding: context.padding(horizontal: 24),
+          //     child:
+          //         chatProvider.isLoading
+          //             ? Center(
+          //               child: SpinKitFadingCircle(
+          //                 color: ColorManager.kPrimary,
+          //                 size: 40,
+          //               ),
+          //             )
+          //             : chatProvider.contactsList.isNotEmpty
+          //             ? ListView.builder(
+          //               itemCount:
+          //                   chatProvider
+          //                       .contactsList
+          //                       .length, // Removed +1 for "Find People Nearby" unless you add it back
+          //               itemBuilder: (context, index) {
+          //                 final contact =
+          //                     chatProvider.contactsList[index];
+          //                 return Slidable(
+          //                   // Re-enabled Slidable
+          //                   key: ValueKey(contact.id), // Use unique key
+          //                   endActionPane: ActionPane(
+          //                     motion: const DrawerMotion(),
+          //                     children: [
+          //                       SlidableAction(
+          //                         onPressed: (context) {
+          //                           // Handle contact specific action, e.g., block, delete from list
+          //                           print(
+          //                             'Delete contact action for ${contact.name}',
+          //                           );
+          //                         },
+          //                         backgroundColor: Colors.red,
+          //                         foregroundColor: Colors.white,
+          //                         icon: Icons.delete,
+          //                         label: 'Delete',
+          //                       ),
+          //                     ],
+          //                   ),
+          //                   child: Padding(
+          //                     padding: context.padding(right: 10),
+          //                     child: ContactCardNew(
+          //                       // Assuming ContactCardNew is your widget for contacts
+          //                       name: contact.name ?? "",
+          //                       role: contact.role ?? "",
+          //                       profileImage: contact.profileImage,
+          //                       onTap: () => _onContactTapped(contact),
+          //                     ),
+          //                   ),
+          //                 );
+          //               },
+          //             )
+          //             : ListView.builder(
+          //         padding: EdgeInsets.zero,
+          //         itemCount: filterProvider.filteredUsersData.length,
+          //         itemBuilder: (context, index) {
+          //           final user = filterProvider.filteredUsersData[index];
+          //           // return ChatCard(
+          //           //               name: "${user.firstName}",
+          //           //               lastMessage: "",
+          //           //               time: DateFormat(
+          //           //                 'hh:mm a',
+          //           //               ).format(chatItem.time.toDate()),
+          //           //               profileImage:
+          //           //                   "", // You'd fetch this from the actual contact
+          //           //               onTap: () => _onChatTapped(ChatModel(name: "${user.firstName}", message: "", chatPartnerId: user.uid, time: Timestamp(0, 0), isMute: false, chatRoomId: chatRoomId)),
+          //           //               // isMute: chatItem.isMute,
+          //           //             );
+          //         },
+          //       ),
+          //       // Center(
+          //       //         child: Text(
+          //       //           "No contacts available",
+          //       //           style: TextStyle(
+          //       //             color: ColorManager.blackMedium,
+          //       //             fontSize: 16,
+          //       //           ),
+          //       //         ),
+          //       //       ),
+          //   ),
+          // ),
+          //   ],
+          // ),
           // Removed the extra SizedBox at the bottom as it was inside the TabBarView
         ],
       ),
@@ -671,13 +625,7 @@ class ContactCardNew extends StatelessWidget {
   final String? profileImage;
   final VoidCallback onTap;
 
-  const ContactCardNew({
-    super.key,
-    required this.name,
-    required this.role,
-    this.profileImage,
-    required this.onTap,
-  });
+  const ContactCardNew({super.key, required this.name, required this.role, this.profileImage, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
@@ -689,7 +637,7 @@ class ContactCardNew extends StatelessWidget {
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(10),
-            // color: Colors.grey.shade800, // Example background
+            // color: Colors.grey.shade100, // Example background
           ),
           child: Row(
             children: [
@@ -697,16 +645,10 @@ class ContactCardNew extends StatelessWidget {
                 radius: 24,
                 // backgroundImage: profileImage != null && profileImage!.isNotEmpty
                 //     ? NetworkImage(profileImage!) : null,
-                backgroundColor: Colors.purple, // Placeholder
+                backgroundColor: ColorManager.kPrimary, // Placeholder
                 child:
                     name.isNotEmpty
-                        ? Text(
-                          name[0].toUpperCase(),
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 18,
-                          ),
-                        )
+                        ? Text(name[0].toUpperCase(), style: const TextStyle(color: Colors.white, fontSize: 18))
                         : const Icon(Icons.person, color: Colors.white),
               ),
               const SizedBox(width: 12),
@@ -714,21 +656,9 @@ class ContactCardNew extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      name,
-                      style: context.semiBold18(
-                        color: ColorManager.white,
-                        fontSize: 16,
-                      ),
-                    ),
+                    Text(name, style: context.semiBold18(color: ColorManager.blackMedium, fontSize: 16)),
                     const SizedBox(height: 3),
-                    Text(
-                      role,
-                      style: context.medium16(
-                        color: ColorManager.disabledText,
-                        fontSize: 14,
-                      ),
-                    ),
+                    Text(role, style: context.medium16(color: ColorManager.grayText, fontSize: 14)),
                   ],
                 ),
               ),

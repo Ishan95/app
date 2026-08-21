@@ -22,26 +22,17 @@ class _TabViewState extends State<TabView> {
   Set<String> expandedIds = {};
 
   Future<void> markAsRead(String notificationId) async {
-    await FirebaseFirestore.instance
-        .collection('notifications')
-        .doc(notificationId)
-        .update({'isRead': true});
+    await FirebaseFirestore.instance.collection('notifications').doc(notificationId).update({'isRead': true});
   }
 
   Future<void> deleteNotification(String notificationId) async {
     try {
-      await FirebaseFirestore.instance
-          .collection('notifications')
-          .doc(notificationId)
-          .delete();
+      await FirebaseFirestore.instance.collection('notifications').doc(notificationId).delete();
 
       // Optional: Show a small snackbar
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text("Notification deleted"),
-          duration: Duration(seconds: 1),
-        ),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text("Notification deleted"), duration: Duration(seconds: 1)));
     } catch (e) {
       print("Error deleting: $e");
     }
@@ -62,19 +53,12 @@ class _TabViewState extends State<TabView> {
               .snapshots(),
       builder: (context, snapshot) {
         if (!snapshot.hasData) {
-          return Center(
-            child: SpinKitFadingCircle(color: ColorManager.kPrimary, size: 40),
-          );
+          return Center(child: SpinKitFadingCircle(color: ColorManager.kPrimary, size: 40));
         }
 
         final docs = snapshot.data!.docs;
         if (docs.isEmpty) {
-          return Center(
-            child: Text(
-              "No notifications",
-              style: context.semiBold14(color: ColorManager.white),
-            ),
-          );
+          return Center(child: Text("No notifications", style: context.semiBold14(color: ColorManager.grayText)));
         }
 
         return ListView.builder(
@@ -82,17 +66,13 @@ class _TabViewState extends State<TabView> {
           itemCount: docs.length,
           itemBuilder: (context, index) {
             final data = docs[index].data() as Map<String, dynamic>;
-            final notification = NotificationModel.fromFirestore(
-              data,
-              docs[index].id,
-            );
+            final notification = NotificationModel.fromFirestore(data, docs[index].id);
             bool isExpanded = expandedIds.contains(notification.id);
 
             // inside your ListView.builder
             return Dismissible(
               key: Key(notification.id), // Unique key for the notification
-              direction:
-                  DismissDirection.endToStart, // Swipe from right to left
+              direction: DismissDirection.endToStart, // Swipe from right to left
               background: Container(
                 alignment: Alignment.centerRight,
                 padding: const EdgeInsets.only(right: 20),
@@ -106,8 +86,9 @@ class _TabViewState extends State<TabView> {
                 duration: const Duration(milliseconds: 300),
                 margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
                 decoration: BoxDecoration(
-                  color: ColorManager.white10,
+                  color: ColorManager.white,
                   borderRadius: BorderRadius.circular(12),
+                  boxShadow: const [BoxShadow(color: Color(0x0A000000), blurRadius: 5, offset: Offset(0, 2))],
                 ),
                 child: Column(
                   children: [
@@ -120,39 +101,30 @@ class _TabViewState extends State<TabView> {
                             : notification.title.contains("Choice 2")
                             ? Assets.choice2
                             : Assets.choice3,
-                        width: context.horizontalSize(40)
+                        width: context.horizontalSize(40),
                       ),
                       title: Text(
                         notification.title,
                         style: context.bold14(
                           color:
                               notification.title.contains("Choice 1")
-                                  ? ColorManager
-                                      .yellow // Top priority
+                                  ? ColorManager.kPrimary
                                   : notification.title.contains("Choice 2")
-                                  ? ColorManager.greenPrimary
-                                  : ColorManager.white,
+                                  ? ColorManager.kPrimaryDark
+                                  : ColorManager.blackMedium,
                         ),
                       ),
-                      subtitle: Text(
-                        notification.message,
-                        style: context.regular14(color: ColorManager.white),
-                      ),
+                      subtitle: Text(notification.message, style: context.regular14(color: ColorManager.grayText)),
                       trailing:
                           isUnreadList
                               ? (notification.isRead
                                   ? Icon(
                                     Icons.check_circle,
                                     color: ColorManager.kPrimary,
-                                  ) // Becomes green on click
-                                  : Icon(
-                                    Icons.circle,
-                                    size: 10,
-                                    color: ColorManager.kPrimary,
-                                  ))
+                                  ) // Becomes green/blue on click
+                                  : Icon(Icons.circle, size: 10, color: ColorManager.kPrimary))
                               : null,
                       onTap: () {
-
                         // 2. Toggle the expansion locally
                         setState(() {
                           if (isExpanded) {
@@ -170,21 +142,13 @@ class _TabViewState extends State<TabView> {
                         future:
                             FirebaseFirestore.instance
                                 .collection('users')
-                                .doc(
-                                  notification.senderID,
-                                ) // Using the ID to get live data
+                                .doc(notification.senderID) // Using the ID to get live data
                                 .get(),
                         builder: (context, userSnap) {
-                          if (userSnap.connectionState ==
-                              ConnectionState.waiting) {
+                          if (userSnap.connectionState == ConnectionState.waiting) {
                             return Padding(
                               padding: EdgeInsets.all(20),
-                              child: Center(
-                                child: SpinKitFadingCircle(
-                                  color: ColorManager.kPrimary,
-                                  size: 40,
-                                ),
-                              ),
+                              child: Center(child: SpinKitFadingCircle(color: ColorManager.kPrimary, size: 40)),
                             );
                           }
 
@@ -193,9 +157,7 @@ class _TabViewState extends State<TabView> {
                               padding: EdgeInsets.all(8.0),
                               child: Text(
                                 "User details no longer available",
-                                style: context.semiBold14(
-                                  color: ColorManager.white,
-                                ),
+                                style: context.semiBold14(color: ColorManager.grayText),
                               ),
                             );
                           }
@@ -206,23 +168,23 @@ class _TabViewState extends State<TabView> {
                           );
 
                           return Padding(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 10,
-                              vertical: 10,
-                            ),
+                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.end,
                               children: [
                                 PersonCard(personDetails: userDetails),
                                 SizedBox(height: context.verticalSize(10)),
-                                !notification.isRead ? GestureDetector(
+                                !notification.isRead
+                                    ? GestureDetector(
                                       onTap: () async {
                                         await markAsRead(notification.id);
                                       },
-                                      child: Text("Mark as Read ✅", style: context.semiBold14(
-                                  color: ColorManager.kPrimary,
-                                ),)
-                                    ) : SizedBox.shrink()
+                                      child: Text(
+                                        "Mark as Read ✅",
+                                        style: context.semiBold14(color: ColorManager.kPrimary),
+                                      ),
+                                    )
+                                    : SizedBox.shrink(),
                               ],
                             ),
                           );

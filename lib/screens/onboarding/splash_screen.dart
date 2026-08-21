@@ -25,10 +25,7 @@ class SplashScreen extends StatefulWidget {
 }
 
 class _SplashScreenState extends State<SplashScreen> {
-  final authProvider = Provider.of<AuthenticationProvider>(
-    ContextHelper.navigatorKey.currentContext!,
-    listen: false,
-  );
+  final authProvider = Provider.of<AuthenticationProvider>(ContextHelper.navigatorKey.currentContext!, listen: false);
   late VideoPlayerController _controller;
 
   String _currentAppVersion = 'Loading...';
@@ -102,12 +99,8 @@ class _SplashScreenState extends State<SplashScreen> {
       // Fetch and activate remote config values
       await _remoteConfig.fetchAndActivate();
 
-      String minimumRequiredVersion = _remoteConfig.getString(
-        'minimum_required_app_version',
-      );
-      print(
-        "Fetched minimum required version: $minimumRequiredVersion    $_currentAppVersion",
-      );
+      String minimumRequiredVersion = _remoteConfig.getString('minimum_required_app_version');
+      print("Fetched minimum required version: $minimumRequiredVersion    $_currentAppVersion");
       // Compare versions
       if (_isUpdateRequired(_currentAppVersion, minimumRequiredVersion)) {
         _showForceUpdateDialog();
@@ -117,17 +110,13 @@ class _SplashScreenState extends State<SplashScreen> {
           await authProvider.updateFcmToken();
           Navigator.pushAndRemoveUntil(
             context,
-            MaterialPageRoute<void>(
-              builder: (BuildContext context) => const Home(index: 0),
-            ),
+            MaterialPageRoute<void>(builder: (BuildContext context) => const Home(index: 0)),
             (route) => false,
           );
         } else {
           Navigator.pushAndRemoveUntil(
             context,
-            MaterialPageRoute<void>(
-              builder: (BuildContext context) => const LoginScreen(),
-            ),
+            MaterialPageRoute<void>(builder: (BuildContext context) => const LoginScreen()),
             (route) => false,
           );
           // return const UserListScreen(); // Or your main app screen after login
@@ -140,17 +129,13 @@ class _SplashScreenState extends State<SplashScreen> {
         // return const LoginScreen();
         Navigator.pushAndRemoveUntil(
           context,
-          MaterialPageRoute<void>(
-            builder: (BuildContext context) => const Home(index: 0),
-          ),
+          MaterialPageRoute<void>(builder: (BuildContext context) => const Home(index: 0)),
           (route) => false,
         );
       } else {
         Navigator.pushAndRemoveUntil(
           context,
-          MaterialPageRoute<void>(
-            builder: (BuildContext context) => const LoginScreen(),
-          ),
+          MaterialPageRoute<void>(builder: (BuildContext context) => const LoginScreen()),
           (route) => false,
         );
       }
@@ -159,8 +144,7 @@ class _SplashScreenState extends State<SplashScreen> {
 
   bool _isUpdateRequired(String currentVersion, String minimumRequiredVersion) {
     List<int> currentParts = currentVersion.split('.').map(int.parse).toList();
-    List<int> minimumParts =
-        minimumRequiredVersion.split('.').map(int.parse).toList();
+    List<int> minimumParts = minimumRequiredVersion.split('.').map(int.parse).toList();
 
     for (int i = 0; i < minimumParts.length; i++) {
       if (i >= currentParts.length || currentParts[i] < minimumParts[i]) {
@@ -178,32 +162,21 @@ class _SplashScreenState extends State<SplashScreen> {
       barrierDismissible: false, // Prevents closing by tapping outside
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text(
-            'New Version Available',
-            style: context.semiBold14(color: ColorManager.black),
-          ),
+          backgroundColor: ColorManager.white,
+          title: Text('New Version Available', style: context.semiBold14(color: ColorManager.blackMedium)),
           content: Text(
             'A new version of the app is available. Please update to continue using the app.',
-            style: context.semiBold14(color: ColorManager.black),
+            style: context.semiBold14(color: ColorManager.blackMedium),
           ),
           actions: <Widget>[
             TextButton(
-              child: Text(
-                'Need Help?',
-                style: context.semiBold14(color: ColorManager.blue),
-              ),
+              child: Text('Need Help?', style: context.semiBold14(color: ColorManager.kPrimary)),
               onPressed: () {
-                contactWhatsApp(
-                  "94713905383",
-                  "Hello, I need assistance with my account.",
-                );
+                contactWhatsApp("94713905383", "Hello, I need assistance with my account.");
               },
             ),
             TextButton(
-              child: Text(
-                'Update Now',
-                style: context.semiBold14(color: ColorManager.black),
-              ),
+              child: Text('Update Now', style: context.semiBold14(color: ColorManager.blackMedium)),
               onPressed: () {
                 _launchStore();
               },
@@ -243,9 +216,7 @@ class _SplashScreenState extends State<SplashScreen> {
 
     // Create WhatsApp URLs
     // final uriApp = Uri.parse("whatsapp://send?phone=$phone&text=$encodedMessage");
-    final uriApp = Uri.parse(
-      "https://api.whatsapp.com/send?phone=$phone&text=$encodedMessage",
-    );
+    final uriApp = Uri.parse("https://api.whatsapp.com/send?phone=$phone&text=$encodedMessage");
     final uriWeb = Uri.parse("https://wa.me/$phone?text=$encodedMessage");
 
     try {
@@ -274,10 +245,8 @@ class _SplashScreenState extends State<SplashScreen> {
   Widget build(BuildContext context) {
     final screenSize = MediaQuery.of(context).size;
     return Scaffold(
-      backgroundColor: ColorManager.black,
-      body: SizedBox.expand(
-        child: Image.asset(Assets.appIcon2, fit: BoxFit.fill),
-      ),
+      backgroundColor: ColorManager.white,
+      body: SizedBox.expand(child: Image.asset(Assets.appIcon2, fit: BoxFit.fill)),
     );
     //       body: _controller.value.isInitialized
     //         ? SizedBox.expand(

@@ -33,8 +33,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     _loadVersion();
     // Fetch users when the screen initializes
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      final accountProvider =
-        Provider.of<AccountProvider>(context, listen: false);
+      final accountProvider = Provider.of<AccountProvider>(context, listen: false);
 
       accountProvider.refreshCurrentUser();
       // accProvider;
@@ -48,112 +47,92 @@ class _ProfileScreenState extends State<ProfileScreen> {
     });
   }
 
-  Future<bool?> _alertDialog(
-    BuildContext context,
-    String title,
-    String content,
-    String confirmText,
-  ) {
+  Future<bool?> _alertDialog(BuildContext context, String title, String content, String confirmText) {
     return showDialog(
       context: context,
       barrierDismissible: false,
       builder:
           (context) => AlertDialog(
             elevation: 10,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(16),
-            ),
-            title: Text(
-              title,
-              textAlign: TextAlign.start,
-              style: context.bold16(color: ColorManager.black),
-            ),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+            title: Text(title, textAlign: TextAlign.start, style: context.bold16(color: ColorManager.blackMedium)),
             content: Text(
               content,
               textAlign: TextAlign.start,
-              style: context.regular14(
-                color: ColorManager.black.withOpacity(0.8),
-              ),
+              style: context.regular14(color: ColorManager.blackMedium.withOpacity(0.8)),
             ),
 
             actions: [
               TextButton(
                 onPressed: () => Navigator.pop(context, false),
-                child: Text(
-                  'Cancel',
-                  style: context.semiBold14(color: ColorManager.black),
-                ),
+                child: Text('Cancel', style: context.semiBold14(color: ColorManager.blackMedium)),
               ),
               TextButton(
                 onPressed: () => Navigator.pop(context, true),
-                child: Text(
-                  confirmText,
-                  style: context.semiBold14(color: ColorManager.red),
-                ),
+                child: Text(confirmText, style: context.semiBold14(color: ColorManager.red)),
               ),
             ],
           ),
     );
   }
 
-// Future<void> launchWhatsApp({
-//   required String phone,
-//   String message = "",
-// }) async {
-//   final messageEncoded = Uri.encodeComponent(message);
+  // Future<void> launchWhatsApp({
+  //   required String phone,
+  //   String message = "",
+  // }) async {
+  //   final messageEncoded = Uri.encodeComponent(message);
 
-//   // Try launching the native WhatsApp app
-//   final whatsappUri = Uri.parse("whatsapp://send?phone=$phone&text=$messageEncoded");
+  //   // Try launching the native WhatsApp app
+  //   final whatsappUri = Uri.parse("whatsapp://send?phone=$phone&text=$messageEncoded");
 
-//   if (await canLaunchUrl(whatsappUri)) {
-//     await launchUrl(whatsappUri, mode: LaunchMode.externalApplication);
-//   } else {
-//     // Fallback to WhatsApp Web
-//     final fallbackUri = Uri.parse("https://wa.me/$phone?text=$messageEncoded");
-//     if (await canLaunchUrl(fallbackUri)) {
-//       await launchUrl(fallbackUri, mode: LaunchMode.externalApplication);
-//     } else {
-//       print("Could not launch WhatsApp.");
-//     }
-//   }
-// }
+  //   if (await canLaunchUrl(whatsappUri)) {
+  //     await launchUrl(whatsappUri, mode: LaunchMode.externalApplication);
+  //   } else {
+  //     // Fallback to WhatsApp Web
+  //     final fallbackUri = Uri.parse("https://wa.me/$phone?text=$messageEncoded");
+  //     if (await canLaunchUrl(fallbackUri)) {
+  //       await launchUrl(fallbackUri, mode: LaunchMode.externalApplication);
+  //     } else {
+  //       print("Could not launch WhatsApp.");
+  //     }
+  //   }
+  // }
 
-Future<void> contactWhatsApp(String phone, String message) async {
-  // Ensure the phone number is in E.164 format
-  if (!phone.startsWith('+')) {
-    phone = '+$phone'; // Add '+' if missing
-  }
-
-  // Encode the message
-  final encodedMessage = Uri.encodeComponent(message);
-
-  // Create WhatsApp URLs
-  // final uriApp = Uri.parse("whatsapp://send?phone=$phone&text=$encodedMessage");
-  final uriApp = Uri.parse("https://api.whatsapp.com/send?phone=$phone&text=$encodedMessage");
-  final uriWeb = Uri.parse("https://wa.me/$phone?text=$encodedMessage");
-
-  try {
-    // 1. Try opening the WhatsApp app
-    if (await canLaunchUrl(uriApp)) {
-      print('$uriApp');
-      await launchUrl(uriApp, mode: LaunchMode.externalApplication);
-      return;
+  Future<void> contactWhatsApp(String phone, String message) async {
+    // Ensure the phone number is in E.164 format
+    if (!phone.startsWith('+')) {
+      phone = '+$phone'; // Add '+' if missing
     }
 
-    // 2. Fallback to WhatsApp Web
-    if (await canLaunchUrl(uriWeb)) {
-      print('$uriWeb');
-      await launchUrl(uriWeb, mode: LaunchMode.platformDefault); // For iOS
-      return;
+    // Encode the message
+    final encodedMessage = Uri.encodeComponent(message);
+
+    // Create WhatsApp URLs
+    // final uriApp = Uri.parse("whatsapp://send?phone=$phone&text=$encodedMessage");
+    final uriApp = Uri.parse("https://api.whatsapp.com/send?phone=$phone&text=$encodedMessage");
+    final uriWeb = Uri.parse("https://wa.me/$phone?text=$encodedMessage");
+
+    try {
+      // Try opening the WhatsApp app
+      if (await canLaunchUrl(uriApp)) {
+        print('$uriApp');
+        await launchUrl(uriApp, mode: LaunchMode.externalApplication);
+        return;
+      }
+
+      // Fallback to WhatsApp Web
+      if (await canLaunchUrl(uriWeb)) {
+        print('$uriWeb');
+        await launchUrl(uriWeb, mode: LaunchMode.platformDefault); // For iOS
+        return;
+      }
+
+      // If both fail, print an error
+      print("WhatsApp not available");
+    } catch (e) {
+      print("Error launching WhatsApp: $e");
     }
-
-    // 3. If both fail, print an error
-    print("WhatsApp not available");
-  } catch (e) {
-    print("Error launching WhatsApp: $e");
   }
-}
-
 
   @override
   Widget build(BuildContext context) {
@@ -167,20 +146,11 @@ Future<void> contactWhatsApp(String phone, String message) async {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             SizedBox(height: context.verticalSize(40)),
-            Center(
-              child: Text(
-                'My Profile',
-                style: context.semiBold20(color: Colors.white),
-              ),
-            ),
+            Center(child: Text('My Profile', style: context.semiBold20(color: ColorManager.blackMedium))),
             SizedBox(height: context.verticalSize(20)),
             Center(
               child: ClipOval(
-                child: Icon(
-                  Icons.person,
-                  size: context.horizontalSize(60),
-                  color: ColorManager.white,
-                ),
+                child: Icon(Icons.person, size: context.horizontalSize(60), color: ColorManager.kPrimary),
               ),
             ),
             SizedBox(height: context.verticalSize(20)),
@@ -191,120 +161,105 @@ Future<void> contactWhatsApp(String phone, String message) async {
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        "Occupation",
-                        style: context.semiBold14(color: ColorManager.white),
-                      ),
+                      Text("Occupation", style: context.semiBold14(color: ColorManager.grayText)),
                       SizedBox(height: context.verticalSize(10)),
-                      Text(
-                        "Name",
-                        style: context.semiBold14(color: ColorManager.white),
-                      ),
+                      Text("Name", style: context.semiBold14(color: ColorManager.grayText)),
                       SizedBox(height: context.verticalSize(10)),
-                      Text(
-                        "Email",
-                        style: context.semiBold14(color: ColorManager.white),
-                      ),
+                      Text("Email", style: context.semiBold14(color: ColorManager.grayText)),
                       SizedBox(height: context.verticalSize(10)),
-                      Text(
-                        "Phone",
-                        style: context.semiBold14(color: ColorManager.white),
-                      ),
+                      Text("Phone", style: context.semiBold14(color: ColorManager.grayText)),
                       SizedBox(height: context.verticalSize(10)),
-                      Text(
-                        "Province",
-                        style: context.semiBold14(color: ColorManager.white),
-                      ),
+                      Text("Province", style: context.semiBold14(color: ColorManager.grayText)),
 
                       SizedBox(height: context.verticalSize(10)),
+                      Text("District", style: context.semiBold14(color: ColorManager.grayText)),
+                      SizedBox(height: context.verticalSize(10)),
                       Text(
-                        "District",
-                        style: context.semiBold14(color: ColorManager.white),
+                        (accountProvider.appUser?.job == "Provincial School Teacher" ||
+                                accountProvider.appUser?.job == "National School Teacher")
+                            ? "kalapa"
+                            : accountProvider.appUser?.job == "Police Officer"
+                            ? "Police Division"
+                            : accountProvider.appUser?.job == "Grama Niladari"
+                            ? "D. Secretariat"
+                            : "Institution",
+                        style: context.semiBold14(color: ColorManager.grayText),
                       ),
                       SizedBox(height: context.verticalSize(10)),
                       Text(
-                        (accountProvider.appUser?.job == "Provincial School Teacher" || accountProvider.appUser?.job == "National School Teacher") ? "kalapa" : accountProvider.appUser?.job == "Police Officer" ? "Police Division" : accountProvider.appUser?.job == "Grama Niladari" ? "D. Secretariat" : "Institution",
-                        style: context.semiBold14(color: ColorManager.white),
+                        (accountProvider.appUser?.job == "Provincial School Teacher" ||
+                                accountProvider.appUser?.job == "National School Teacher")
+                            ? "School"
+                            : accountProvider.appUser?.job == "Police Officer"
+                            ? "Police Station"
+                            : "Office",
+                        style: context.semiBold14(color: ColorManager.grayText),
                       ),
                       SizedBox(height: context.verticalSize(10)),
-                      Text(
-                        (accountProvider.appUser?.job == "Provincial School Teacher" || accountProvider.appUser?.job == "National School Teacher") ? "School" : accountProvider.appUser?.job == "Police Officer" ? "Police Station" : "Office",
-                        style: context.semiBold14(color: ColorManager.white),
+                      (accountProvider.appUser?.job == "Provincial School Teacher" ||
+                              accountProvider.appUser?.job == "National School Teacher")
+                          ? Text("scheme", style: context.semiBold14(color: ColorManager.grayText))
+                          : Text("grade", style: context.semiBold14(color: ColorManager.grayText)),
+                      SizedBox(
+                        height: context.verticalSize(
+                          (accountProvider.appUser?.job == "Provincial School Teacher" ||
+                                  accountProvider.appUser?.job == "National School Teacher")
+                              ? 10
+                              : 0,
+                        ),
                       ),
+                      (accountProvider.appUser?.job == "Provincial School Teacher" ||
+                              accountProvider.appUser?.job == "National School Teacher")
+                          ? Text("Subject", style: context.semiBold14(color: ColorManager.grayText))
+                          : SizedBox.shrink(),
                       SizedBox(height: context.verticalSize(10)),
-                      (accountProvider.appUser?.job == "Provincial School Teacher" || accountProvider.appUser?.job == "National School Teacher") ? Text(
-                        "scheme",
-                        style: context.semiBold14(color: ColorManager.white),
-                      ) : 
-                      Text(
-                        "grade",
-                        style: context.semiBold14(color: ColorManager.white),
-                      ),
-                      SizedBox(height: context.verticalSize((accountProvider.appUser?.job == "Provincial School Teacher" || accountProvider.appUser?.job == "National School Teacher") ? 10 : 0)),
-                      (accountProvider.appUser?.job == "Provincial School Teacher" || accountProvider.appUser?.job == "National School Teacher") ? Text(
-                        "Subject",
-                        style: context.semiBold14(color: ColorManager.white),
-                      ) : SizedBox.shrink(),
+                      Text("Choice 1", style: context.semiBold14(color: ColorManager.grayText)),
                       SizedBox(height: context.verticalSize(10)),
-                      Text(
-                        "Choice 1",
-                        style: context.semiBold14(color: ColorManager.white),
-                      ),
+                      Text("Choice 2", style: context.semiBold14(color: ColorManager.grayText)),
                       SizedBox(height: context.verticalSize(10)),
-                      Text(
-                        "Choice 2",
-                        style: context.semiBold14(color: ColorManager.white),
-                      ),
+                      Text("Choice 3", style: context.semiBold14(color: ColorManager.grayText)),
                       SizedBox(height: context.verticalSize(10)),
-                      Text(
-                        "Choice 3",
-                        style: context.semiBold14(color: ColorManager.white),
-                      ),
-                      SizedBox(height: context.verticalSize(10)),
-                      Text(
-                        "Note",
-                        style: context.semiBold14(color: ColorManager.white),
-                      ),
+                      Text("Note", style: context.semiBold14(color: ColorManager.grayText)),
 
                       // SizedBox(height: context.verticalSize(40)),
                       // Text(
                       //   "Transfer Date",
-                      //   style: context.semiBold14(color: ColorManager.white),
+                      //   style: context.semiBold14(color: ColorManager.grayText),
                       // ),
                       // SizedBox(height: context.verticalSize(10)),
                       // Text(
                       //   "Ref No",
-                      //   style: context.semiBold14(color: ColorManager.white),
+                      //   style: context.semiBold14(color: ColorManager.grayText),
                       // ),
                       // SizedBox(height: context.verticalSize(10)),
                       // Text(
                       //   "Acc Number",
-                      //   style: context.semiBold14(color: ColorManager.white),
+                      //   style: context.semiBold14(color: ColorManager.grayText),
                       // ),
                       // SizedBox(height: context.verticalSize(10)),
                       // Text(
                       //   "Client name",
-                      //   style: context.semiBold14(color: ColorManager.white),
+                      //   style: context.semiBold14(color: ColorManager.grayText),
                       // ),
                       // SizedBox(height: context.verticalSize(10)),
                       // Text(
                       //   "Amount",
-                      //   style: context.semiBold14(color: ColorManager.white),
+                      //   style: context.semiBold14(color: ColorManager.grayText),
                       // ),
                       // SizedBox(height: context.verticalSize(10)),
                       // Text(
                       //   "Service Provi.",
-                      //   style: context.semiBold14(color: ColorManager.white),
+                      //   style: context.semiBold14(color: ColorManager.grayText),
                       // ),
                       // SizedBox(height: context.verticalSize(10)),
                       // Text(
                       //   "IsEnable",
-                      //   style: context.semiBold14(color: ColorManager.white),
+                      //   style: context.semiBold14(color: ColorManager.grayText),
                       // ),
                       // SizedBox(height: context.verticalSize(10)),
                       // Text(
                       //   "Photo",
-                      //   style: context.semiBold14(color: ColorManager.white),
+                      //   style: context.semiBold14(color: ColorManager.grayText),
                       // ),
                     ],
                   ),
@@ -312,12 +267,7 @@ Future<void> contactWhatsApp(String phone, String message) async {
                     builder: (context, accProvider, child) {
                       if (accProvider.isLoading) {
                         return Expanded(
-                          child: Center(
-                            child: SpinKitFadingCircle(
-                              color: ColorManager.kPrimary,
-                              size: 40,
-                            ),
-                          ),
+                          child: Center(child: SpinKitFadingCircle(color: ColorManager.kPrimary, size: 40)),
                         );
                       }
                       return Column(
@@ -325,24 +275,18 @@ Future<void> contactWhatsApp(String phone, String message) async {
                         children: [
                           Text(
                             " :  ${accProvider.appUser?.job ?? "--"}",
-                            style: context.semiBold14(
-                              color: ColorManager.white,
-                            ),
+                            style: context.semiBold14(color: ColorManager.blackMedium),
                           ),
                           SizedBox(height: context.verticalSize(10)),
                           Text(
                             // filter.appUser != null ? ' :  ${filter.appUser!.name}' : ' :  --',
                             " :  ${accProvider.appUser?.displayName ?? "--"}",
-                            style: context.semiBold14(
-                              color: ColorManager.white,
-                            ),
+                            style: context.semiBold14(color: ColorManager.blackMedium),
                           ),
                           SizedBox(height: context.verticalSize(10)),
                           Text(
                             " :  ${accProvider.appUser?.authEmail ?? "--"}",
-                            style: context.semiBold14(
-                              color: ColorManager.white,
-                            ),
+                            style: context.semiBold14(color: ColorManager.blackMedium),
                           ),
                           SizedBox(height: context.verticalSize(10)),
                           SizedBox(
@@ -353,20 +297,15 @@ Future<void> contactWhatsApp(String phone, String message) async {
                                 Expanded(
                                   child: Text(
                                     " :  ${accProvider.appUser?.phone ?? '--'}",
-                                    style: context.semiBold14(
-                                      color: ColorManager.white,
-                                    ),
+                                    style: context.semiBold14(color: ColorManager.blackMedium),
                                     overflow: TextOverflow.ellipsis,
                                   ),
                                 ),
                                 Text(
-                                  (accProvider.appUser?.isPhoneHide == true &&
-                                          accProvider.appUser?.phone != null)
+                                  (accProvider.appUser?.isPhoneHide == true && accProvider.appUser?.phone != null)
                                       ? '(Hidden)'
                                       : '',
-                                  style: context.semiBold14(
-                                    color: ColorManager.white,
-                                  ),
+                                  style: context.semiBold14(color: ColorManager.grayText),
                                 ),
                               ],
                             ),
@@ -374,23 +313,25 @@ Future<void> contactWhatsApp(String phone, String message) async {
                           SizedBox(height: context.verticalSize(10)),
                           Text(
                             " :  ${accProvider.appUser?.province ?? "--"}",
-                            style: context.semiBold14(
-                              color: ColorManager.white,
-                            ),
+                            style: context.semiBold14(color: ColorManager.blackMedium),
                           ),
                           SizedBox(height: context.verticalSize(10)),
                           Text(
                             " :  ${accProvider.appUser?.district ?? "--"}",
-                            style: context.semiBold14(
-                              color: ColorManager.white,
-                            ),
+                            style: context.semiBold14(color: ColorManager.blackMedium),
                           ),
                           SizedBox(height: context.verticalSize(10)),
                           Text(
-                            " :  ${(accountProvider.appUser?.job == "Provincial School Teacher" || accountProvider.appUser?.job == "National School Teacher") ? accProvider.appUser?.kalapa ?? "--" : accountProvider.appUser?.job == "Nurse" ? accProvider.appUser?.institutionTypeForNurse ?? "--" : accountProvider.appUser?.job == "Management Assistant" ? accProvider.appUser?.institutionTypeForMA ?? "--" : accountProvider.appUser?.job == "Police Officer" ? accProvider.appUser?.policeDivisions ?? "--" : accProvider.appUser?.divisionalSecretariat ?? "--"}",
-                            style: context.semiBold14(
-                              color: ColorManager.white,
-                            ),
+                            " :  ${(accountProvider.appUser?.job == "Provincial School Teacher" || accountProvider.appUser?.job == "National School Teacher")
+                                ? accProvider.appUser?.kalapa ?? "--"
+                                : accountProvider.appUser?.job == "Nurse"
+                                ? accProvider.appUser?.institutionTypeForNurse ?? "--"
+                                : accountProvider.appUser?.job == "Management Assistant"
+                                ? accProvider.appUser?.institutionTypeForMA ?? "--"
+                                : accountProvider.appUser?.job == "Police Officer"
+                                ? accProvider.appUser?.policeDivisions ?? "--"
+                                : accProvider.appUser?.divisionalSecretariat ?? "--"}",
+                            style: context.semiBold14(color: ColorManager.blackMedium),
                           ),
                           SizedBox(height: context.verticalSize(10)),
                           SizedBox(
@@ -400,127 +341,133 @@ Future<void> contactWhatsApp(String phone, String message) async {
                               children: [
                                 Expanded(
                                   child: Text(
-                                    " :  ${accountProvider.appUser?.job == "Provincial School Teacher" ? accProvider.appUser?.school ?? '--' : accountProvider.appUser?.job == "National School Teacher" ? accProvider.appUser?.nationalSchool ?? '--' : accountProvider.appUser?.job == "Nurse" ? accProvider.appUser?.officeForNurse ?? '--' : accountProvider.appUser?.job == "Management Assistant" ? accProvider.appUser?.officeForMA ?? '--' : accountProvider.appUser?.job == "Police Officer" ? accProvider.appUser?.policeStations ?? "--" : (accProvider.appUser?.gramaNiladhariDivision?.length ?? 0) > 20 ? '${accProvider.appUser?.gramaNiladhariDivision?.substring(0, 20)}...' : accProvider.appUser?.gramaNiladhariDivision ?? "--"}",
-                                    style: context.semiBold14(
-                                      color: ColorManager.white,
-                                    ),
+                                    " :  ${accountProvider.appUser?.job == "Provincial School Teacher"
+                                        ? accProvider.appUser?.school ?? '--'
+                                        : accountProvider.appUser?.job == "National School Teacher"
+                                        ? accProvider.appUser?.nationalSchool ?? '--'
+                                        : accountProvider.appUser?.job == "Nurse"
+                                        ? accProvider.appUser?.officeForNurse ?? '--'
+                                        : accountProvider.appUser?.job == "Management Assistant"
+                                        ? accProvider.appUser?.officeForMA ?? '--'
+                                        : accountProvider.appUser?.job == "Police Officer"
+                                        ? accProvider.appUser?.policeStations ?? "--"
+                                        : (accProvider.appUser?.gramaNiladhariDivision?.length ?? 0) > 20
+                                        ? '${accProvider.appUser?.gramaNiladhariDivision?.substring(0, 20)}...'
+                                        : accProvider.appUser?.gramaNiladhariDivision ?? "--"}",
+                                    style: context.semiBold14(color: ColorManager.blackMedium),
                                     overflow: TextOverflow.ellipsis,
                                   ),
                                 ),
                                 Text(
-                                  (accProvider.appUser?.isSchoolHide == true &&
-                                          accProvider.appUser?.school != null)
+                                  (accProvider.appUser?.isSchoolHide == true && accProvider.appUser?.school != null)
                                       ? '(Hidden)'
                                       : '',
-                                  style: context.semiBold14(
-                                    color: ColorManager.white,
-                                  ),
+                                  style: context.semiBold14(color: ColorManager.grayText),
                                 ),
                               ],
                             ),
                           ),
                           SizedBox(height: context.verticalSize(10)),
-                          (accountProvider.appUser?.job == "Provincial School Teacher" || accountProvider.appUser?.job == "National School Teacher") ? Text(
-                            " :  ${accProvider.appUser?.scheme ?? "--"}",
-                            style: context.semiBold14(
-                              color: ColorManager.white,
-                            ),
-                          ) : Text(
-                            " :  ${accProvider.appUser?.grade ?? "--"}",
-                            style: context.semiBold14(
-                              color: ColorManager.white,
+                          (accountProvider.appUser?.job == "Provincial School Teacher" ||
+                                  accountProvider.appUser?.job == "National School Teacher")
+                              ? Text(
+                                " :  ${accProvider.appUser?.scheme ?? "--"}",
+                                style: context.semiBold14(color: ColorManager.blackMedium),
+                              )
+                              : Text(
+                                " :  ${accProvider.appUser?.grade ?? "--"}",
+                                style: context.semiBold14(color: ColorManager.blackMedium),
+                              ),
+                          SizedBox(
+                            height: context.verticalSize(
+                              (accountProvider.appUser?.job == "Provincial School Teacher" ||
+                                      accountProvider.appUser?.job == "National School Teacher")
+                                  ? 10
+                                  : 0,
                             ),
                           ),
-                          SizedBox(height: context.verticalSize((accountProvider.appUser?.job == "Provincial School Teacher" || accountProvider.appUser?.job == "National School Teacher") ? 10 : 0)),
-                          (accountProvider.appUser?.job == "Provincial School Teacher" || accountProvider.appUser?.job == "National School Teacher") ? Text(
-                            " :  ${(accProvider.appUser?.subject != null && accProvider.appUser?.scheme != "PRIMARY") ? accProvider.appUser?.subject : "--"}",
-                            style: context.semiBold14(
-                              color: ColorManager.white,
-                            ),
-                          ) : SizedBox.shrink(),
+                          (accountProvider.appUser?.job == "Provincial School Teacher" ||
+                                  accountProvider.appUser?.job == "National School Teacher")
+                              ? Text(
+                                " :  ${(accProvider.appUser?.subject != null && accProvider.appUser?.scheme != "PRIMARY") ? accProvider.appUser?.subject : "--"}",
+                                style: context.semiBold14(color: ColorManager.blackMedium),
+                              )
+                              : SizedBox.shrink(),
                           SizedBox(height: context.verticalSize(10)),
                           Text(
                             " :  ${accProvider.appUser?.choice1 ?? "--"}",
-                            style: context.semiBold14(
-                              color: ColorManager.white,
-                            ),
+                            style: context.semiBold14(color: ColorManager.blackMedium),
                           ),
                           SizedBox(height: context.verticalSize(10)),
                           Text(
                             " :  ${(accProvider.appUser?.choice2 != null && accProvider.appUser?.choice2 != "") ? accProvider.appUser?.choice2 : "--"}",
-                            style: context.semiBold14(
-                              color: ColorManager.white,
-                            ),
+                            style: context.semiBold14(color: ColorManager.blackMedium),
                           ),
                           SizedBox(height: context.verticalSize(10)),
                           Text(
                             " :  ${(accProvider.appUser?.choice3 != null && accProvider.appUser?.choice3 != "") ? accProvider.appUser?.choice3 : "--"}",
-                            style: context.semiBold14(
-                              color: ColorManager.white,
-                            ),
+                            style: context.semiBold14(color: ColorManager.blackMedium),
                           ),
                           SizedBox(height: context.verticalSize(10)),
                           Text(
                             " :  ${accProvider.appUser?.note ?? "--"}",
-                            style: context.semiBold14(
-                              color: ColorManager.white,
-                            ),
+                            style: context.semiBold14(color: ColorManager.blackMedium),
                           ),
 
                           // SizedBox(height: context.verticalSize(40)),
                           // Text(
                           //   " :  ${accProvider.appUser?.transferDate ?? "--"}",
                           //   style: context.semiBold14(
-                          //     color: ColorManager.white,
+                          //     color: ColorManager.blackMedium,
                           //   ),
                           // ),
                           // SizedBox(height: context.verticalSize(10)),
                           // Text(
                           //   " :  ${accProvider.appUser?.refNo ?? "--"}",
                           //   style: context.semiBold14(
-                          //     color: ColorManager.white,
+                          //     color: ColorManager.blackMedium,
                           //   ),
                           // ),
                           // SizedBox(height: context.verticalSize(10)),
                           // Text(
                           //   " :  ${accProvider.appUser?.accountNo ?? "--"}",
                           //   style: context.semiBold14(
-                          //     color: ColorManager.white,
+                          //     color: ColorManager.blackMedium,
                           //   ),
                           // ),
                           // SizedBox(height: context.verticalSize(10)),
                           // Text(
                           //   " :  ${accProvider.appUser?.clientName ?? "--"}",
                           //   style: context.semiBold14(
-                          //     color: ColorManager.white,
+                          //     color: ColorManager.blackMedium,
                           //   ),
                           // ),
                           // SizedBox(height: context.verticalSize(10)),
                           // Text(
                           //   " :  ${accProvider.appUser?.amount ?? "--"}",
                           //   style: context.semiBold14(
-                          //     color: ColorManager.white,
+                          //     color: ColorManager.blackMedium,
                           //   ),
                           // ),
                           // SizedBox(height: context.verticalSize(10)),
                           // Text(
                           //   " :  ${accProvider.appUser?.serviceProvider ?? "--"}",
                           //   style: context.semiBold14(
-                          //     color: ColorManager.white,
+                          //     color: ColorManager.blackMedium,
                           //   ),
                           // ),
                           // SizedBox(height: context.verticalSize(10)),
                           // Text(
                           //   " :  ${accProvider.appUser?.isEnable ?? "--"}",
                           //   style: context.semiBold14(
-                          //     color: ColorManager.white,
+                          //     color: ColorManager.blackMedium,
                           //   ),
                           // ),
                           // SizedBox(height: context.verticalSize(10)),
                           // Text(
                           //   " :",
                           //   style: context.semiBold14(
-                          //     color: ColorManager.white,
+                          //     color: ColorManager.blackMedium,
                           //   ),
                           // ),
                         ],
@@ -534,19 +481,16 @@ Future<void> contactWhatsApp(String phone, String message) async {
             SizedBox(height: context.verticalSize(20)),
             _buildListTile(
               context,
-              titleStyle: context.semiBold14(color: ColorManager.white),
+              titleStyle: context.semiBold14(color: ColorManager.blackMedium),
               title: 'Edit profile',
               onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => EditDetailsScreen()),
-                );
+                Navigator.push(context, MaterialPageRoute(builder: (context) => EditDetailsScreen()));
               },
             ),
             _buildDivider(),
             // _buildListTile(
             //   context,
-            //   titleStyle: context.semiBold14(color: ColorManager.white),
+            //   titleStyle: context.semiBold14(color: ColorManager.blackMedium),
             //   title: 'Edit Payment Details',
             //   onTap: () {
             //     Navigator.push(
@@ -560,21 +504,16 @@ Future<void> contactWhatsApp(String phone, String message) async {
             _buildDivider(),
             _buildListTile(
               context,
-              titleStyle: context.semiBold14(color: ColorManager.white),
+              titleStyle: context.semiBold14(color: ColorManager.blackMedium),
               title: 'Change Password',
               onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => ChangePasswordScreen(),
-                  ),
-                );
+                Navigator.push(context, MaterialPageRoute(builder: (context) => ChangePasswordScreen()));
               },
             ),
             _buildDivider(),
             _buildListTile(
               context,
-              titleStyle: context.semiBold14(color: ColorManager.white),
+              titleStyle: context.semiBold14(color: ColorManager.blackMedium),
               title: 'Help and Support',
               onTap: () {
                 contactWhatsApp(
@@ -588,7 +527,7 @@ Future<void> contactWhatsApp(String phone, String message) async {
               context,
               // iconPath: 'assets/images/profile/exit.png',
               title: 'Sign out',
-              titleStyle: context.semiBold14(color: ColorManager.white),
+              titleStyle: context.semiBold14(color: ColorManager.blackMedium),
               onTap: () async {
                 final shouldSave = await _alertDialog(
                   context,
@@ -615,21 +554,14 @@ Future<void> contactWhatsApp(String phone, String message) async {
                   'Delect',
                 );
                 if (shouldSave == true) {
-                  await authProvider.deleteAccount(
-                    ContextHelper.navigatorKey.currentContext!,
-                  );
+                  await authProvider.deleteAccount(ContextHelper.navigatorKey.currentContext!);
                 } else {}
               },
             ),
             _buildDivider(),
 
             SizedBox(height: context.verticalSize(40)),
-            Center(
-              child: Text(
-                'VERSION $_version',
-                style: context.semiBold14(color: ColorManager.white),
-              ),
-            ),
+            Center(child: Text('VERSION $_version', style: context.semiBold14(color: ColorManager.grayText))),
             SizedBox(height: context.verticalSize(150)),
 
             // ElevatedButton(
@@ -669,17 +601,8 @@ Future<void> contactWhatsApp(String phone, String message) async {
       //   width: 20,
       //   height: 20,
       // ),
-      title: Text(
-        title,
-        style: titleStyle ?? context.semiBold14(color: ColorManager.black),
-      ),
-      trailing:
-          trailingWidget ??
-          const Icon(
-            Icons.arrow_forward_ios,
-            color: Color(0xff8F9098),
-            size: 12,
-          ),
+      title: Text(title, style: titleStyle ?? context.semiBold14(color: ColorManager.blackMedium)),
+      trailing: trailingWidget ?? const Icon(Icons.arrow_forward_ios, color: Color(0xff8F9098), size: 12),
       onTap: onTap,
     );
   }

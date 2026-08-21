@@ -6,12 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:app/app/export.dart';
 
 class CustomCameraNw extends StatefulWidget {
-  const CustomCameraNw({
-    super.key,
-    this.isOnboard = false,
-    this.onPress,
-    required this.onImageSelected,
-  });
+  const CustomCameraNw({super.key, this.isOnboard = false, this.onPress, required this.onImageSelected});
 
   final bool isOnboard;
   final VoidCallback? onPress;
@@ -59,10 +54,7 @@ class _CustomCameraNwState extends State<CustomCameraNw> {
 
     Navigator.push(
       context,
-      MaterialPageRoute(
-        builder: (context) =>
-            PhotoPreview(imagePath: image.path, isOnboard: widget.isOnboard),
-      ),
+      MaterialPageRoute(builder: (context) => PhotoPreview(imagePath: image.path, isOnboard: widget.isOnboard)),
     ).then((isSuccess) async {
       if (isSuccess) {
         // widget.selectedImage = image;
@@ -109,15 +101,11 @@ class _CustomCameraNwState extends State<CustomCameraNw> {
           // Positioned.fill(
           //   child: CameraPreview(_controller!),
           // ),
-
           Positioned.fill(
             child: Center(
               child: AspectRatio(
                 aspectRatio: _controller!.value.aspectRatio,
-                child: RotatedBox(
-                  quarterTurns: rotation,
-                  child: CameraPreview(_controller!),
-                ),
+                child: RotatedBox(quarterTurns: rotation, child: CameraPreview(_controller!)),
               ),
             ),
           ),
@@ -169,10 +157,7 @@ class _CustomCameraNwState extends State<CustomCameraNw> {
                   onPressed: () => Navigator.of(context)..pop(false),
                   // Navigator.pop(context),
                 ),
-                Text(
-                  'Take a photo',
-                  style: context.semiBold20(color: ColorManager.white),
-                ),
+                Text('Take a photo', style: context.semiBold20(color: ColorManager.white)),
                 const SizedBox(width: 48), // Spacer
               ],
             ),
@@ -191,20 +176,12 @@ class _CustomCameraNwState extends State<CustomCameraNw> {
                   children: [
                     GestureDetector(
                       onTap: _switchCamera,
-                      child: Icon(
-                        Icons.cameraswitch,
-                        color: Colors.white,
-                        size: 32,
-                      ),
+                      child: Icon(Icons.cameraswitch, color: Colors.white, size: 32),
                     ),
                     const SizedBox(width: 40),
                     GestureDetector(
                       onTap: _takePicture,
-                      child: Icon(
-                        Icons.camera,
-                        color: Colors.white,
-                        size: 80,
-                      ),
+                      child: Icon(Icons.camera, color: Colors.white, size: 80),
                       // Image.asset(
                       //   Assets.clickbutton,
                       //   height: 60,
@@ -213,11 +190,7 @@ class _CustomCameraNwState extends State<CustomCameraNw> {
                     ),
                     const SizedBox(width: 40),
                     IconButton(
-                      icon: Icon(
-                        _isFlashOn ? Icons.flash_on : Icons.flash_off,
-                        color: ColorManager.kPrimaryWarm,
-                        size: 32,
-                      ),
+                      icon: Icon(_isFlashOn ? Icons.flash_on : Icons.flash_off, color: ColorManager.kPrimary, size: 32),
                       onPressed: _toggleFlash,
                     ),
                   ],
@@ -229,13 +202,13 @@ class _CustomCameraNwState extends State<CustomCameraNw> {
                 widget.isOnboard
                     ? const SizedBox()
                     : const Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 20.0),
-                        child: Text(
-                          "Step back and capture a clear, well-framed photo that provides the best details possible.",
-                          textAlign: TextAlign.center,
-                          style: TextStyle(color: Colors.white, fontSize: 14),
-                        ),
+                      padding: EdgeInsets.symmetric(horizontal: 20.0),
+                      child: Text(
+                        "Step back and capture a clear, well-framed photo that provides the best details possible.",
+                        textAlign: TextAlign.center,
+                        style: TextStyle(color: Colors.white, fontSize: 14),
                       ),
+                    ),
                 const SizedBox(height: 10),
               ],
             ),

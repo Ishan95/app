@@ -13,7 +13,13 @@ class VerifyEmailScreen extends StatefulWidget {
   final bool isSelected;
   final bool isSchoolSelected;
   final bool isEnable;
-  const VerifyEmailScreen({required this.user, required this.isSelected, required this.isSchoolSelected, required this.isEnable, super.key});
+  const VerifyEmailScreen({
+    required this.user,
+    required this.isSelected,
+    required this.isSchoolSelected,
+    required this.isEnable,
+    super.key,
+  });
 
   @override
   State<VerifyEmailScreen> createState() => _VerifyEmailScreenState();
@@ -22,48 +28,30 @@ class VerifyEmailScreen extends StatefulWidget {
 class _VerifyEmailScreenState extends State<VerifyEmailScreen> {
   bool checking = false;
 
-  Future<bool?> _saveAlertDialog(
-    BuildContext context,
-    String title,
-    String content,
-    String confirmText,
-  ) {
+  Future<bool?> _saveAlertDialog(BuildContext context, String title, String content, String confirmText) {
     return showDialog(
       context: context,
       barrierDismissible: false,
       builder:
           (context) => AlertDialog(
             elevation: 10,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(16),
-            ),
-            title: Text(
-              title,
-              textAlign: TextAlign.start,
-              style: context.bold16(color: ColorManager.black),
-            ),
+            backgroundColor: ColorManager.white,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+            title: Text(title, textAlign: TextAlign.start, style: context.bold16(color: ColorManager.blackMedium)),
             content: Text(
               content,
               textAlign: TextAlign.start,
-              style: context.regular14(
-                color: ColorManager.black.withOpacity(0.8),
-              ),
+              style: context.regular14(color: ColorManager.blackMedium.withOpacity(0.8)),
             ),
 
             actions: [
               TextButton(
                 onPressed: () => Navigator.pop(context, false),
-                child: Text(
-                  'Cancel',
-                  style: context.semiBold14(color: ColorManager.black),
-                ),
+                child: Text('Cancel', style: context.semiBold14(color: ColorManager.blackMedium)),
               ),
               TextButton(
                 onPressed: () => Navigator.pop(context, true),
-                child: Text(
-                  confirmText,
-                  style: context.semiBold14(color: ColorManager.red),
-                ),
+                child: Text(confirmText, style: context.semiBold14(color: ColorManager.red)),
               ),
             ],
           ),
@@ -71,70 +59,91 @@ class _VerifyEmailScreenState extends State<VerifyEmailScreen> {
   }
 
   Future<void> contactWhatsApp(String phone, String message) async {
-  // Ensure the phone number is in E.164 format
-  if (!phone.startsWith('+')) {
-    phone = '+$phone'; // Add '+' if missing
-  }
-
-  // Encode the message
-  final encodedMessage = Uri.encodeComponent(message);
-
-  // Create WhatsApp URLs
-  // final uriApp = Uri.parse("whatsapp://send?phone=$phone&text=$encodedMessage");
-  final uriApp = Uri.parse("https://api.whatsapp.com/send?phone=$phone&text=$encodedMessage");
-  final uriWeb = Uri.parse("https://wa.me/$phone?text=$encodedMessage");
-
-  try {
-    // 1. Try opening the WhatsApp app
-    if (await canLaunchUrl(uriApp)) {
-      print('$uriApp');
-      await launchUrl(uriApp, mode: LaunchMode.externalApplication);
-      return;
+    // Ensure the phone number is in E.164 format
+    if (!phone.startsWith('+')) {
+      phone = '+$phone'; // Add '+' if missing
     }
 
-    // 2. Fallback to WhatsApp Web
-    if (await canLaunchUrl(uriWeb)) {
-      print('$uriWeb');
-      await launchUrl(uriWeb, mode: LaunchMode.platformDefault); // For iOS
-      return;
-    }
+    // Encode the message
+    final encodedMessage = Uri.encodeComponent(message);
 
-    // 3. If both fail, print an error
-    print("WhatsApp not available");
-  } catch (e) {
-    print("Error launching WhatsApp: $e");
+    // Create WhatsApp URLs
+    // final uriApp = Uri.parse("whatsapp://send?phone=$phone&text=$encodedMessage");
+    final uriApp = Uri.parse("https://api.whatsapp.com/send?phone=$phone&text=$encodedMessage");
+    final uriWeb = Uri.parse("https://wa.me/$phone?text=$encodedMessage");
+
+    try {
+      // 1. Try opening the WhatsApp app
+      if (await canLaunchUrl(uriApp)) {
+        print('$uriApp');
+        await launchUrl(uriApp, mode: LaunchMode.externalApplication);
+        return;
+      }
+
+      // 2. Fallback to WhatsApp Web
+      if (await canLaunchUrl(uriWeb)) {
+        print('$uriWeb');
+        await launchUrl(uriWeb, mode: LaunchMode.platformDefault); // For iOS
+        return;
+      }
+
+      // 3. If both fail, print an error
+      print("WhatsApp not available");
+    } catch (e) {
+      print("Error launching WhatsApp: $e");
+    }
   }
-}
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("Verify Email")),
+      backgroundColor: ColorManager.white,
+      appBar: AppBar(
+        title: Text("Verify Email", style: context.semiBold20(color: ColorManager.blackMedium)),
+        backgroundColor: ColorManager.white,
+        elevation: 0.5,
+        iconTheme: IconThemeData(color: ColorManager.blackMedium),
+      ),
       body: Padding(
         padding: const EdgeInsets.all(20),
         child: Column(
           children: [
-            const Text(
+            SizedBox(height: context.verticalSize(20)),
+            Text(
               "A verification link has been sent to your email.\nPlease verify and then click continue.",
               textAlign: TextAlign.center,
+              style: context.regular16(color: ColorManager.blackMedium),
             ),
-            const SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: checking ? null : checkVerification,
-              child: checking
-                  ? const CircularProgressIndicator()
-                  : const Text("I Verified, Continue"),
+            const SizedBox(height: 30),
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: ColorManager.kPrimary,
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(25)),
+                  elevation: 0,
+                ),
+                onPressed: checking ? null : checkVerification,
+                child:
+                    checking
+                        ? SizedBox(
+                          height: 20,
+                          width: 20,
+                          child: const CircularProgressIndicator(color: Colors.white, strokeWidth: 2.5),
+                        )
+                        : Text("I Verified, Continue", style: context.semiBold14(color: ColorManager.white)),
+              ),
             ),
             const SizedBox(height: 20),
             TextButton(
+              style: TextButton.styleFrom(foregroundColor: ColorManager.kPrimary),
               onPressed: () async {
                 await widget.user.sendEmailVerification();
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text("Verification email resent")),
-                );
+                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Verification email resent")));
               },
-              child: const Text("Resend Verification Email"),
-            )
+              child: Text("Resend Verification Email", style: context.semiBold14(color: ColorManager.kPrimary)),
+            ),
           ],
         ),
       ),
@@ -149,35 +158,29 @@ class _VerifyEmailScreenState extends State<VerifyEmailScreen> {
     final verified = await authProvider.reloadAndCheckVerified();
 
     if (verified) {
+      final success = await authProvider.createAccount(
+        isPhoneHide: widget.isSelected,
+        isSchoolHide: widget.isSchoolSelected,
+        isEnable: widget.isEnable,
+      );
 
-      final success = await authProvider.createAccount(isPhoneHide: widget.isSelected, isSchoolHide: widget.isSchoolSelected, isEnable: widget.isEnable);
-
-      if(success) {
+      if (success) {
         await accProvider.refreshCurrentUser();
-        Navigator.pushAndRemoveUntil(
-          context,
-          MaterialPageRoute(builder: (_) => Home(index: 0)),
-          (route) => false,
-        );
+        Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (_) => Home(index: 0)), (route) => false);
       } else {
         final shouldSave = await _saveAlertDialog(
-                            context,
-                            "Can't create your Account",
-                            "Please connect with us via WhatsApp to create your account.",
-                            'Need Help?',
-                          );
+          context,
+          "Can't create your Account",
+          "Please connect with us via WhatsApp to create your account.",
+          'Need Help?',
+        );
 
-                          if (shouldSave == true) {
-                            contactWhatsApp(
-                          "94713905383",
-                          "Hello, I need assistance with my account.",
-                        );
-                          }
+        if (shouldSave == true) {
+          contactWhatsApp("94713905383", "Hello, I need assistance with my account.");
+        }
       }
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Email not verified yet!")),
-      );
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Email not verified yet!")));
     }
 
     setState(() => checking = false);

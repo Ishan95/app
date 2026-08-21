@@ -209,6 +209,31 @@ class FirebaseService {
   }
 
   static Future<String?> getFcmToken() async {
-    return await _firebaseMessaging.getToken();
+    try {
+      if (Platform.isIOS) {
+        // Wait for the APNS token to be available before requesting the FCM token
+        String? apnsToken = await _firebaseMessaging.getAPNSToken();
+        int retries = 0;
+
+        // Retry fetching the APNS token up to 5 times (5 seconds total)
+        while (apnsToken == null && retries < 5) {
+          await Future.delayed(const Duration(seconds: 1));
+          apnsToken = await _firebaseMessaging.getAPNSToken();
+          retries++;
+        }
+
+        if (apnsToken == null) {
+          debugPrint('APNS token is still null after waiting. Check your Xcode configuration.');
+          return null; // Don't proceed to getToken() if APNS is missing
+        }
+      }
+
+      // Once APNS is confirmed (or if on Android), get the FCM token
+      return await _firebaseMessaging.getToken();
+
+    } catch (e) {
+      debugPrint('Error getting FCM token: $e');
+      return null;
+    }
   }
 }

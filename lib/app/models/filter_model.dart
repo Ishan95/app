@@ -12516,7 +12516,7 @@ this.districtInstitutionTypeForNurse = const {
       ],
     },
     this.institutionTypeOfficesForNurse = const {
-      // --- Colombo ---
+      //  Colombo 
       "National Hospital Colombo": [
         "The National Hospital of Sri Lanka (Colombo)",
       ],
@@ -12612,7 +12612,7 @@ this.districtInstitutionTypeForNurse = const {
         "Port Health Office – Colombo",
       ],
 
-      // --- Gampaha ---
+      //  Gampaha 
       "Teaching Hospital Gampaha": [
         "Teaching Hospital Colombo North Ragama"
       ],
@@ -12693,7 +12693,7 @@ this.districtInstitutionTypeForNurse = const {
         "Chest Clinic",
       ],
 
-      // --- Kalutara ---
+      //  Kalutara 
       "Teaching Hospital Kalutara": [
         "Teaching Hospital Kalutara"
       ],
@@ -12761,7 +12761,7 @@ this.districtInstitutionTypeForNurse = const {
         "Geekiyanakanda Estate Hospital",
       ],
 
-      // --- Kandy ---
+      //  Kandy 
       "National Hospital Kandy": ["National Hospital – Kandy"],
       "Teaching Hospital Kandy": [
         "Teaching Hospital Peradeniya",
@@ -12894,7 +12894,7 @@ this.districtInstitutionTypeForNurse = const {
         "STD/AIDS Clinic-Kandy",
       ],
 
-      // --- Matale ---
+      //  Matale 
       "District General Hospital Matale": [
         "District General Hospital – Matale",
       ],
@@ -12959,7 +12959,7 @@ this.districtInstitutionTypeForNurse = const {
         "STD/AIDS Clinic-Matale",
       ],
 
-      // --- Nuwara Eliya ---
+      //  Nuwara Eliya 
       "District General Hospital Nuwara Eliya": [
         "District General Hospital – Nuwara Eliya",
       ],
@@ -13038,7 +13038,7 @@ this.districtInstitutionTypeForNurse = const {
         "STD/AIDS Clinic- Nuwara-Eliya",
       ],
 
-      // --- Galle ---
+      //  Galle 
       "National Hospital Galle": [
         "Teaching Hospital Karapitiya (National Hospital)",
       ],
@@ -13129,7 +13129,7 @@ this.districtInstitutionTypeForNurse = const {
         "Port Health Office",
       ],
 
-      // --- Matara ---
+      //  Matara 
       "District General Hospital Matara": [
         "District General Hospital – Matara",
       ],
@@ -13203,7 +13203,7 @@ this.districtInstitutionTypeForNurse = const {
         "STD/AIDS Clinic",
       ],
 
-      // --- Hambantota ---
+      //  Hambantota 
       "District General Hospital Hambantota": [
         "District General Hospital – Hambanthota",
       ],
@@ -13270,7 +13270,7 @@ this.districtInstitutionTypeForNurse = const {
         "STD/AIDS Clinic",
       ],
 
-      // --- Jaffna ---
+      //  Jaffna 
       "Teaching Hospital Jaffna": ["Teaching Hospital – Jaffna"],
       "Base Hospital Jaffna": [
         "Base Hospital-Point Pedro",
@@ -13353,7 +13353,7 @@ this.districtInstitutionTypeForNurse = const {
         "Psycosocial Unit- Jaffna",
       ],
 
-      // --- Kilinochchi ---
+      //  Kilinochchi 
       "District General Hospital Kilinochchi": [
         "District General Hospital – Kilinochchi",
       ],
@@ -13385,7 +13385,7 @@ this.districtInstitutionTypeForNurse = const {
         "Regional Medical Supplies Division-Kilinochchi",
       ],
 
-      // --- Mannar ---
+      //  Mannar 
       "District General Hospital Mannar": [
         "District General Hospital – Mannar",
       ],
@@ -13427,7 +13427,7 @@ this.districtInstitutionTypeForNurse = const {
         "STD/AIDS Clinic-Mannar",
       ],
 
-      // --- Mullaitivu ---
+      //  Mullaitivu 
       "District General Hospital Mullaitivu": [
         "District General Hospital – Mullaitivu",
       ],
@@ -13465,7 +13465,7 @@ this.districtInstitutionTypeForNurse = const {
         "Chest Clinic-Mullativu",
       ],
 
-      // --- Vavuniya ---
+      //  Vavuniya 
       "District General Hospital Vavuniya": [
         "District General Hospital – Vavuniya",
       ],
@@ -13503,7 +13503,7 @@ this.districtInstitutionTypeForNurse = const {
         "STD/AIDS Clinic-Vavuniya",
       ],
 
-      // --- Trincomalee ---
+      //  Trincomalee 
       "District General Hospital Trincomalee": [
         "District General Hospital – Trincomalee",
       ],
@@ -13572,7 +13572,7 @@ this.districtInstitutionTypeForNurse = const {
         "Bio Medical Engineering Unit–Trincomalee",
       ],
 
-      // --- Batticaloa ---
+      //  Batticaloa 
       "Teaching Hospital Batticaloa": ["Teaching Hospital Batticaloa"],
       "District General Hospital Batticaloa": [
         "District General Hospital Batticaloa",
@@ -13645,7 +13645,7 @@ this.districtInstitutionTypeForNurse = const {
         "Regional Medical Supplies Division-Batticaloa",
       ],
 
-      // --- Ampara ---
+      //  Ampara 
       "District General Hospital Ampara": ["District General Hospital Ampara"],
       "Base Hospital Ampara": [
         "Base Hospital Akkaraipattu",
@@ -13740,7 +13740,7 @@ this.districtInstitutionTypeForNurse = const {
         "Ayurvedic Unit -Kalmunai",
       ],
 
-      // --- Kurunegala ---
+      //  Kurunegala 
       "Teaching Hospital Kurunegala": [
         "Teaching Hospital – Kurunegala",
         "Teaching Hospital – Kuliyapitiya",
@@ -13882,7 +13882,7 @@ this.districtInstitutionTypeForNurse = const {
         "Suwamadura Dental",
       ],
 
-      // --- Puttalam ---
+      //  Puttalam 
       "District General Hospital Puttalam": [
         "District General Hospital Chilaw",
       ],
@@ -13933,7 +13933,7 @@ this.districtInstitutionTypeForNurse = const {
         "Regional Anti Rabies Division",
       ],
 
-      // --- Anuradhapura ---
+      //  Anuradhapura 
       "Teaching Hospital Anuradhapura": ["Teaching Hospital – Anuradhapura"],
       "Base Hospital Anuradhapura": [
         "Base Hospital – Kebithigollewa",
@@ -14028,7 +14028,7 @@ this.districtInstitutionTypeForNurse = const {
         "STD/AIDS Clinic – Anuradhapura",
       ],
 
-      // --- Polonnaruwa ---
+      //  Polonnaruwa 
       "District General Hospital Polonnaruwa": [
         "District General Hospital – Polonnaruwa",
       ],
@@ -14083,7 +14083,7 @@ this.districtInstitutionTypeForNurse = const {
         "Divisional Pharmacist",
       ],
 
-      // --- Badulla ---
+      //  Badulla 
       "Provincial General Hospital Badulla": [
         "Provincial General Hospital Badulla",
       ],
@@ -14180,7 +14180,7 @@ this.districtInstitutionTypeForNurse = const {
         "Pharmacist",
       ],
 
-      // --- Monaragala ---
+      //  Monaragala 
       "District General Hospital Monaragala": [
         "District General Hospital – Monaragala",
       ],
@@ -14239,7 +14239,7 @@ this.districtInstitutionTypeForNurse = const {
         "Regional Malaria Officer",
       ],
 
-      // --- Ratnapura ---
+      //  Ratnapura 
       "Teaching Hospital Ratnapura": ["Teaching Hospital Ratnapura"],
       "District General Hospital Ratnapura": ["District General Hospital"],
       "Base Hospital Ratnapura": [
@@ -14320,7 +14320,7 @@ this.districtInstitutionTypeForNurse = const {
         "Chest Clinic",
       ],
 
-      // --- Kegalle ---
+      //  Kegalle 
       "Teaching Hospital Kegalle": ["District General Hospital – Kegalle"],
       "District General Hospital Kegalle": [
         "District General Hospital – Kegalle",

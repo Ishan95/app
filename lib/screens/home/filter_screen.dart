@@ -36,18 +36,26 @@ class _FilterScreenState extends State<FilterScreen> {
   String? selectedName;
   String? originalSelectedName;
   bool showList = false;
-  final accProvider = Provider.of<AccountProvider>(
-    ContextHelper.navigatorKey.currentContext!,
-    listen: false,
-  );
+  final accProvider = Provider.of<AccountProvider>(ContextHelper.navigatorKey.currentContext!, listen: false);
 
   @override
   void initState() {
     super.initState();
     _loadFilterData(); // Call the async method
-    allNames = (accProvider.appUser?.job == "Provincial School Teacher" ? originalFilterDetails.kottasaSchools.values : accProvider.appUser?.job == "National School Teacher" ? originalFilterDetails.kottasaSchools.values : accProvider.appUser?.job == "Nurse" ? originalFilterDetails.institutionTypeOfficesForNurse.values : accProvider.appUser?.job == "Management Assistant" ? originalFilterDetails.institutionTypeOfficesForMA.values : accProvider.appUser?.job == "Police Officer" ? originalFilterDetails.policeDivisionStations.values : originalFilterDetails.dsDivisionGnDivisions.values)
-        .expand((offices) => offices)
-        .toList();
+    allNames =
+        (accProvider.appUser?.job == "Provincial School Teacher"
+                ? originalFilterDetails.kottasaSchools.values
+                : accProvider.appUser?.job == "National School Teacher"
+                ? originalFilterDetails.kottasaSchools.values
+                : accProvider.appUser?.job == "Nurse"
+                ? originalFilterDetails.institutionTypeOfficesForNurse.values
+                : accProvider.appUser?.job == "Management Assistant"
+                ? originalFilterDetails.institutionTypeOfficesForMA.values
+                : accProvider.appUser?.job == "Police Officer"
+                ? originalFilterDetails.policeDivisionStations.values
+                : originalFilterDetails.dsDivisionGnDivisions.values)
+            .expand((offices) => offices)
+            .toList();
     filteredNames = allNames;
     _focusNode.addListener(() {
       setState(() {
@@ -87,7 +95,17 @@ class _FilterScreenState extends State<FilterScreen> {
     originalFilterDetails = filter.copy();
     setState(() {
       allNames =
-          (accProvider.appUser?.job == "Provincial School Teacher" ? originalFilterDetails.kottasaSchools.values : accProvider.appUser?.job == "National School Teacher" ? originalFilterDetails.kottasaNationalSchools.values : accProvider.appUser?.job == "Nurse" ? originalFilterDetails.institutionTypeOfficesForNurse.values : accProvider.appUser?.job == "Management Assistant" ? originalFilterDetails.institutionTypeOfficesForMA.values : accProvider.appUser?.job == "Police Officer" ? originalFilterDetails.policeDivisionStations.values : originalFilterDetails.dsDivisionGnDivisions.values)
+          (accProvider.appUser?.job == "Provincial School Teacher"
+                  ? originalFilterDetails.kottasaSchools.values
+                  : accProvider.appUser?.job == "National School Teacher"
+                  ? originalFilterDetails.kottasaNationalSchools.values
+                  : accProvider.appUser?.job == "Nurse"
+                  ? originalFilterDetails.institutionTypeOfficesForNurse.values
+                  : accProvider.appUser?.job == "Management Assistant"
+                  ? originalFilterDetails.institutionTypeOfficesForMA.values
+                  : accProvider.appUser?.job == "Police Officer"
+                  ? originalFilterDetails.policeDivisionStations.values
+                  : originalFilterDetails.dsDivisionGnDivisions.values)
               .expand((schools) => schools)
               .toSet()
               .toList()
@@ -102,12 +120,7 @@ class _FilterScreenState extends State<FilterScreen> {
       if (query.isEmpty) {
         filteredNames = allNames;
       } else {
-        filteredNames =
-            allNames
-                .where(
-                  (name) => name.toLowerCase().contains(query.toLowerCase()),
-                )
-                .toList();
+        filteredNames = allNames.where((name) => name.toLowerCase().contains(query.toLowerCase())).toList();
       }
     });
   }
@@ -135,84 +148,51 @@ class _FilterScreenState extends State<FilterScreen> {
       builder:
           (context) => AlertDialog(
             elevation: 10,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(16),
-            ),
-            title: Text(
-              title,
-              textAlign: TextAlign.start,
-              style: context.bold16(color: ColorManager.black),
-            ),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+            title: Text(title, textAlign: TextAlign.start, style: context.bold16(color: ColorManager.blackMedium)),
             content: Text(
               content,
               textAlign: TextAlign.start,
-              style: context.regular14(
-                color: ColorManager.black.withOpacity(0.8),
-              ),
+              style: context.regular14(color: ColorManager.blackMedium.withOpacity(0.8)),
             ),
 
             actions: [
               TextButton(
                 onPressed: onCancel,
-                child: Text(
-                  'Cancel',
-                  style: context.semiBold14(color: ColorManager.black),
-                ),
+                child: Text('Cancel', style: context.semiBold14(color: ColorManager.blackMedium)),
               ),
               TextButton(
                 onPressed: onConfirm,
-                child: Text(
-                  confirmText,
-                  style: context.semiBold14(color: ColorManager.red),
-                ),
+                child: Text(confirmText, style: context.semiBold14(color: ColorManager.red)),
               ),
             ],
           ),
     );
   }
 
-  Future<bool?> _saveAlertDialog(
-    BuildContext context,
-    String title,
-    String content,
-    String confirmText,
-  ) {
+  Future<bool?> _saveAlertDialog(BuildContext context, String title, String content, String confirmText) {
     return showDialog(
       context: context,
       barrierDismissible: false,
       builder:
           (context) => AlertDialog(
             elevation: 10,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(16),
-            ),
-            title: Text(
-              title,
-              textAlign: TextAlign.start,
-              style: context.bold16(color: ColorManager.black),
-            ),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+            title: Text(title, textAlign: TextAlign.start, style: context.bold16(color: ColorManager.blackMedium)),
             content: Text(
               content,
               textAlign: TextAlign.start,
-              style: context.regular14(
-                color: ColorManager.black.withOpacity(0.8),
-              ),
+              style: context.regular14(color: ColorManager.blackMedium.withOpacity(0.8)),
             ),
 
             actions: [
               TextButton(
                 onPressed: () => Navigator.pop(context, false),
-                child: Text(
-                  'Cancel',
-                  style: context.semiBold14(color: ColorManager.black),
-                ),
+                child: Text('Cancel', style: context.semiBold14(color: ColorManager.blackMedium)),
               ),
               TextButton(
                 onPressed: () => Navigator.pop(context, true),
-                child: Text(
-                  confirmText,
-                  style: context.semiBold14(color: ColorManager.red),
-                ),
+                child: Text(confirmText, style: context.semiBold14(color: ColorManager.red)),
               ),
             ],
           ),
@@ -220,8 +200,7 @@ class _FilterScreenState extends State<FilterScreen> {
   }
 
   bool get hasUnsavedChanges {
-    final filter =
-        Provider.of<FiltterProvider>(context, listen: false).filterDetails;
+    final filter = Provider.of<FiltterProvider>(context, listen: false).filterDetails;
     return !filter.isEqual(originalFilterDetails) ||
         locationFilter != originalLocationFilter ||
         schoolFilter != originalSchoolFilter ||
@@ -281,8 +260,10 @@ class _FilterScreenState extends State<FilterScreen> {
       // if (filter.school.isNotEmpty) summary.add('School: ${filter.school}');
     }
     if (schoolFilter && selectedName != null && selectedName!.isNotEmpty) {
-    summary.add('${(accProvider.appUser?.job == "Provincial School Teacher" || accProvider.appUser?.job == "National School Teacher") ? "School" : "Office"}: $selectedName');
-  }
+      summary.add(
+        '${(accProvider.appUser?.job == "Provincial School Teacher" || accProvider.appUser?.job == "National School Teacher") ? "School" : "Office"}: $selectedName',
+      );
+    }
     if (subjectFilter) {
       if (filter.scheme.isNotEmpty) summary.add('Scheme: ${filter.scheme}');
       if (filter.subject.isNotEmpty) summary.add('Subject: ${filter.subject}');
@@ -297,8 +278,7 @@ class _FilterScreenState extends State<FilterScreen> {
   }
 
   bool get isDefaultFilters {
-    final filter =
-        Provider.of<FiltterProvider>(context, listen: false).filterDetails;
+    final filter = Provider.of<FiltterProvider>(context, listen: false).filterDetails;
     return filter.isEqual(FilterModel()) &&
         !locationFilter &&
         !schoolFilter &&
@@ -313,13 +293,12 @@ class _FilterScreenState extends State<FilterScreen> {
       onTap: _hideList,
       behavior: HitTestBehavior.translucent,
       child: Scaffold(
-        backgroundColor: ColorManager.kPrimaryBlack,
+        backgroundColor: ColorManager.white,
         resizeToAvoidBottomInset: true,
         appBar: AppBar(
-          title: Text(
-            'Filter',
-            style: context.semiBold20(color: ColorManager.white),
-          ),
+          backgroundColor: ColorManager.white,
+          elevation: 0.5,
+          title: Text('Filter', style: context.semiBold20(color: ColorManager.blackMedium)),
           centerTitle: true,
           leading: GestureDetector(
             onTap: () {
@@ -337,11 +316,7 @@ class _FilterScreenState extends State<FilterScreen> {
                   )
                   : Navigator.of(context).pop();
             },
-            child: Icon(
-              Icons.arrow_back,
-              size: context.verticalSize(25),
-              color: ColorManager.white,
-            ),
+            child: Icon(Icons.arrow_back, size: context.verticalSize(25), color: ColorManager.blackMedium),
           ),
           actions: [
             if (!isDefaultFilters)
@@ -355,18 +330,13 @@ class _FilterScreenState extends State<FilterScreen> {
                       _resetFilters,
                       () => Navigator.of(context).pop(),
                     ),
-                child: Text(
-                  'Reset',
-                  style: context.semiBold14(color: ColorManager.redExtra),
-                ),
+                child: Text('Reset', style: context.semiBold14(color: ColorManager.red)),
               ),
             SizedBox(width: 4),
           ],
         ),
         body: SingleChildScrollView(
-          padding: EdgeInsets.only(
-            bottom: MediaQuery.of(context).viewInsets.bottom,
-          ),
+          padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
           child: Padding(
             padding: context.padding(horizontal: 20, top: 10),
             child: Consumer<FiltterProvider>(
@@ -381,15 +351,14 @@ class _FilterScreenState extends State<FilterScreen> {
                       children: [
                         Text(
                           "Location Filter According to choice",
-                          style: context.semiBold14(color: ColorManager.white),
+                          style: context.semiBold14(color: ColorManager.blackMedium),
                         ),
                         Switch(
                           value: locationFilter,
-                          activeColor: ColorManager.kPrimaryWarm,
-                          activeTrackColor: ColorManager.kPrimaryWarm
-                              .withOpacity(0.5),
-                          inactiveThumbColor: ColorManager.white,
-                          inactiveTrackColor: ColorManager.white10,
+                          activeColor: ColorManager.kPrimary,
+                          activeTrackColor: ColorManager.kPrimary.withOpacity(0.5),
+                          inactiveThumbColor: ColorManager.gray,
+                          inactiveTrackColor: ColorManager.grayLight,
                           onChanged: (value) {
                             setState(() {
                               locationFilter = value;
@@ -406,23 +375,16 @@ class _FilterScreenState extends State<FilterScreen> {
                             Container(
                               height: context.verticalSize(40),
                               width: double.infinity,
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 12,
-                              ),
+                              padding: const EdgeInsets.symmetric(horizontal: 12),
                               decoration: BoxDecoration(
-                                color: ColorManager.white10,
+                                color: ColorManager.whiteddd,
                                 borderRadius: BorderRadius.circular(20),
                               ),
                               child: DropdownButton<String>(
-                                value:
-                                    filter.filterDetails.province.isNotEmpty
-                                        ? filter.filterDetails.province
-                                        : null,
+                                value: filter.filterDetails.province.isNotEmpty ? filter.filterDetails.province : null,
                                 hint: Text(
                                   "Select Province",
-                                  style: context.regular14(
-                                    color: ColorManager.disabledText,
-                                  ),
+                                  style: context.regular14(color: ColorManager.disabledText),
                                 ),
                                 items:
                                     filter.filterDetails.provinceDistricts.keys
@@ -431,10 +393,7 @@ class _FilterScreenState extends State<FilterScreen> {
                                             value: province,
                                             child: Text(
                                               province,
-                                              style: context.regular14(
-                                                color:
-                                                    ColorManager.disabledText,
-                                              ),
+                                              style: context.regular14(color: ColorManager.blackMedium),
                                             ),
                                           ),
                                         )
@@ -442,63 +401,40 @@ class _FilterScreenState extends State<FilterScreen> {
                                 onChanged: (value) {
                                   setState(() {
                                     filter.filterDetails.province = value ?? '';
-                                    filter.filterDetails.district =
-                                        ''; // reset district
-                                    filter.filterDetails.kalapa =
-                                        ''; // reset kalapa
-                                    filter.filterDetails.school =
-                                        ''; // reset School
+                                    filter.filterDetails.district = ''; // reset district
+                                    filter.filterDetails.kalapa = ''; // reset kalapa
+                                    filter.filterDetails.school = ''; // reset School
                                   });
                                 },
-                                dropdownColor: ColorManager.kPrimaryBlack,
+                                dropdownColor: ColorManager.white,
                                 underline: const SizedBox(),
-                                icon: Icon(
-                                  Icons.arrow_drop_down,
-                                  color: ColorManager.disabledText,
-                                ),
+                                icon: Icon(Icons.arrow_drop_down, color: ColorManager.disabledText),
                                 isExpanded: true,
                               ),
                             ),
 
-                            SizedBox(
-                              height: context.verticalSize(
-                                filter.filterDetails.province.isNotEmpty
-                                    ? 20
-                                    : 0,
-                              ),
-                            ),
+                            SizedBox(height: context.verticalSize(filter.filterDetails.province.isNotEmpty ? 20 : 0)),
 
                             // District Dropdown
                             filter.filterDetails.province.isNotEmpty
                                 ? Container(
                                   height: context.verticalSize(40),
                                   width: double.infinity,
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 12,
-                                  ),
+                                  padding: const EdgeInsets.symmetric(horizontal: 12),
                                   decoration: BoxDecoration(
-                                    color: ColorManager.white10,
+                                    color: ColorManager.whiteddd,
                                     borderRadius: BorderRadius.circular(20),
                                   ),
                                   child: DropdownButton<String>(
                                     value:
-                                        filter.filterDetails.district.isNotEmpty
-                                            ? filter.filterDetails.district
-                                            : null,
+                                        filter.filterDetails.district.isNotEmpty ? filter.filterDetails.district : null,
                                     hint: Text(
                                       "Select District",
-                                      style: context.regular14(
-                                        color: ColorManager.disabledText,
-                                      ),
+                                      style: context.regular14(color: ColorManager.disabledText),
                                     ),
                                     items:
-                                        (filter
-                                                    .filterDetails
-                                                    .province
-                                                    .isNotEmpty
-                                                ? filter
-                                                        .filterDetails
-                                                        .provinceDistricts[filter
+                                        (filter.filterDetails.province.isNotEmpty
+                                                ? filter.filterDetails.provinceDistricts[filter
                                                         .filterDetails
                                                         .province] ??
                                                     []
@@ -508,42 +444,26 @@ class _FilterScreenState extends State<FilterScreen> {
                                                 value: district,
                                                 child: Text(
                                                   district,
-                                                  style: context.regular14(
-                                                    color:
-                                                        ColorManager
-                                                            .disabledText,
-                                                  ),
+                                                  style: context.regular14(color: ColorManager.blackMedium),
                                                 ),
                                               ),
                                             )
                                             .toList(),
                                     onChanged: (value) {
                                       setState(() {
-                                        filter.filterDetails.district =
-                                            value ?? '';
-                                        filter.filterDetails.kalapa =
-                                            ''; // reset kalapa
-                                        filter.filterDetails.school =
-                                            ''; // reset School
+                                        filter.filterDetails.district = value ?? '';
+                                        filter.filterDetails.kalapa = ''; // reset kalapa
+                                        filter.filterDetails.school = ''; // reset School
                                       });
                                     },
-                                    dropdownColor: ColorManager.kPrimaryBlack,
+                                    dropdownColor: ColorManager.white,
                                     underline: const SizedBox(),
-                                    icon: Icon(
-                                      Icons.arrow_drop_down,
-                                      color: ColorManager.disabledText,
-                                    ),
+                                    icon: Icon(Icons.arrow_drop_down, color: ColorManager.disabledText),
                                     isExpanded: true,
                                   ),
                                 )
                                 : SizedBox.shrink(),
-                            SizedBox(
-                              height: context.verticalSize(
-                                filter.filterDetails.district.isNotEmpty
-                                    ? 20
-                                    : 0,
-                              ),
-                            ),
+                            SizedBox(height: context.verticalSize(filter.filterDetails.district.isNotEmpty ? 20 : 0)),
                           ],
                         )
                         : SizedBox.shrink(),
@@ -553,15 +473,14 @@ class _FilterScreenState extends State<FilterScreen> {
                       children: [
                         Text(
                           "${(accProvider.appUser?.job == "Provincial School Teacher" || accProvider.appUser?.job == "National School Teacher") ? "School" : "Office"}  Filter",
-                          style: context.semiBold14(color: ColorManager.white),
+                          style: context.semiBold14(color: ColorManager.blackMedium),
                         ),
                         Switch(
                           value: schoolFilter,
-                          activeColor: ColorManager.kPrimaryWarm,
-                          activeTrackColor: ColorManager.kPrimaryWarm
-                              .withOpacity(0.5),
-                          inactiveThumbColor: ColorManager.white,
-                          inactiveTrackColor: ColorManager.white10,
+                          activeColor: ColorManager.kPrimary,
+                          activeTrackColor: ColorManager.kPrimary.withOpacity(0.5),
+                          inactiveThumbColor: ColorManager.gray,
+                          inactiveTrackColor: ColorManager.grayLight,
                           onChanged: (value) {
                             setState(() {
                               schoolFilter = value;
@@ -584,33 +503,21 @@ class _FilterScreenState extends State<FilterScreen> {
                               child: TextField(
                                 controller: _controller,
                                 focusNode: _focusNode,
-                                cursorColor: Colors.white,
+                                cursorColor: ColorManager.kPrimary,
                                 decoration: InputDecoration(
                                   hintText: "Search a name...",
-                                  hintStyle: const TextStyle(
-                                    color: Colors.white70,
-                                  ),
-                                  prefixIcon: const Icon(
-                                    Icons.search,
-                                    color: Colors.white,
-                                  ),
+                                  hintStyle: TextStyle(color: ColorManager.grayText),
+                                  prefixIcon: Icon(Icons.search, color: ColorManager.grayText),
                                   enabledBorder: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(8),
-                                    borderSide: BorderSide(
-                                      color:
-                                          Colors.grey, // gray when not focused
-                                      width: 1.2,
-                                    ),
+                                    borderSide: BorderSide(color: ColorManager.gray, width: 1.2),
                                   ),
                                   focusedBorder: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(8),
-                                    borderSide: BorderSide(
-                                      color: Colors.blue, // blue on focus
-                                      width: 1.5,
-                                    ),
+                                    borderSide: BorderSide(color: ColorManager.kPrimary, width: 1.5),
                                   ),
                                 ),
-                                style: const TextStyle(color: Colors.white),
+                                style: TextStyle(color: ColorManager.blackMedium),
                                 onChanged: (query) {
                                   _filterNames(query);
                                   setState(() {
@@ -627,9 +534,9 @@ class _FilterScreenState extends State<FilterScreen> {
                                   maxHeight: 200, // limit dropdown height
                                 ),
                                 decoration: BoxDecoration(
-                                  color: ColorManager.kPrimaryBlack,
+                                  color: ColorManager.white,
                                   borderRadius: BorderRadius.circular(8),
-                                  border: Border.all(color: Colors.grey),
+                                  border: Border.all(color: ColorManager.gray),
                                 ),
                                 child:
                                     filteredNames.isEmpty
@@ -637,9 +544,7 @@ class _FilterScreenState extends State<FilterScreen> {
                                           padding: const EdgeInsets.all(16.0),
                                           child: Text(
                                             "No results found",
-                                            style: context.regular14(
-                                              color: ColorManager.disabledText,
-                                            ),
+                                            style: context.regular14(color: ColorManager.grayText),
                                           ),
                                         )
                                         : ListView.builder(
@@ -650,10 +555,7 @@ class _FilterScreenState extends State<FilterScreen> {
                                             return ListTile(
                                               title: Text(
                                                 name,
-                                                style: context.regular14(
-                                                  color:
-                                                      ColorManager.disabledText,
-                                                ),
+                                                style: context.regular14(color: ColorManager.blackMedium),
                                               ),
                                               onTap: () {
                                                 setState(() {
@@ -674,19 +576,26 @@ class _FilterScreenState extends State<FilterScreen> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
-                          (accProvider.appUser?.job == "Provincial School Teacher" || accProvider.appUser?.job == "National School Teacher") ? "Scheme & Subject Filter" : "Grade Filter",
-                          style: context.semiBold14(color: ColorManager.white),
+                          (accProvider.appUser?.job == "Provincial School Teacher" ||
+                                  accProvider.appUser?.job == "National School Teacher")
+                              ? "Scheme & Subject Filter"
+                              : "Grade Filter",
+                          style: context.semiBold14(color: ColorManager.blackMedium),
                         ),
                         Switch(
-                          value: (accProvider.appUser?.job == "Provincial School Teacher" || accProvider.appUser?.job == "National School Teacher") ? subjectFilter : gradeFilter,
-                          activeColor: ColorManager.kPrimaryWarm,
-                          activeTrackColor: ColorManager.kPrimaryWarm
-                              .withOpacity(0.5),
-                          inactiveThumbColor: ColorManager.white,
-                          inactiveTrackColor: ColorManager.white10,
+                          value:
+                              (accProvider.appUser?.job == "Provincial School Teacher" ||
+                                      accProvider.appUser?.job == "National School Teacher")
+                                  ? subjectFilter
+                                  : gradeFilter,
+                          activeColor: ColorManager.kPrimary,
+                          activeTrackColor: ColorManager.kPrimary.withOpacity(0.5),
+                          inactiveThumbColor: ColorManager.gray,
+                          inactiveTrackColor: ColorManager.grayLight,
                           onChanged: (value) {
                             setState(() {
-                              if((accProvider.appUser?.job == "Provincial School Teacher" || accProvider.appUser?.job == "National School Teacher")) {
+                              if ((accProvider.appUser?.job == "Provincial School Teacher" ||
+                                  accProvider.appUser?.job == "National School Teacher")) {
                                 subjectFilter = value;
                               } else {
                                 gradeFilter = value;
@@ -696,134 +605,115 @@ class _FilterScreenState extends State<FilterScreen> {
                         ),
                       ],
                     ),
-                    ((accProvider.appUser?.job == "Provincial School Teacher" || accProvider.appUser?.job == "National School Teacher") && subjectFilter || gradeFilter)
+                    ((accProvider.appUser?.job == "Provincial School Teacher" ||
+                                    accProvider.appUser?.job == "National School Teacher") &&
+                                subjectFilter ||
+                            gradeFilter)
                         ? Column(
                           children: [
                             SizedBox(height: context.verticalSize(8)),
                             Container(
                               height: context.verticalSize(40),
                               width: double.infinity,
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 12,
-                              ),
+                              padding: const EdgeInsets.symmetric(horizontal: 12),
                               decoration: BoxDecoration(
-                                color: ColorManager.white10,
+                                color: ColorManager.whiteddd,
                                 borderRadius: BorderRadius.circular(20),
                               ),
                               child: DropdownButton<String>(
                                 value:
-                                    (accProvider.appUser?.job == "Provincial School Teacher" || accProvider.appUser?.job == "National School Teacher") ? filter.filterDetails.scheme.isNotEmpty
-                                        ? filter.filterDetails.scheme
-                                        : null : filter.filterDetails.grade.isNotEmpty
+                                    (accProvider.appUser?.job == "Provincial School Teacher" ||
+                                            accProvider.appUser?.job == "National School Teacher")
+                                        ? filter.filterDetails.scheme.isNotEmpty
+                                            ? filter.filterDetails.scheme
+                                            : null
+                                        : filter.filterDetails.grade.isNotEmpty
                                         ? filter.filterDetails.grade
                                         : null,
                                 hint: Text(
                                   "Select ${(accProvider.appUser?.job == "Provincial School Teacher" || accProvider.appUser?.job == "National School Teacher") ? "Scheme" : "Grade"}",
-                                  style: context.regular14(
-                                    color: ColorManager.disabledText,
-                                  ),
+                                  style: context.regular14(color: ColorManager.disabledText),
                                 ),
                                 items:
-                                    ((accProvider.appUser?.job == "Provincial School Teacher" || accProvider.appUser?.job == "National School Teacher") ? filter.filterDetails.schemeSubjects.keys : filter.filterDetails.gradeList)
+                                    ((accProvider.appUser?.job == "Provincial School Teacher" ||
+                                                accProvider.appUser?.job == "National School Teacher")
+                                            ? filter.filterDetails.schemeSubjects.keys
+                                            : filter.filterDetails.gradeList)
                                         .map(
                                           (scheme) => DropdownMenuItem(
                                             value: scheme,
                                             child: Text(
                                               scheme,
-                                              style: context.regular14(
-                                                color:
-                                                    ColorManager.disabledText,
-                                              ),
+                                              style: context.regular14(color: ColorManager.blackMedium),
                                             ),
                                           ),
                                         )
                                         .toList(),
                                 onChanged: (value) {
                                   setState(() {
-                                    if(accProvider.appUser?.job == "Provincial School Teacher" || accProvider.appUser?.job == "National School Teacher") {
+                                    if ((accProvider.appUser?.job == "Provincial School Teacher" ||
+                                        accProvider.appUser?.job == "National School Teacher")) {
                                       filter.filterDetails.scheme = value ?? '';
-                                      filter.filterDetails.subject =
-                                          ''; // reset subject
+                                      filter.filterDetails.subject = ''; // reset subject
                                     } else {
                                       filter.filterDetails.grade = value ?? '';
                                     }
                                   });
                                 },
-                                dropdownColor: ColorManager.kPrimaryBlack,
+                                dropdownColor: ColorManager.white,
                                 underline: const SizedBox(),
-                                icon: Icon(
-                                  Icons.arrow_drop_down,
-                                  color: ColorManager.disabledText,
-                                ),
+                                icon: Icon(Icons.arrow_drop_down, color: ColorManager.disabledText),
                                 isExpanded: true,
                               ),
                             ),
 
                             SizedBox(
                               height: context.verticalSize(
-                                (filter.filterDetails.scheme.isNotEmpty || filter.filterDetails.grade.isNotEmpty) ? 20 : 0,
+                                (filter.filterDetails.scheme.isNotEmpty || filter.filterDetails.grade.isNotEmpty)
+                                    ? 20
+                                    : 0,
                               ),
                             ),
 
                             // District Dropdown
-                            (filter.filterDetails.scheme != "PRIMARY" &&
-                                    filter.filterDetails.scheme.isNotEmpty)
+                            (filter.filterDetails.scheme != "PRIMARY" && filter.filterDetails.scheme.isNotEmpty)
                                 ? Container(
                                   height: context.verticalSize(40),
                                   width: double.infinity,
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 12,
-                                  ),
+                                  padding: const EdgeInsets.symmetric(horizontal: 12),
                                   decoration: BoxDecoration(
-                                    color: ColorManager.white10,
+                                    color: ColorManager.whiteddd,
                                     borderRadius: BorderRadius.circular(20),
                                   ),
                                   child: DropdownButton<String>(
                                     value:
-                                        filter.filterDetails.subject.isNotEmpty
-                                            ? filter.filterDetails.subject
-                                            : null,
+                                        filter.filterDetails.subject.isNotEmpty ? filter.filterDetails.subject : null,
                                     hint: Text(
                                       "Select Subject",
-                                      style: context.regular14(
-                                        color: ColorManager.disabledText,
-                                      ),
+                                      style: context.regular14(color: ColorManager.disabledText),
                                     ),
                                     items:
                                         (filter.filterDetails.scheme.isNotEmpty
-                                                ? filter
-                                                        .filterDetails
-                                                        .schemeSubjects[filter
-                                                        .filterDetails
-                                                        .scheme] ??
-                                                    []
+                                                ? filter.filterDetails.schemeSubjects[filter.filterDetails.scheme] ?? []
                                                 : <String>[])
                                             .map(
                                               (subject) => DropdownMenuItem(
                                                 value: subject,
                                                 child: Text(
                                                   subject,
-                                                  style: context.regular14(
-                                                    color:
-                                                        ColorManager
-                                                            .disabledText,
-                                                  ),
+                                                  style: context.regular14(color: ColorManager.blackMedium),
                                                 ),
                                               ),
                                             )
                                             .toList(),
                                     onChanged: (value) {
                                       setState(() {
-                                        filter.filterDetails.subject =
-                                            value ?? '';
+                                        filter.filterDetails.subject = value ?? '';
                                       });
                                     },
-                                    dropdownColor: ColorManager.kPrimaryBlack,
+                                    dropdownColor: ColorManager.white,
                                     underline: const SizedBox(),
-                                    icon: Icon(
-                                      Icons.arrow_drop_down,
-                                      color: ColorManager.disabledText,
-                                    ),
+                                    icon: Icon(Icons.arrow_drop_down, color: ColorManager.disabledText),
                                     isExpanded: true,
                                   ),
                                 )
@@ -838,85 +728,35 @@ class _FilterScreenState extends State<FilterScreen> {
                     CenterTextIconButton(
                       onPress: () async {
                         if (hasUnsavedChanges) {
-                          final filterDetails =
-                              Provider.of<FiltterProvider>(
-                                context,
-                                listen: false,
-                              ).filterDetails;
+                          final filterDetails = Provider.of<FiltterProvider>(context, listen: false).filterDetails;
                           final summary = _buildFilterSummary(filterDetails);
 
                           if (summary == 'No filters selected.') {
-                            toastErrorMessage(
-                              "Please select at least one filter before saving.",
-                            );
+                            toastErrorMessage("Please select at least one filter before saving.");
                             return; // Don't proceed if no filters are selected
                           }
 
-                          if (filterDetails.province.isNotEmpty && 
-                              filterDetails.district.isEmpty) {
-                            toastErrorMessage(
-                              "Please select a district for the selected province.",
-                            );
+                          if (filterDetails.province.isNotEmpty && filterDetails.district.isEmpty) {
+                            toastErrorMessage("Please select a district for the selected province.");
                             return;
                           }
 
-                          final shouldSave = await _saveAlertDialog(
-                            context,
-                            'Confirm Filters',
-                            summary,
-                            'Save',
-                          );
+                          final shouldSave = await _saveAlertDialog(context, 'Confirm Filters', summary, 'Save');
 
                           if (shouldSave == true) {
                             final prefs = await SharedPreferences.getInstance();
-                            await prefs.setString(
-                              'province',
-                              filterDetails.province,
-                            );
-                            await prefs.setString(
-                              'district',
-                              filterDetails.district,
-                            );
-                            await prefs.setString(
-                              'kalapa',
-                              filterDetails.kalapa,
-                            );
-                            await prefs.setString(
-                              'school',
-                              filterDetails.school,
-                            );
-                            await prefs.setString(
-                              'scheme',
-                              filterDetails.scheme,
-                            );
-                            await prefs.setString(
-                              'subject',
-                              filterDetails.subject,
-                            );
-                            await prefs.setString(
-                              'grade',
-                              filterDetails.grade,
-                            );
-                            await prefs.setString(
-                              'locationViaFilter',
-                              locationFilter ? "true" : "false",
-                            );
-                            await prefs.setString(
-                              'schoolViaFilter',
-                              schoolFilter ? "true" : "false",
-                            );
-                            await prefs.setString(
-                              'subjectViaFilter',
-                              subjectFilter ? "true" : "false",
-                            );
-                            await prefs.setString(
-                              'gradeViaFilter',
-                              gradeFilter ? "true" : "false",
-                            );
-                            await prefs.setString(
-                              'selectedName',
-                              selectedName ?? '',
-                            );
+                            await prefs.setString('province', filterDetails.province);
+                            await prefs.setString('district', filterDetails.district);
+                            await prefs.setString('kalapa', filterDetails.kalapa);
+                            await prefs.setString('school', filterDetails.school);
+                            await prefs.setString('scheme', filterDetails.scheme);
+                            await prefs.setString('subject', filterDetails.subject);
+                            await prefs.setString('grade', filterDetails.grade);
+                            await prefs.setString('locationViaFilter', locationFilter ? "true" : "false");
+                            await prefs.setString('schoolViaFilter', schoolFilter ? "true" : "false");
+                            await prefs.setString('subjectViaFilter', subjectFilter ? "true" : "false");
+                            await prefs.setString('gradeViaFilter', gradeFilter ? "true" : "false");
+                            await prefs.setString('selectedName', selectedName ?? '');
 
                             originalFilterDetails = filterDetails.copy();
                             originalSelectedName = selectedName;
@@ -930,26 +770,12 @@ class _FilterScreenState extends State<FilterScreen> {
                             print(filterDetails.scheme);
                             print(filterDetails.subject);
                             filter.applyFilters(
-                              district:
-                                  summary.contains('District:')
-                                      ? filterDetails.district
-                                      : null,
-                              school: schoolFilter && selectedName != ""
-                                    ? selectedName
-                                    : null,
-                              scheme:
-                                  summary.contains('Scheme:')
-                                      ? filterDetails.scheme
-                                      : null,
-                              subject:
-                                  summary.contains('Subject:')
-                                      ? filterDetails.subject
-                                      : null,
-                              grade:
-                                  summary.contains('Grade:')
-                                      ? filterDetails.grade
-                                      : null,
-                              job: accProvider.appUser?.job
+                              district: summary.contains('District:') ? filterDetails.district : null,
+                              school: schoolFilter && selectedName != "" ? selectedName : null,
+                              scheme: summary.contains('Scheme:') ? filterDetails.scheme : null,
+                              subject: summary.contains('Subject:') ? filterDetails.subject : null,
+                              grade: summary.contains('Grade:') ? filterDetails.grade : null,
+                              job: accProvider.appUser?.job,
                             );
                             Navigator.pop(context);
                           }
@@ -959,10 +785,7 @@ class _FilterScreenState extends State<FilterScreen> {
                       },
                       // isLoading: auth.getIsSignIn,
                       buttonText: "Save Changes",
-                      gradientColors:
-                          hasUnsavedChanges
-                              ? ColorManager.gradientButtons2
-                              : ColorManager.gradientGray,
+                      gradientColors: hasUnsavedChanges ? ColorManager.gradientButtons2 : ColorManager.gradientGray,
                     ),
                   ],
                 );
