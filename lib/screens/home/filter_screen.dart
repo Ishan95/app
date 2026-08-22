@@ -4,6 +4,7 @@ import 'package:app/app/utils/context_helper.dart';
 import 'package:app/app/utils/custom_toast.dart';
 import 'package:app/providers/account_provider.dart';
 import 'package:app/providers/filtter_provider.dart';
+import 'package:app/providers/service_providers/static_data_service.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -28,35 +29,21 @@ class _FilterScreenState extends State<FilterScreen> {
   bool originalSubjectFilter = false;
   bool originalgradeFilter = false;
 
-  // late FilterModel originalFilterDetails;
   FilterModel originalFilterDetails = FilterModel();
 
-  late List<String> allNames;
-  late List<String> filteredNames;
+  List<String> allNames = [];
+  List<String> filteredNames = [];
   String? selectedName;
   String? originalSelectedName;
   bool showList = false;
-  final accProvider = Provider.of<AccountProvider>(ContextHelper.navigatorKey.currentContext!, listen: false);
+  late AccountProvider accProvider;
 
   @override
   void initState() {
     super.initState();
-    _loadFilterData(); // Call the async method
-    allNames =
-        (accProvider.appUser?.job == "Provincial School Teacher"
-                ? originalFilterDetails.kottasaSchools.values
-                : accProvider.appUser?.job == "National School Teacher"
-                ? originalFilterDetails.kottasaSchools.values
-                : accProvider.appUser?.job == "Nurse"
-                ? originalFilterDetails.institutionTypeOfficesForNurse.values
-                : accProvider.appUser?.job == "Management Assistant"
-                ? originalFilterDetails.institutionTypeOfficesForMA.values
-                : accProvider.appUser?.job == "Police Officer"
-                ? originalFilterDetails.policeDivisionStations.values
-                : originalFilterDetails.dsDivisionGnDivisions.values)
-            .expand((offices) => offices)
-            .toList();
-    filteredNames = allNames;
+    accProvider = Provider.of<AccountProvider>(ContextHelper.navigatorKey.currentContext!, listen: false);
+    _loadFilterData();
+
     _focusNode.addListener(() {
       setState(() {
         showList = _focusNode.hasFocus;
@@ -91,28 +78,42 @@ class _FilterScreenState extends State<FilterScreen> {
     originalSubjectFilter = subjectFilter;
     originalgradeFilter = gradeFilter;
 
+    await StaticDataService.loadRootData(filter);
+    if (filter.province.isNotEmpty) {
+      await StaticDataService.fetchDistricts(filter, filter.province);
+    }
+
     Provider.of<FiltterProvider>(context, listen: false).filterDetails = filter;
     originalFilterDetails = filter.copy();
-    setState(() {
-      allNames =
-          (accProvider.appUser?.job == "Provincial School Teacher"
-                  ? originalFilterDetails.kottasaSchools.values
-                  : accProvider.appUser?.job == "National School Teacher"
-                  ? originalFilterDetails.kottasaNationalSchools.values
-                  : accProvider.appUser?.job == "Nurse"
-                  ? originalFilterDetails.institutionTypeOfficesForNurse.values
-                  : accProvider.appUser?.job == "Management Assistant"
-                  ? originalFilterDetails.institutionTypeOfficesForMA.values
-                  : accProvider.appUser?.job == "Police Officer"
-                  ? originalFilterDetails.policeDivisionStations.values
-                  : originalFilterDetails.dsDivisionGnDivisions.values)
-              .expand((schools) => schools)
-              .toSet()
-              .toList()
-            ..sort();
 
-      filteredNames = List.from(allNames);
-    }); // To update the UI after loading
+    final filtterProvider = Provider.of<FiltterProvider>(context, listen: false);
+    final job = accProvider.appUser?.job ?? '';
+
+    Set<String> extractedNames = {};
+    for (var user in filtterProvider.allUsersData) {
+      if (job == "Provincial School Teacher" && user.school != null && user.school!.isNotEmpty) {
+        extractedNames.add(user.school!);
+      } else if (job == "National School Teacher" && user.nationalSchool != null && user.nationalSchool!.isNotEmpty) {
+        extractedNames.add(user.nationalSchool!);
+      } else if (job == "Nurse" && user.officeForNurse != null && user.officeForNurse!.isNotEmpty) {
+        extractedNames.add(user.officeForNurse!);
+      } else if (job == "Management Assistant" && user.officeForMA != null && user.officeForMA!.isNotEmpty) {
+        extractedNames.add(user.officeForMA!);
+      } else if (job == "Police Officer" && user.policeStations != null && user.policeStations!.isNotEmpty) {
+        extractedNames.add(user.policeStations!);
+      } else if (job == "Grama Niladari" &&
+          user.gramaNiladhariDivision != null &&
+          user.gramaNiladhariDivision!.isNotEmpty) {
+        extractedNames.add(user.gramaNiladhariDivision!);
+      }
+    }
+
+    if (mounted) {
+      setState(() {
+        allNames = extractedNames.toList()..sort();
+        filteredNames = List.from(allNames);
+      });
+    }
   }
 
   void _filterNames(String query) {
@@ -155,7 +156,6 @@ class _FilterScreenState extends State<FilterScreen> {
               textAlign: TextAlign.start,
               style: context.regular14(color: ColorManager.blackMedium.withOpacity(0.8)),
             ),
-
             actions: [
               TextButton(
                 onPressed: onCancel,
@@ -184,7 +184,6 @@ class _FilterScreenState extends State<FilterScreen> {
               textAlign: TextAlign.start,
               style: context.regular14(color: ColorManager.blackMedium.withOpacity(0.8)),
             ),
-
             actions: [
               TextButton(
                 onPressed: () => Navigator.pop(context, false),
@@ -225,7 +224,6 @@ class _FilterScreenState extends State<FilterScreen> {
       originalSubjectFilter = subjectFilter;
       originalgradeFilter = gradeFilter;
       _controller.clear();
-      // selectedName = null;
       filteredNames = allNames;
     });
     final prefs = await SharedPreferences.getInstance();
@@ -257,7 +255,6 @@ class _FilterScreenState extends State<FilterScreen> {
         summary.add('District: ${filter.district}');
       }
       if (filter.kalapa.isNotEmpty) summary.add('Kalapa: ${filter.kalapa}');
-      // if (filter.school.isNotEmpty) summary.add('School: ${filter.school}');
     }
     if (schoolFilter && selectedName != null && selectedName!.isNotEmpty) {
       summary.add(
@@ -268,9 +265,6 @@ class _FilterScreenState extends State<FilterScreen> {
       if (filter.scheme.isNotEmpty) summary.add('Scheme: ${filter.scheme}');
       if (filter.subject.isNotEmpty) summary.add('Subject: ${filter.subject}');
     }
-    // if (schoolFilter && selectedName != null && selectedName!.isNotEmpty) {
-    //   summary.add('Name: $selectedName');
-    // }
     if (gradeFilter) {
       if (filter.grade.isNotEmpty) summary.add('Grade: ${filter.grade}');
     }
@@ -345,7 +339,6 @@ class _FilterScreenState extends State<FilterScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    // SizedBox(height: context.verticalSize(80)),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
@@ -387,7 +380,7 @@ class _FilterScreenState extends State<FilterScreen> {
                                   style: context.regular14(color: ColorManager.disabledText),
                                 ),
                                 items:
-                                    filter.filterDetails.provinceDistricts.keys
+                                    filter.filterDetails.provinces
                                         .map(
                                           (province) => DropdownMenuItem(
                                             value: province,
@@ -398,13 +391,17 @@ class _FilterScreenState extends State<FilterScreen> {
                                           ),
                                         )
                                         .toList(),
-                                onChanged: (value) {
+                                onChanged: (value) async {
                                   setState(() {
                                     filter.filterDetails.province = value ?? '';
                                     filter.filterDetails.district = ''; // reset district
                                     filter.filterDetails.kalapa = ''; // reset kalapa
                                     filter.filterDetails.school = ''; // reset School
                                   });
+                                  if (value != null && value.isNotEmpty) {
+                                    await StaticDataService.fetchDistricts(filter.filterDetails, value);
+                                    setState(() {});
+                                  }
                                 },
                                 dropdownColor: ColorManager.white,
                                 underline: const SizedBox(),
@@ -637,7 +634,7 @@ class _FilterScreenState extends State<FilterScreen> {
                                 items:
                                     ((accProvider.appUser?.job == "Provincial School Teacher" ||
                                                 accProvider.appUser?.job == "National School Teacher")
-                                            ? filter.filterDetails.schemeSubjects.keys
+                                            ? filter.filterDetails.schemes
                                             : filter.filterDetails.gradeList)
                                         .map(
                                           (scheme) => DropdownMenuItem(
@@ -649,7 +646,7 @@ class _FilterScreenState extends State<FilterScreen> {
                                           ),
                                         )
                                         .toList(),
-                                onChanged: (value) {
+                                onChanged: (value) async {
                                   setState(() {
                                     if ((accProvider.appUser?.job == "Provincial School Teacher" ||
                                         accProvider.appUser?.job == "National School Teacher")) {
@@ -659,6 +656,12 @@ class _FilterScreenState extends State<FilterScreen> {
                                       filter.filterDetails.grade = value ?? '';
                                     }
                                   });
+                                  if ((filter.filterDetails.job == "Provincial School Teacher" ||
+                                          filter.filterDetails.job == "National School Teacher") &&
+                                      value != null) {
+                                    await StaticDataService.fetchSubjects(filter.filterDetails, value);
+                                    setState(() {});
+                                  }
                                 },
                                 dropdownColor: ColorManager.white,
                                 underline: const SizedBox(),
@@ -675,7 +678,7 @@ class _FilterScreenState extends State<FilterScreen> {
                               ),
                             ),
 
-                            // District Dropdown
+                            // Subject Dropdown
                             (filter.filterDetails.scheme != "PRIMARY" && filter.filterDetails.scheme.isNotEmpty)
                                 ? Container(
                                   height: context.verticalSize(40),
@@ -765,10 +768,6 @@ class _FilterScreenState extends State<FilterScreen> {
                             originalSubjectFilter = subjectFilter;
                             originalgradeFilter = gradeFilter;
 
-                            print(filterDetails.district);
-                            print(filterDetails.school);
-                            print(filterDetails.scheme);
-                            print(filterDetails.subject);
                             filter.applyFilters(
                               district: summary.contains('District:') ? filterDetails.district : null,
                               school: schoolFilter && selectedName != "" ? selectedName : null,
@@ -783,7 +782,6 @@ class _FilterScreenState extends State<FilterScreen> {
                           print('No changes to save.');
                         }
                       },
-                      // isLoading: auth.getIsSignIn,
                       buttonText: "Save Changes",
                       gradientColors: hasUnsavedChanges ? ColorManager.gradientButtons2 : ColorManager.gradientGray,
                     ),
@@ -794,7 +792,6 @@ class _FilterScreenState extends State<FilterScreen> {
           ),
         ),
       ),
-      // ),
     );
   }
 }
