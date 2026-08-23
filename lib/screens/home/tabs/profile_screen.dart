@@ -484,6 +484,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   Widget _buildDivider() {
-    return Divider(color: dividerColor, thickness: 0.5, height: 0.2);
+    return Divider(color: dividerColor, thickness: 2, height: 0.2);
   }
 }
