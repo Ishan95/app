@@ -23,6 +23,7 @@ import 'package:provider/provider.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:app/l10n/app_localizations.dart';
+import 'package:app/providers/service_providers/onesignal_service.dart';
 
 RemoteMessage? _initialMessage;
 
@@ -35,6 +36,7 @@ Future<void> handleBackgroundMessage(RemoteMessage remoteMessage) async {
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  OneSignalService.initialize();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   FirebaseMessaging.onBackgroundMessage(handleBackgroundMessage);
   final firebaseService = FirebaseService();
