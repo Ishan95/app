@@ -14,7 +14,7 @@ class InfoButtonWithTooltip extends StatelessWidget {
     super.key,
     required this.tooltipText,
     this.width = 200,
-    this.height = 85,
+    this.height = 95,
     this.paddin = 20,
     this.isSignUp = false,
     this.child,

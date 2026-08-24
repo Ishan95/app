@@ -9,6 +9,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart' as firebase_auth;
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:app/l10n/app_localizations.dart';
 
 class TabView extends StatefulWidget {
   final int index;
@@ -25,14 +26,13 @@ class _TabViewState extends State<TabView> {
     await FirebaseFirestore.instance.collection('notifications').doc(notificationId).update({'isRead': true});
   }
 
-  Future<void> deleteNotification(String notificationId) async {
+  Future<void> deleteNotification(String notificationId, AppLocalizations l10n) async {
     try {
       await FirebaseFirestore.instance.collection('notifications').doc(notificationId).delete();
 
-      // Optional: Show a small snackbar
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(const SnackBar(content: Text("Notification deleted"), duration: Duration(seconds: 1)));
+      ).showSnackBar(SnackBar(content: Text(l10n.notificationDeleted), duration: const Duration(seconds: 1)));
     } catch (e) {
       print("Error deleting: $e");
     }
@@ -42,6 +42,7 @@ class _TabViewState extends State<TabView> {
   Widget build(BuildContext context) {
     final currentUser = firebase_auth.FirebaseAuth.instance.currentUser;
     final bool isUnreadList = widget.index == 1;
+    final l10n = AppLocalizations.of(context)!;
 
     return StreamBuilder<QuerySnapshot>(
       stream:
@@ -58,7 +59,7 @@ class _TabViewState extends State<TabView> {
 
         final docs = snapshot.data!.docs;
         if (docs.isEmpty) {
-          return Center(child: Text("No notifications", style: context.semiBold14(color: ColorManager.grayText)));
+          return Center(child: Text(l10n.noNotifications, style: context.semiBold14(color: ColorManager.grayText)));
         }
 
         return ListView.builder(
@@ -69,10 +70,9 @@ class _TabViewState extends State<TabView> {
             final notification = NotificationModel.fromFirestore(data, docs[index].id);
             bool isExpanded = expandedIds.contains(notification.id);
 
-            // inside your ListView.builder
             return Dismissible(
-              key: Key(notification.id), // Unique key for the notification
-              direction: DismissDirection.endToStart, // Swipe from right to left
+              key: Key(notification.id),
+              direction: DismissDirection.endToStart,
               background: Container(
                 alignment: Alignment.centerRight,
                 padding: const EdgeInsets.only(right: 20),
@@ -80,7 +80,7 @@ class _TabViewState extends State<TabView> {
                 child: const Icon(Icons.delete, color: Colors.white),
               ),
               onDismissed: (direction) {
-                deleteNotification(notification.id);
+                deleteNotification(notification.id, l10n);
               },
               child: AnimatedContainer(
                 duration: const Duration(milliseconds: 300),
@@ -92,9 +92,7 @@ class _TabViewState extends State<TabView> {
                 ),
                 child: Column(
                   children: [
-                    // STAGE 1: THE PREVIEW TILE
                     ListTile(
-                      // leading: Icon(Icons.person_add, color: ColorManager.blue),
                       leading: Image.asset(
                         notification.title.contains("Choice 1")
                             ? Assets.choice1
@@ -118,14 +116,10 @@ class _TabViewState extends State<TabView> {
                       trailing:
                           isUnreadList
                               ? (notification.isRead
-                                  ? Icon(
-                                    Icons.check_circle,
-                                    color: ColorManager.kPrimary,
-                                  ) // Becomes green/blue on click
+                                  ? Icon(Icons.check_circle, color: ColorManager.kPrimary)
                                   : Icon(Icons.circle, size: 10, color: ColorManager.kPrimary))
                               : null,
                       onTap: () {
-                        // 2. Toggle the expansion locally
                         setState(() {
                           if (isExpanded) {
                             expandedIds.remove(notification.id);
@@ -136,33 +130,27 @@ class _TabViewState extends State<TabView> {
                       },
                     ),
 
-                    // STAGE 2: THE EXPANDED PERSON CARD
                     if (isExpanded)
                       FutureBuilder<DocumentSnapshot>(
-                        future:
-                            FirebaseFirestore.instance
-                                .collection('users')
-                                .doc(notification.senderID) // Using the ID to get live data
-                                .get(),
+                        future: FirebaseFirestore.instance.collection('users').doc(notification.senderID).get(),
                         builder: (context, userSnap) {
                           if (userSnap.connectionState == ConnectionState.waiting) {
                             return Padding(
-                              padding: EdgeInsets.all(20),
+                              padding: const EdgeInsets.all(20),
                               child: Center(child: SpinKitFadingCircle(color: ColorManager.kPrimary, size: 40)),
                             );
                           }
 
                           if (!userSnap.hasData || !userSnap.data!.exists) {
                             return Padding(
-                              padding: EdgeInsets.all(8.0),
+                              padding: const EdgeInsets.all(8.0),
                               child: Text(
-                                "User details no longer available",
+                                l10n.userDetailsUnavailable,
                                 style: context.semiBold14(color: ColorManager.grayText),
                               ),
                             );
                           }
 
-                          // Map data using your existing factory
                           final userDetails = PersonDetailsModel.fromJson(
                             userSnap.data!.data() as Map<String, dynamic>,
                           );
@@ -180,7 +168,7 @@ class _TabViewState extends State<TabView> {
                                         await markAsRead(notification.id);
                                       },
                                       child: Text(
-                                        "Mark as Read ✅",
+                                        l10n.markAsRead,
                                         style: context.semiBold14(color: ColorManager.kPrimary),
                                       ),
                                     )

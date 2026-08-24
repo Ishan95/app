@@ -10,6 +10,8 @@ import 'package:flutter/material.dart';
 import 'package:app/app/export.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:app/l10n/app_localizations.dart';
+import 'package:app/app/utils/translation_service.dart';
 
 class PersonCard extends StatefulWidget {
   final PersonDetailsModel personDetails;
@@ -50,8 +52,9 @@ class _PersonCardState extends State<PersonCard> {
   @override
   Widget build(BuildContext context) {
     final FiltterProvider filterProvider = Provider.of<FiltterProvider>(context, listen: false);
-
     final String? currentUserId = filterProvider.firebaseUser?.uid;
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       decoration: BoxDecoration(
         color: ColorManager.white,
@@ -94,7 +97,7 @@ class _PersonCardState extends State<PersonCard> {
                             style: context.bold16(color: ColorManager.blackMedium),
                           ),
                           Text(
-                            "${widget.personDetails.district}",
+                            TranslationService.translate(context, widget.personDetails.district),
                             style: context.regular12(color: ColorManager.grayText),
                           ),
                         ],
@@ -112,11 +115,14 @@ class _PersonCardState extends State<PersonCard> {
                                 (widget.personDetails.job == "Provincial School Teacher" ||
                                         widget.personDetails.job == "National School Teacher")
                                     ? (widget.personDetails.scheme == "PRIMARY")
-                                        ? "Primary"
+                                        ? l10n.primary
                                         : (widget.personDetails.subject?.length ?? 0) > 35
-                                        ? '${widget.personDetails.subject?.substring(0, 35)}...'
-                                        : widget.personDetails.subject ?? ""
-                                    : "${widget.personDetails.grade}",
+                                        ? TranslationService.translate(
+                                          context,
+                                          '${widget.personDetails.subject?.substring(0, 35)}...',
+                                        )
+                                        : TranslationService.translate(context, widget.personDetails.subject)
+                                    : TranslationService.translate(context, widget.personDetails.grade),
                                 style: context.regular12(color: ColorManager.blackMedium),
                               ),
                             ),
@@ -130,14 +136,20 @@ class _PersonCardState extends State<PersonCard> {
                               child: Text(
                                 (widget.personDetails.job == "Provincial School Teacher" ||
                                         widget.personDetails.job == "National School Teacher")
-                                    ? "${widget.personDetails.scheme}"
+                                    ? TranslationService.translate(context, widget.personDetails.scheme)
                                     : widget.personDetails.job == "Nurse"
-                                    ? "${widget.personDetails.institutionTypeForNurse?.toShortInstitutionType()}"
+                                    ? TranslationService.translate(
+                                      context,
+                                      widget.personDetails.institutionTypeForNurse?.toShortInstitutionType(),
+                                    )
                                     : widget.personDetails.job == "Management Assistant"
-                                    ? "${widget.personDetails.institutionTypeForMA?.toShortInstitutionTypeForMA()}"
+                                    ? TranslationService.translate(
+                                      context,
+                                      widget.personDetails.institutionTypeForMA?.toShortInstitutionTypeForMA(),
+                                    )
                                     : widget.personDetails.job == "Police Officer"
-                                    ? "${widget.personDetails.policeDivisions}"
-                                    : "${widget.personDetails.divisionalSecretariat}",
+                                    ? TranslationService.translate(context, widget.personDetails.policeDivisions)
+                                    : TranslationService.translate(context, widget.personDetails.divisionalSecretariat),
                                 style: context.regular12(color: ColorManager.blackMedium),
                               ),
                             ),
@@ -146,25 +158,25 @@ class _PersonCardState extends State<PersonCard> {
                       ),
                       (widget.page == 'home' || isExpanded)
                           ? Text(
-                            "Transaction Requesting for(District) -",
+                            l10n.transactionRequestingDistrict,
                             style: context.regular12(color: ColorManager.grayText),
                             overflow: TextOverflow.visible,
                           )
-                          : SizedBox.shrink(),
+                          : const SizedBox.shrink(),
                       (widget.page == 'home' || isExpanded)
                           ? Text(
-                            "  1. ${widget.personDetails.choice1} (1st Choice)",
+                            "  1. ${TranslationService.translate(context, widget.personDetails.choice1)}${l10n.firstChoiceIndicator}",
                             style: context.semiBold14(color: ColorManager.blackMedium),
                             overflow: TextOverflow.visible,
                           )
-                          : SizedBox.shrink(),
+                          : const SizedBox.shrink(),
                       ((widget.page == 'home' || isExpanded) && widget.personDetails.choice2 != "")
                           ? Text(
-                            "  2. ${widget.personDetails.choice2},  ${widget.personDetails.choice3} (2nd & 3rd Choice)",
+                            "  2. ${TranslationService.translate(context, widget.personDetails.choice2)},  ${TranslationService.translate(context, widget.personDetails.choice3)}${l10n.secondThirdChoiceIndicator}",
                             style: context.regular12(color: ColorManager.blackMedium),
                             overflow: TextOverflow.visible,
                           )
-                          : SizedBox.shrink(),
+                          : const SizedBox.shrink(),
                     ],
                   ),
                 ),
@@ -193,6 +205,7 @@ class _PersonCardState extends State<PersonCard> {
             isExpanded
                 ? Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Expanded(
                       child: Column(
@@ -202,7 +215,7 @@ class _PersonCardState extends State<PersonCard> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                "   ${(widget.personDetails.job == "Provincial School Teacher" || widget.personDetails.job == "National School Teacher") ? "School" : "Office"} :  ",
+                                "   ${(widget.personDetails.job == "Provincial School Teacher" || widget.personDetails.job == "National School Teacher") ? l10n.schoolLabel : l10n.officeLabel} :  ",
                                 style: context.semiBold14(color: ColorManager.grayText),
                               ),
                               widget.personDetails.uid != currentUserId
@@ -214,27 +227,45 @@ class _PersonCardState extends State<PersonCard> {
                                     child: Text(
                                       widget.personDetails.job == "Provincial School Teacher"
                                           ? (widget.personDetails.school?.length ?? 0) > 28
-                                              ? '${widget.personDetails.school?.substring(0, 28)}...'
-                                              : "${widget.personDetails.school ?? '*****************'}    "
+                                              ? TranslationService.translate(
+                                                context,
+                                                '${widget.personDetails.school?.substring(0, 28)}...',
+                                              )
+                                              : "${TranslationService.translate(context, widget.personDetails.school) ?? '*****************'}    "
                                           : widget.personDetails.job == "National School Teacher"
                                           ? (widget.personDetails.nationalSchool?.length ?? 0) > 28
-                                              ? '${widget.personDetails.nationalSchool?.substring(0, 28)}...'
-                                              : "${widget.personDetails.nationalSchool ?? '*****************'}    "
+                                              ? TranslationService.translate(
+                                                context,
+                                                '${widget.personDetails.nationalSchool?.substring(0, 28)}...',
+                                              )
+                                              : "${TranslationService.translate(context, widget.personDetails.nationalSchool) ?? '*****************'}    "
                                           : widget.personDetails.job == "Nurse"
                                           ? (widget.personDetails.officeForNurse?.length ?? 0) > 28
-                                              ? '${widget.personDetails.officeForNurse?.substring(0, 28)}...'
-                                              : "${widget.personDetails.officeForNurse ?? '*****************'}    "
+                                              ? TranslationService.translate(
+                                                context,
+                                                '${widget.personDetails.officeForNurse?.substring(0, 28)}...',
+                                              )
+                                              : "${TranslationService.translate(context, widget.personDetails.officeForNurse) ?? '*****************'}    "
                                           : widget.personDetails.job == "Management Assistant"
                                           ? (widget.personDetails.officeForMA?.length ?? 0) > 28
-                                              ? '${widget.personDetails.officeForMA?.substring(0, 28)}...'
-                                              : "${widget.personDetails.officeForMA ?? '*****************'}    "
+                                              ? TranslationService.translate(
+                                                context,
+                                                '${widget.personDetails.officeForMA?.substring(0, 28)}...',
+                                              )
+                                              : "${TranslationService.translate(context, widget.personDetails.officeForMA) ?? '*****************'}    "
                                           : widget.personDetails.job == "Police Officer"
                                           ? (widget.personDetails.policeStations?.length ?? 0) > 28
-                                              ? '${widget.personDetails.policeStations?.substring(0, 28)}...'
-                                              : "${widget.personDetails.policeStations ?? '*****************'}    "
+                                              ? TranslationService.translate(
+                                                context,
+                                                '${widget.personDetails.policeStations?.substring(0, 28)}...',
+                                              )
+                                              : "${TranslationService.translate(context, widget.personDetails.policeStations) ?? '*****************'}    "
                                           : (widget.personDetails.gramaNiladhariDivision?.length ?? 0) > 28
-                                          ? '${widget.personDetails.gramaNiladhariDivision?.substring(0, 28)}...'
-                                          : "${widget.personDetails.gramaNiladhariDivision ?? '*****************'}    ",
+                                          ? TranslationService.translate(
+                                            context,
+                                            '${widget.personDetails.gramaNiladhariDivision?.substring(0, 28)}...',
+                                          )
+                                          : "${TranslationService.translate(context, widget.personDetails.gramaNiladhariDivision) ?? '*****************'}    ",
                                       style: context.semiBold14(color: ColorManager.blackMedium),
                                       overflow: TextOverflow.visible,
                                     ),
@@ -242,27 +273,45 @@ class _PersonCardState extends State<PersonCard> {
                                   : Text(
                                     widget.personDetails.job == "Provincial School Teacher"
                                         ? (widget.personDetails.school?.length ?? 0) > 30
-                                            ? '${widget.personDetails.school?.substring(0, 30)}...'
-                                            : "${widget.personDetails.school ?? '*****************'}    "
+                                            ? TranslationService.translate(
+                                              context,
+                                              '${widget.personDetails.school?.substring(0, 30)}...',
+                                            )
+                                            : "${TranslationService.translate(context, widget.personDetails.school) ?? '*****************'}    "
                                         : widget.personDetails.job == "National School Teacher"
                                         ? (widget.personDetails.nationalSchool?.length ?? 0) > 30
-                                            ? '${widget.personDetails.nationalSchool?.substring(0, 30)}...'
-                                            : "${widget.personDetails.nationalSchool ?? '*****************'}    "
+                                            ? TranslationService.translate(
+                                              context,
+                                              '${widget.personDetails.nationalSchool?.substring(0, 30)}...',
+                                            )
+                                            : "${TranslationService.translate(context, widget.personDetails.nationalSchool) ?? '*****************'}    "
                                         : widget.personDetails.job == "Nurse"
                                         ? (widget.personDetails.officeForNurse?.length ?? 0) > 30
-                                            ? '${widget.personDetails.officeForNurse?.substring(0, 30)}...'
-                                            : "${widget.personDetails.officeForNurse ?? '*****************'}    "
+                                            ? TranslationService.translate(
+                                              context,
+                                              '${widget.personDetails.officeForNurse?.substring(0, 30)}...',
+                                            )
+                                            : "${TranslationService.translate(context, widget.personDetails.officeForNurse) ?? '*****************'}    "
                                         : widget.personDetails.job == "Management Assistant"
                                         ? (widget.personDetails.officeForMA?.length ?? 0) > 30
-                                            ? '${widget.personDetails.officeForMA?.substring(0, 30)}...'
-                                            : "${widget.personDetails.officeForMA ?? '*****************'}    "
+                                            ? TranslationService.translate(
+                                              context,
+                                              '${widget.personDetails.officeForMA?.substring(0, 30)}...',
+                                            )
+                                            : "${TranslationService.translate(context, widget.personDetails.officeForMA) ?? '*****************'}    "
                                         : widget.personDetails.job == "Police Officer"
                                         ? (widget.personDetails.policeStations?.length ?? 0) > 30
-                                            ? '${widget.personDetails.policeStations?.substring(0, 30)}...'
-                                            : "${widget.personDetails.policeStations ?? '*****************'}    "
+                                            ? TranslationService.translate(
+                                              context,
+                                              '${widget.personDetails.policeStations?.substring(0, 30)}...',
+                                            )
+                                            : "${TranslationService.translate(context, widget.personDetails.policeStations) ?? '*****************'}    "
                                         : (widget.personDetails.gramaNiladhariDivision?.length ?? 0) > 30
-                                        ? '${widget.personDetails.gramaNiladhariDivision?.substring(0, 30)}...'
-                                        : "${widget.personDetails.gramaNiladhariDivision ?? '*****************'}    ",
+                                        ? TranslationService.translate(
+                                          context,
+                                          '${widget.personDetails.gramaNiladhariDivision?.substring(0, 30)}...',
+                                        )
+                                        : "${TranslationService.translate(context, widget.personDetails.gramaNiladhariDivision) ?? '*****************'}    ",
                                     style: context.semiBold14(color: ColorManager.blackMedium),
                                     overflow: TextOverflow.visible,
                                   ),
@@ -270,18 +319,18 @@ class _PersonCardState extends State<PersonCard> {
                                   ? Padding(
                                     padding: const EdgeInsets.only(right: 15.0),
                                     child: InfoButtonWithTooltip(
-                                      tooltipText: 'This content is hidden. Tap the chat icon to request your details.',
+                                      tooltipText: l10n.contentHiddenTooltip,
                                       child: Icon(Icons.visibility_off, color: ColorManager.grayText, size: 16),
                                     ),
                                   )
-                                  : SizedBox.shrink(),
+                                  : const SizedBox.shrink(),
                             ],
                           ),
                           SizedBox(height: context.verticalSize(5)),
                           Row(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text("   Contact :  ", style: context.semiBold14(color: ColorManager.grayText)),
+                              Text(l10n.contactIndicator, style: context.semiBold14(color: ColorManager.grayText)),
                               Expanded(
                                 child:
                                     widget.personDetails.uid != currentUserId
@@ -306,19 +355,30 @@ class _PersonCardState extends State<PersonCard> {
                                   ? Padding(
                                     padding: const EdgeInsets.only(right: 15.0),
                                     child: InfoButtonWithTooltip(
-                                      tooltipText: 'This content is hidden. Tap the chat icon to request your details.',
+                                      tooltipText: l10n.contentHiddenTooltip,
                                       child: Icon(Icons.visibility_off, color: ColorManager.grayText, size: 16),
                                     ),
                                   )
-                                  : SizedBox.shrink(),
+                                  : const SizedBox.shrink(),
+                            ],
+                          ),
 
-                              if (widget.personDetails.whatsapp != null && widget.personDetails.whatsapp!.isNotEmpty)
-                                Padding(
-                                  padding: const EdgeInsets.only(left: 8.0, right: 8.0),
+                          // SEPARATED WHATSAPP ROW
+                          if (widget.personDetails.whatsapp != null && widget.personDetails.whatsapp!.isNotEmpty)
+                            SizedBox(height: context.verticalSize(5)),
+                          if (widget.personDetails.whatsapp != null && widget.personDetails.whatsapp!.isNotEmpty)
+                            Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  "   ${l10n.whatsappIndicator}",
+                                  style: context.semiBold14(color: ColorManager.grayText),
+                                ),
+                                Expanded(
                                   child:
                                       widget.personDetails.uid == currentUserId
                                           ? Text(
-                                            "WhatsApp: ${widget.personDetails.whatsapp}",
+                                            widget.personDetails.whatsapp!,
                                             style: context.semiBold14(color: ColorManager.blackMedium),
                                           )
                                           : InkWell(
@@ -329,15 +389,16 @@ class _PersonCardState extends State<PersonCard> {
                                               );
                                             },
                                             child: Text(
-                                              "Chat with WhatsApp",
+                                              l10n.chatWithWhatsapp,
                                               style: context
                                                   .semiBold14(color: Colors.green)
                                                   .copyWith(decoration: TextDecoration.underline),
                                             ),
                                           ),
                                 ),
-                            ],
-                          ),
+                              ],
+                            ),
+
                           SizedBox(height: context.verticalSize(5)),
                           widget.personDetails.note != ""
                               ? Text(
@@ -345,7 +406,7 @@ class _PersonCardState extends State<PersonCard> {
                                 style: context.regular12(color: ColorManager.grayText),
                                 overflow: TextOverflow.visible,
                               )
-                              : SizedBox.shrink(),
+                              : const SizedBox.shrink(),
                         ],
                       ),
                     ),
@@ -374,10 +435,10 @@ class _PersonCardState extends State<PersonCard> {
                             child: Icon(Icons.chat, color: ColorManager.kPrimary),
                           ),
                         )
-                        : SizedBox(),
+                        : const SizedBox(),
                   ],
                 )
-                : SizedBox.shrink(),
+                : const SizedBox.shrink(),
           ],
         ),
       ),

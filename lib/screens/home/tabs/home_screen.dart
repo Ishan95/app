@@ -8,6 +8,7 @@ import 'package:firebase_auth/firebase_auth.dart' as firebase_auth;
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:provider/provider.dart';
+import 'package:app/l10n/app_localizations.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -20,7 +21,6 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
-    // Fetch users when the screen initializes
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       final filterProvider = Provider.of<FiltterProvider>(context, listen: false);
       await filterProvider.getAllUserDetails();
@@ -33,20 +33,22 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Padding(
       padding: context.padding(horizontal: 15),
       child: Consumer2<AccountProvider, FiltterProvider>(
         builder: (context, acc, filter, child) {
           final currentUserJob = acc.appUser?.job;
 
-          // Strict filtering: users only see profiles matching their own job role
           final displayedUsers =
               filter.filteredUsersData.where((user) {
                 if (currentUserJob == null || currentUserJob.isEmpty) {
-                  return false; // Or return true if users without a set job should see all
+                  return false;
                 }
                 return user.job == currentUserJob;
               }).toList();
+
           if (acc.appUser?.isEnable == false) {
             return Center(
               child: Padding(
@@ -55,7 +57,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
-                      'Your account has been disabled. Please contact support for more information.',
+                      l10n.accountDisabledMsg,
                       style: const TextStyle(color: Colors.red),
                       textAlign: TextAlign.center,
                     ),
@@ -78,14 +80,14 @@ class _HomeScreenState extends State<HomeScreen> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text('Error: ${filter.errorMessage}', style: const TextStyle(color: Colors.red)),
+                    Text('${l10n.errorPrefix}: ${filter.errorMessage}', style: const TextStyle(color: Colors.red)),
                     const SizedBox(height: 16),
                     ElevatedButton(
                       onPressed: () async {
                         await filter.getAllUserDetails();
                         await filter.reapplySavedFilters();
                       },
-                      child: const Text('Retry'),
+                      child: Text(l10n.retry),
                     ),
                   ],
                 ),
@@ -105,7 +107,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       },
                       child: Row(
                         children: [
-                          Text("Filter your Results", style: context.semiBold14(color: ColorManager.blackMedium)),
+                          Text(l10n.filterYourResults, style: context.semiBold14(color: ColorManager.blackMedium)),
                           SizedBox(width: context.horizontalSize(10)),
                           CircleAvatar(
                             backgroundColor: ColorManager.bgForButton,
@@ -116,7 +118,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                     ),
                     Text(
-                      "Results: ${displayedUsers.length}",
+                      "${l10n.results}: ${displayedUsers.length}",
                       style: context.semiBold14(color: ColorManager.blackMedium),
                     ),
                   ],
@@ -125,7 +127,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 displayedUsers.isEmpty
                     ? Expanded(
                       child: Center(
-                        child: Text("No Data Found!", style: context.semiBold14(color: ColorManager.grayText)),
+                        child: Text(l10n.noDataFound, style: context.semiBold14(color: ColorManager.grayText)),
                       ),
                     )
                     : Expanded(
@@ -143,7 +145,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                     user.uid == "UNKNOWN"
                                         ? currentUser?.displayName == user.firstName
                                             ? "${currentUser?.uid}"
-                                            : "UNKNOWN"
+                                            : l10n.unknown
                                         : user.uid,
                                 nicNo: user.nicNo ?? '--',
                                 firstName: user.firstName ?? '--',

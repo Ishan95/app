@@ -1,12 +1,17 @@
 import 'dart:io';
-import 'package:app/app/utils/color_manager.dart';
+import 'dart:ui';
+import 'package:app/app/export.dart';
+import 'package:app/app/models/filter_model.dart';
+import 'package:app/app/models/person_details_model.dart';
 import 'package:app/app/utils/context_helper.dart';
+import 'package:app/app/utils/custom_toast.dart';
 import 'package:app/app/utils/scroll_behavior.dart';
 import 'package:app/firebase_options.dart';
 import 'package:app/providers/account_provider.dart';
 import 'package:app/providers/auth_provider.dart';
 import 'package:app/providers/chat_provider.dart';
 import 'package:app/providers/filtter_provider.dart';
+import 'package:app/providers/locale_provider.dart';
 import 'package:app/providers/service_providers/firebase_service.dart';
 import 'package:app/screens/home/home.dart';
 import 'package:app/screens/onboarding/splash_screen.dart';
@@ -16,6 +21,8 @@ import 'package:flutter/services.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:provider/provider.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:app/l10n/app_localizations.dart';
 
 RemoteMessage? _initialMessage;
 
@@ -46,13 +53,14 @@ void main() async {
     ),
   );
   SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]).then(
-    (value) => runApp(
+        (value) => runApp(
       MultiProvider(
         providers: [
           ChangeNotifierProvider(create: (_) => AuthenticationProvider()),
           ChangeNotifierProvider(create: (_) => AccountProvider()),
           ChangeNotifierProvider(create: (_) => FiltterProvider()),
           ChangeNotifierProvider(create: (_) => ChatProvider()),
+          ChangeNotifierProvider(create: (_) => LocaleProvider()),
         ],
         child: const MyApp(),
       ),
@@ -86,6 +94,9 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
+    // Consume LocaleProvider
+    final localeProvider = Provider.of<LocaleProvider>(context);
+
     return LayoutBuilder(
       builder: (context, constraints) {
         return MaterialApp(
@@ -94,6 +105,18 @@ class _MyAppState extends State<MyApp> {
           navigatorKey: ContextHelper.navigatorKey,
           scrollBehavior: const MyScrollBehavior(),
           title: 'App',
+          locale: localeProvider.locale,
+          localizationsDelegates: const [
+            AppLocalizations.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          supportedLocales: const [
+            Locale('en', ''),
+            Locale('si', ''),
+            Locale('ta', ''),
+          ],
           theme: ThemeData(
             colorScheme: ColorScheme.fromSeed(seedColor: ColorManager.kPrimary, primary: ColorManager.kPrimary),
             useMaterial3: false,

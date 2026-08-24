@@ -2,6 +2,7 @@ import 'package:app/providers/auth_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:app/app/export.dart';
+import 'package:app/l10n/app_localizations.dart';
 
 class BottomNavBar extends StatelessWidget {
   const BottomNavBar({super.key, required this.onPress});
@@ -10,19 +11,13 @@ class BottomNavBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       decoration: BoxDecoration(
         color: ColorManager.white,
-        borderRadius: const BorderRadius.only(
-            topLeft: Radius.circular(20), topRight: Radius.circular(20)),
-        boxShadow: const [
-          BoxShadow(
-            color: Color(0x0A05241A), // Shadow color
-            offset: Offset(3, 3), // Shadow offset
-            blurRadius: 10, // Blur radius
-            spreadRadius: 4, // Spread radius
-          ),
-        ],
+        borderRadius: const BorderRadius.only(topLeft: Radius.circular(20), topRight: Radius.circular(20)),
+        boxShadow: const [BoxShadow(color: Color(0x0A05241A), offset: Offset(3, 3), blurRadius: 10, spreadRadius: 4)],
       ),
       padding: EdgeInsets.all(12),
       child: Consumer<AuthenticationProvider>(
@@ -43,7 +38,7 @@ class BottomNavBar extends StatelessWidget {
                           Icon(Icons.home, color: ColorManager.grayText),
                           SizedBox(height: context.verticalSize(4)),
                           Text(
-                            'Home',
+                            l10n.homeNav,
                             style: context.regular12(color: ColorManager.grayText),
                           ),
                           SizedBox(height: context.verticalSize(4)),
@@ -61,7 +56,7 @@ class BottomNavBar extends StatelessWidget {
                           Icon(Icons.notifications, color: ColorManager.grayText),
                           SizedBox(height: context.verticalSize(4)),
                           Text(
-                            'Notifications',
+                            l10n.notificationsNav,
                             style: context.regular12(color: ColorManager.grayText),
                           ),
                           SizedBox(height: context.verticalSize(4)),
@@ -99,7 +94,7 @@ class BottomNavBar extends StatelessWidget {
                           Icon(Icons.chat, color: ColorManager.grayText),
                           SizedBox(height: context.verticalSize(4)),
                           Text(
-                            'Chat',
+                            l10n.chatNav,
                             style: context.regular12(color: ColorManager.grayText),
                           ),
                           SizedBox(height: context.verticalSize(4)),
@@ -117,7 +112,7 @@ class BottomNavBar extends StatelessWidget {
                           Icon(Icons.person, color: ColorManager.grayText),
                           SizedBox(height: context.verticalSize(4)),
                           Text(
-                            'Account',
+                            l10n.accountNav,
                             style: context.regular12(color: ColorManager.grayText),
                           ),
                           SizedBox(height: context.verticalSize(4)),

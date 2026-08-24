@@ -5,6 +5,8 @@ import 'package:app/app/models/person_details_model.dart';
 import 'package:app/screens/notification/widget/string_extensions.dart';
 import 'package:flutter/material.dart';
 import 'package:app/app/export.dart';
+import 'package:app/l10n/app_localizations.dart';
+import 'package:app/app/utils/translation_service.dart';
 
 class PersonNotificationCard extends StatefulWidget {
   final PersonDetailsModel personDetails;
@@ -17,8 +19,11 @@ class PersonNotificationCard extends StatefulWidget {
 
 class _PersonNotificationCardState extends State<PersonNotificationCard> {
   bool isExpanded = false;
+
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       decoration: BoxDecoration(
         color: ColorManager.white,
@@ -58,7 +63,7 @@ class _PersonNotificationCardState extends State<PersonNotificationCard> {
                             style: context.bold16(color: ColorManager.blackMedium),
                           ),
                           Text(
-                            "${widget.personDetails.district}",
+                            TranslationService.translate(context, widget.personDetails.district),
                             style: context.regular12(color: ColorManager.grayText),
                           ),
                         ],
@@ -76,11 +81,14 @@ class _PersonNotificationCardState extends State<PersonNotificationCard> {
                                 (widget.personDetails.job == "Provincial School Teacher" ||
                                         widget.personDetails.job == "National School Teacher")
                                     ? (widget.personDetails.scheme == "PRIMARY")
-                                        ? "Primary"
+                                        ? l10n.primary
                                         : (widget.personDetails.subject?.length ?? 0) > 35
-                                        ? '${widget.personDetails.subject?.substring(0, 35)}...'
-                                        : widget.personDetails.subject ?? ""
-                                    : "${widget.personDetails.grade}",
+                                        ? TranslationService.translate(
+                                          context,
+                                          '${widget.personDetails.subject?.substring(0, 35)}...',
+                                        )
+                                        : TranslationService.translate(context, widget.personDetails.subject)
+                                    : TranslationService.translate(context, widget.personDetails.grade),
                                 style: context.regular12(color: ColorManager.blackMedium),
                               ),
                             ),
@@ -94,12 +102,18 @@ class _PersonNotificationCardState extends State<PersonNotificationCard> {
                               child: Text(
                                 (widget.personDetails.job == "Provincial School Teacher" ||
                                         widget.personDetails.job == "National School Teacher")
-                                    ? "${widget.personDetails.scheme}"
+                                    ? TranslationService.translate(context, widget.personDetails.scheme)
                                     : widget.personDetails.job == "Nurse"
-                                    ? "${widget.personDetails.institutionTypeForNurse?.toShortInstitutionType()}"
+                                    ? TranslationService.translate(
+                                      context,
+                                      widget.personDetails.institutionTypeForNurse?.toShortInstitutionType(),
+                                    )
                                     : widget.personDetails.job == "Management Assistant"
-                                    ? "${widget.personDetails.institutionTypeForMA?.toShortInstitutionType()}"
-                                    : "${widget.personDetails.institutionTypeForMA}",
+                                    ? TranslationService.translate(
+                                      context,
+                                      widget.personDetails.institutionTypeForMA?.toShortInstitutionType(),
+                                    )
+                                    : TranslationService.translate(context, widget.personDetails.institutionTypeForMA),
                                 style: context.regular12(color: ColorManager.blackMedium),
                               ),
                             ),
@@ -108,25 +122,25 @@ class _PersonNotificationCardState extends State<PersonNotificationCard> {
                       ),
                       isExpanded
                           ? Text(
-                            "Transaction Requesting for(District) -",
+                            l10n.transactionRequestingDistrict,
                             style: context.regular12(color: ColorManager.grayText),
                             overflow: TextOverflow.visible,
                           )
-                          : SizedBox.shrink(),
+                          : const SizedBox.shrink(),
                       isExpanded
                           ? Text(
-                            "  1. ${widget.personDetails.choice1} (1st Choice)",
+                            "  1. ${TranslationService.translate(context, widget.personDetails.choice1)}${l10n.firstChoiceIndicator}",
                             style: context.semiBold14(color: ColorManager.blackMedium),
                             overflow: TextOverflow.visible,
                           )
-                          : SizedBox.shrink(),
+                          : const SizedBox.shrink(),
                       isExpanded
                           ? Text(
-                            "  2. ${widget.personDetails.choice2},  ${widget.personDetails.choice3} (2nd & 3rd Choice)",
+                            "  2. ${TranslationService.translate(context, widget.personDetails.choice2)},  ${TranslationService.translate(context, widget.personDetails.choice3)}${l10n.secondThirdChoiceIndicator}",
                             style: context.regular12(color: ColorManager.blackMedium),
                             overflow: TextOverflow.visible,
                           )
-                          : SizedBox.shrink(),
+                          : const SizedBox.shrink(),
                     ],
                   ),
                 ),
@@ -142,10 +156,8 @@ class _PersonNotificationCardState extends State<PersonNotificationCard> {
                 },
                 child: CircleAvatar(
                   backgroundColor: ColorManager.whiteddd,
-                  // radius: 20,
                   radius: 12,
                   child: Icon(
-                    // Icons.filter_list,
                     isExpanded ? Icons.arrow_drop_up : Icons.arrow_drop_down_circle,
                     color: ColorManager.kPrimary,
                     size: 22,
@@ -157,6 +169,7 @@ class _PersonNotificationCardState extends State<PersonNotificationCard> {
             isExpanded
                 ? Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Expanded(
                       child: Column(
@@ -166,7 +179,7 @@ class _PersonNotificationCardState extends State<PersonNotificationCard> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                "   ${(widget.personDetails.job == "Provincial School Teacher" || widget.personDetails.job == "National School Teacher") ? "School" : "Office"} :  ",
+                                "   ${(widget.personDetails.job == "Provincial School Teacher" || widget.personDetails.job == "National School Teacher") ? l10n.schoolLabel : l10n.officeLabel} :  ",
                                 style: context.semiBold14(color: ColorManager.grayText),
                               ),
                               ImageFiltered(
@@ -178,15 +191,24 @@ class _PersonNotificationCardState extends State<PersonNotificationCard> {
                                   (widget.personDetails.job == "Provincial School Teacher" ||
                                           widget.personDetails.job == "National School Teacher")
                                       ? (widget.personDetails.school?.length ?? 0) > 25
-                                          ? '${widget.personDetails.school?.substring(0, 25)}...'
-                                          : "${widget.personDetails.school ?? '*****************'}    "
+                                          ? TranslationService.translate(
+                                            context,
+                                            '${widget.personDetails.school?.substring(0, 25)}...',
+                                          )
+                                          : "${TranslationService.translate(context, widget.personDetails.school) ?? '*****************'}    "
                                       : widget.personDetails.job == "Nurse"
                                       ? (widget.personDetails.officeForNurse?.length ?? 0) > 25
-                                          ? '${widget.personDetails.officeForNurse?.substring(0, 25)}...'
-                                          : "${widget.personDetails.officeForNurse ?? '*****************'}    "
+                                          ? TranslationService.translate(
+                                            context,
+                                            '${widget.personDetails.officeForNurse?.substring(0, 25)}...',
+                                          )
+                                          : "${TranslationService.translate(context, widget.personDetails.officeForNurse) ?? '*****************'}    "
                                       : (widget.personDetails.officeForMA?.length ?? 0) > 25
-                                      ? '${widget.personDetails.officeForMA?.substring(0, 25)}...'
-                                      : "${widget.personDetails.officeForMA ?? '*****************'}    ",
+                                      ? TranslationService.translate(
+                                        context,
+                                        '${widget.personDetails.officeForMA?.substring(0, 25)}...',
+                                      )
+                                      : "${TranslationService.translate(context, widget.personDetails.officeForMA) ?? '*****************'}    ",
                                   style: context.semiBold14(color: ColorManager.blackMedium),
                                   overflow: TextOverflow.visible,
                                 ),
@@ -194,28 +216,19 @@ class _PersonNotificationCardState extends State<PersonNotificationCard> {
                               widget.personDetails.isSchoolHide
                                   ? Padding(
                                     padding: const EdgeInsets.only(right: 15.0),
-                                    // child: Tooltip(
-                                    //   message:
-                                    //       "Content hidden. Tap chat icon to request details.",
-                                    //   child: Icon(
-                                    //     Icons.visibility_off,
-                                    //     color: ColorManager.white,
-                                    //     size: 16,
-                                    //   ),
-                                    // ),
                                     child: InfoButtonWithTooltip(
-                                      tooltipText: 'This content is hidden. Tap the chat icon to request your details.',
+                                      tooltipText: l10n.contentHiddenTooltip,
                                       child: Icon(Icons.visibility_off, color: ColorManager.grayText, size: 16),
                                     ),
                                   )
-                                  : SizedBox.shrink(),
+                                  : const SizedBox.shrink(),
                             ],
                           ),
                           SizedBox(height: context.verticalSize(5)),
                           Row(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text("   Contact :  ", style: context.semiBold14(color: ColorManager.grayText)),
+                              Text(l10n.contactIndicator, style: context.semiBold14(color: ColorManager.grayText)),
                               ImageFiltered(
                                 imageFilter: ImageFilter.blur(
                                   sigmaX: widget.personDetails.isPhoneHide ? 5 : 0,
@@ -230,23 +243,34 @@ class _PersonNotificationCardState extends State<PersonNotificationCard> {
                               widget.personDetails.isPhoneHide
                                   ? Padding(
                                     padding: const EdgeInsets.only(right: 15.0),
-                                    // child: Tooltip(
-                                    //   message:
-                                    //       "Content hidden. Tap chat icon to request details.",
-                                    //   child: Icon(
-                                    //     Icons.visibility_off,
-                                    //     color: ColorManager.white,
-                                    //     size: 16,
-                                    //   ),
-                                    // ),
                                     child: InfoButtonWithTooltip(
-                                      tooltipText: 'This content is hidden. Tap the chat icon to request your details.',
+                                      tooltipText: l10n.contentHiddenTooltip,
                                       child: Icon(Icons.visibility_off, color: ColorManager.grayText, size: 16),
                                     ),
                                   )
-                                  : SizedBox.shrink(),
+                                  : const SizedBox.shrink(),
                             ],
                           ),
+
+                          if (widget.personDetails.whatsapp != null && widget.personDetails.whatsapp!.isNotEmpty)
+                            SizedBox(height: context.verticalSize(5)),
+                          if (widget.personDetails.whatsapp != null && widget.personDetails.whatsapp!.isNotEmpty)
+                            Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  "   ${l10n.whatsappIndicator}",
+                                  style: context.semiBold14(color: ColorManager.grayText),
+                                ),
+                                Expanded(
+                                  child: Text(
+                                    widget.personDetails.whatsapp!,
+                                    style: context.semiBold14(color: ColorManager.blackMedium),
+                                  ),
+                                ),
+                              ],
+                            ),
+
                           SizedBox(height: context.verticalSize(5)),
                           widget.personDetails.note != ""
                               ? Text(
@@ -254,7 +278,7 @@ class _PersonNotificationCardState extends State<PersonNotificationCard> {
                                 style: context.regular12(color: ColorManager.grayText),
                                 overflow: TextOverflow.visible,
                               )
-                              : SizedBox.shrink(),
+                              : const SizedBox.shrink(),
                         ],
                       ),
                     ),
@@ -268,7 +292,7 @@ class _PersonNotificationCardState extends State<PersonNotificationCard> {
                     ),
                   ],
                 )
-                : SizedBox.shrink(),
+                : const SizedBox.shrink(),
           ],
         ),
       ),

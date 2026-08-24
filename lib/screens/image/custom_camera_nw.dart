@@ -4,6 +4,7 @@ import 'package:app/screens/image/photo_view.dart';
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:app/app/export.dart';
+import 'package:app/l10n/app_localizations.dart';
 
 class CustomCameraNw extends StatefulWidget {
   const CustomCameraNw({super.key, this.isOnboard = false, this.onPress, required this.onImageSelected});
@@ -89,18 +90,12 @@ class _CustomCameraNwState extends State<CustomCameraNw> {
     if (_controller != null && _controller!.value.isInitialized) {
       rotation = (_controller!.description.sensorOrientation ~/ 90) % 4;
     }
-    // if (_controller == null || !_controller!.value.isInitialized) {
-    //   return const Center(child: CircularProgressIndicator());
-    // }
-    // int rotation = (_controller!.description.sensorOrientation ~/ 90) % 4;
+
+    final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
       body: Stack(
         children: [
-          /// **Full-Screen Camera Preview**
-          // Positioned.fill(
-          //   child: CameraPreview(_controller!),
-          // ),
           Positioned.fill(
             child: Center(
               child: AspectRatio(
@@ -109,14 +104,12 @@ class _CustomCameraNwState extends State<CustomCameraNw> {
               ),
             ),
           ),
-
-          /// **Dark Black Overlay at the Top**
           Positioned(
             top: 0,
             left: 0,
             right: 0,
             child: Container(
-              height: 150, // Adjust height as needed
+              height: 150,
               decoration: const BoxDecoration(
                 gradient: LinearGradient(
                   begin: Alignment.topCenter,
@@ -126,14 +119,12 @@ class _CustomCameraNwState extends State<CustomCameraNw> {
               ),
             ),
           ),
-
-          /// **Dark Black Overlay at the Bottom**
           Positioned(
             bottom: 0,
             left: 0,
             right: 0,
             child: Container(
-              height: 200, // Adjust height as needed
+              height: 200,
               decoration: const BoxDecoration(
                 gradient: LinearGradient(
                   begin: Alignment.bottomCenter,
@@ -143,8 +134,6 @@ class _CustomCameraNwState extends State<CustomCameraNw> {
               ),
             ),
           ),
-
-          /// **Top Bar with Back Button and Title**
           Positioned(
             top: 40,
             left: 16,
@@ -155,22 +144,18 @@ class _CustomCameraNwState extends State<CustomCameraNw> {
                 IconButton(
                   icon: const Icon(Icons.arrow_back, color: Colors.white),
                   onPressed: () => Navigator.of(context)..pop(false),
-                  // Navigator.pop(context),
                 ),
-                Text('Take a photo', style: context.semiBold20(color: ColorManager.white)),
-                const SizedBox(width: 48), // Spacer
+                Text(l10n.takePhotoTitle, style: context.semiBold20(color: ColorManager.white)),
+                const SizedBox(width: 48),
               ],
             ),
           ),
-
-          /// **Bottom Camera Controls**
           Positioned(
             bottom: 40,
             left: 0,
             right: 0,
             child: Column(
               children: [
-                /// **Camera Control Buttons**
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
@@ -179,15 +164,7 @@ class _CustomCameraNwState extends State<CustomCameraNw> {
                       child: Icon(Icons.cameraswitch, color: Colors.white, size: 32),
                     ),
                     const SizedBox(width: 40),
-                    GestureDetector(
-                      onTap: _takePicture,
-                      child: Icon(Icons.camera, color: Colors.white, size: 80),
-                      // Image.asset(
-                      //   Assets.clickbutton,
-                      //   height: 60,
-                      //   width: 60,
-                      // ),
-                    ),
+                    GestureDetector(onTap: _takePicture, child: Icon(Icons.camera, color: Colors.white, size: 80)),
                     const SizedBox(width: 40),
                     IconButton(
                       icon: Icon(_isFlashOn ? Icons.flash_on : Icons.flash_off, color: ColorManager.kPrimary, size: 32),
@@ -195,18 +172,15 @@ class _CustomCameraNwState extends State<CustomCameraNw> {
                     ),
                   ],
                 ),
-
                 const SizedBox(height: 40),
-
-                /// **Instructional Text**
                 widget.isOnboard
                     ? const SizedBox()
-                    : const Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 20.0),
+                    : Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 20.0),
                       child: Text(
-                        "Step back and capture a clear, well-framed photo that provides the best details possible.",
+                        l10n.cameraInstruction,
                         textAlign: TextAlign.center,
-                        style: TextStyle(color: Colors.white, fontSize: 14),
+                        style: const TextStyle(color: Colors.white, fontSize: 14),
                       ),
                     ),
                 const SizedBox(height: 10),

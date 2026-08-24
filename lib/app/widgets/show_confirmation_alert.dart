@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:app/app/export.dart';
+import 'package:app/l10n/app_localizations.dart';
 
 class ConfirmationAlert {
   static Future<Widget> showConfirmationAlert({
@@ -16,6 +17,8 @@ class ConfirmationAlert {
     Function()? cancelOnTap,
     Function()? onDismiss,
   }) async {
+    final l10n = AppLocalizations.of(context)!;
+
     return await showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -24,7 +27,6 @@ class ConfirmationAlert {
         return Padding(
           padding: const EdgeInsets.all(10.0),
           child: SizedBox(
-            // height: context.screenHeight * 0.27,
             height: context.screenHeight * 0.34,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
@@ -79,7 +81,7 @@ class ConfirmationAlert {
                           child: Padding(
                             padding: const EdgeInsets.all(20.0),
                             child: Text(
-                              "Cancel",
+                              l10n.cancel,
                               style: context.semiBold18(color: cancelColor ?? ColorManager.kPrimary),
                               textAlign: TextAlign.center,
                             ),

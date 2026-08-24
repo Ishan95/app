@@ -14,8 +14,8 @@ import 'package:app/app/export.dart';
 import 'package:lottie/lottie.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'dart:io' show Platform;
-
 import 'package:video_player/video_player.dart';
+import 'package:app/l10n/app_localizations.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -40,7 +40,7 @@ class _SplashScreenState extends State<SplashScreen> {
       final userID = prefs.getString('userId');
       if (userID != null) {
       } else {
-        await Future.delayed(const Duration(seconds: 4)); // Ensure Lottie runs
+        await Future.delayed(const Duration(seconds: 4));
       }
 
       if (!mounted) return;
@@ -54,7 +54,6 @@ class _SplashScreenState extends State<SplashScreen> {
             }
           })
           .catchError((error) {
-            // THIS WILL PRINT THE EXACT FAILURE IN DEBUG CONSOLE
             print("Video Initialization Error: $error");
           });
 
@@ -72,22 +71,16 @@ class _SplashScreenState extends State<SplashScreen> {
   }
 
   Future<void> _initializeFirebaseAndCheckForUpdates() async {
-    // Ensure Firebase is initialized
     await Future.delayed(const Duration(seconds: 2));
-    await Firebase.initializeApp(); // Only needed if not already called in main()
+    await Firebase.initializeApp();
 
-    // Get current app version
     PackageInfo packageInfo = await PackageInfo.fromPlatform();
     setState(() {
       _currentAppVersion = packageInfo.version;
     });
 
-    // Initialize Remote Config
     await _remoteConfig.setConfigSettings(
-      RemoteConfigSettings(
-        fetchTimeout: const Duration(minutes: 1), // How long to wait to fetch
-        minimumFetchInterval: const Duration(minutes: 1), // How often to fetch
-      ),
+      RemoteConfigSettings(fetchTimeout: const Duration(minutes: 1), minimumFetchInterval: const Duration(minutes: 1)),
     );
 
     // Set default values (matches console default, important for initial fetch)
@@ -96,12 +89,10 @@ class _SplashScreenState extends State<SplashScreen> {
     // });
 
     try {
-      // Fetch and activate remote config values
       await _remoteConfig.fetchAndActivate();
 
       String minimumRequiredVersion = _remoteConfig.getString('minimum_required_app_version');
-      print("Fetched minimum required version: $minimumRequiredVersion    $_currentAppVersion");
-      // Compare versions
+      print("Fetched minimum required version: $minimumRequiredVersion   $_currentAppVersion");
       if (_isUpdateRequired(_currentAppVersion, minimumRequiredVersion)) {
         _showForceUpdateDialog();
       } else {
@@ -124,9 +115,7 @@ class _SplashScreenState extends State<SplashScreen> {
       }
     } catch (e) {
       print("Error fetching remote config: $e");
-      // Handle error gracefully, maybe allow user to proceed or show a warning.
       if (authProvider.user != null) {
-        // return const LoginScreen();
         Navigator.pushAndRemoveUntil(
           context,
           MaterialPageRoute<void>(builder: (BuildContext context) => const Home(index: 0)),
@@ -148,35 +137,33 @@ class _SplashScreenState extends State<SplashScreen> {
 
     for (int i = 0; i < minimumParts.length; i++) {
       if (i >= currentParts.length || currentParts[i] < minimumParts[i]) {
-        return true; // Current version is older
+        return true;
       } else if (currentParts[i] > minimumParts[i]) {
-        return false; // Current version is newer or equal at this part
+        return false;
       }
     }
-    return false; // Versions are the same, no update required
+    return false;
   }
 
   void _showForceUpdateDialog() {
     showDialog(
       context: context,
-      barrierDismissible: false, // Prevents closing by tapping outside
+      barrierDismissible: false,
       builder: (BuildContext context) {
+        final l10n = AppLocalizations.of(context)!;
         return AlertDialog(
           backgroundColor: ColorManager.white,
-          title: Text('New Version Available', style: context.semiBold14(color: ColorManager.blackMedium)),
-          content: Text(
-            'A new version of the app is available. Please update to continue using the app.',
-            style: context.semiBold14(color: ColorManager.blackMedium),
-          ),
+          title: Text(l10n.newVersionAvailable, style: context.semiBold14(color: ColorManager.blackMedium)),
+          content: Text(l10n.newVersionMessage, style: context.semiBold14(color: ColorManager.blackMedium)),
           actions: <Widget>[
             TextButton(
-              child: Text('Need Help?', style: context.semiBold14(color: ColorManager.kPrimary)),
+              child: Text(l10n.needHelp, style: context.semiBold14(color: ColorManager.kPrimary)),
               onPressed: () {
                 contactWhatsApp("94713905383", "Hello, I need assistance with my account.");
               },
             ),
             TextButton(
-              child: Text('Update Now', style: context.semiBold14(color: ColorManager.blackMedium)),
+              child: Text(l10n.updateNow, style: context.semiBold14(color: ColorManager.blackMedium)),
               onPressed: () {
                 _launchStore();
               },
@@ -201,17 +188,14 @@ class _SplashScreenState extends State<SplashScreen> {
       await launchUrl(Uri.parse(url));
     } else {
       print('Could not launch $url');
-      // Optionally show an error message to the user
     }
   }
 
   Future<void> contactWhatsApp(String phone, String message) async {
-    // Ensure the phone number is in E.164 format
     if (!phone.startsWith('+')) {
-      phone = '+$phone'; // Add '+' if missing
+      phone = '+$phone';
     }
 
-    // Encode the message
     final encodedMessage = Uri.encodeComponent(message);
 
     // Create WhatsApp URLs
@@ -220,21 +204,14 @@ class _SplashScreenState extends State<SplashScreen> {
     final uriWeb = Uri.parse("https://wa.me/$phone?text=$encodedMessage");
 
     try {
-      // 1. Try opening the WhatsApp app
       if (await canLaunchUrl(uriApp)) {
-        print('$uriApp');
         await launchUrl(uriApp, mode: LaunchMode.externalApplication);
         return;
       }
-
-      // 2. Fallback to WhatsApp Web
       if (await canLaunchUrl(uriWeb)) {
-        print('$uriWeb');
-        await launchUrl(uriWeb, mode: LaunchMode.platformDefault); // For iOS
+        await launchUrl(uriWeb, mode: LaunchMode.platformDefault);
         return;
       }
-
-      // 3. If both fail, print an error
       print("WhatsApp not available");
     } catch (e) {
       print("Error launching WhatsApp: $e");

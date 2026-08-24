@@ -7,6 +7,7 @@ import 'package:firebase_auth/firebase_auth.dart' as firebase_auth;
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:app/l10n/app_localizations.dart';
 
 class VerifyEmailScreen extends StatefulWidget {
   final firebase_auth.User user;
@@ -30,7 +31,13 @@ class VerifyEmailScreen extends StatefulWidget {
 class _VerifyEmailScreenState extends State<VerifyEmailScreen> {
   bool checking = false;
 
-  Future<bool?> _saveAlertDialog(BuildContext context, String title, String content, String confirmText) {
+  Future<bool?> _saveAlertDialog(
+    BuildContext context,
+    String title,
+    String content,
+    String confirmText,
+    AppLocalizations l10n,
+  ) {
     return showDialog(
       context: context,
       barrierDismissible: false,
@@ -49,7 +56,7 @@ class _VerifyEmailScreenState extends State<VerifyEmailScreen> {
             actions: [
               TextButton(
                 onPressed: () => Navigator.pop(context, false),
-                child: Text('Cancel', style: context.semiBold14(color: ColorManager.blackMedium)),
+                child: Text(l10n.cancel, style: context.semiBold14(color: ColorManager.blackMedium)),
               ),
               TextButton(
                 onPressed: () => Navigator.pop(context, true),
@@ -87,10 +94,12 @@ class _VerifyEmailScreenState extends State<VerifyEmailScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Scaffold(
       backgroundColor: ColorManager.white,
       appBar: AppBar(
-        title: Text("Verify Email", style: context.semiBold20(color: ColorManager.blackMedium)),
+        title: Text(l10n.verifyEmailTitle, style: context.semiBold20(color: ColorManager.blackMedium)),
         backgroundColor: ColorManager.white,
         elevation: 0.5,
         iconTheme: IconThemeData(color: ColorManager.blackMedium),
@@ -101,7 +110,7 @@ class _VerifyEmailScreenState extends State<VerifyEmailScreen> {
           children: [
             SizedBox(height: context.verticalSize(20)),
             Text(
-              "A verification link has been sent to your email.\nPlease verify and then click continue.",
+              l10n.verifyEmailMessage,
               textAlign: TextAlign.center,
               style: context.regular16(color: ColorManager.blackMedium),
             ),
@@ -115,15 +124,15 @@ class _VerifyEmailScreenState extends State<VerifyEmailScreen> {
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(25)),
                   elevation: 0,
                 ),
-                onPressed: checking ? null : checkVerification,
+                onPressed: checking ? null : () => checkVerification(l10n),
                 child:
                     checking
-                        ? SizedBox(
+                        ? const SizedBox(
                           height: 20,
                           width: 20,
-                          child: const CircularProgressIndicator(color: Colors.white, strokeWidth: 2.5),
+                          child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2.5),
                         )
-                        : Text("I Verified, Continue", style: context.semiBold14(color: ColorManager.white)),
+                        : Text(l10n.iVerifiedContinue, style: context.semiBold14(color: ColorManager.white)),
               ),
             ),
             const SizedBox(height: 20),
@@ -131,9 +140,9 @@ class _VerifyEmailScreenState extends State<VerifyEmailScreen> {
               style: TextButton.styleFrom(foregroundColor: ColorManager.kPrimary),
               onPressed: () async {
                 await widget.user.sendEmailVerification();
-                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Verification email resent")));
+                ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(l10n.verificationEmailResent)));
               },
-              child: Text("Resend Verification Email", style: context.semiBold14(color: ColorManager.kPrimary)),
+              child: Text(l10n.resendVerificationEmail, style: context.semiBold14(color: ColorManager.kPrimary)),
             ),
           ],
         ),
@@ -141,7 +150,7 @@ class _VerifyEmailScreenState extends State<VerifyEmailScreen> {
     );
   }
 
-  Future<void> checkVerification() async {
+  Future<void> checkVerification(AppLocalizations l10n) async {
     setState(() => checking = true);
 
     final authProvider = Provider.of<AuthenticationProvider>(context, listen: false);
@@ -158,13 +167,18 @@ class _VerifyEmailScreenState extends State<VerifyEmailScreen> {
 
       if (success) {
         await accProvider.refreshCurrentUser();
-        Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (_) => Home(index: 0)), (route) => false);
+        Navigator.pushAndRemoveUntil(
+          context,
+          MaterialPageRoute(builder: (_) => const Home(index: 0)),
+          (route) => false,
+        );
       } else {
         final shouldSave = await _saveAlertDialog(
           context,
-          "Can't create your Account",
-          "Please connect with us via WhatsApp to create your account.",
-          'Need Help?',
+          l10n.cantCreateAccount,
+          l10n.connectWhatsappToCreate,
+          l10n.needHelp,
+          l10n,
         );
 
         if (shouldSave == true) {
@@ -172,7 +186,7 @@ class _VerifyEmailScreenState extends State<VerifyEmailScreen> {
         }
       }
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Email not verified yet!")));
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(l10n.emailNotVerifiedYet)));
     }
 
     setState(() => checking = false);

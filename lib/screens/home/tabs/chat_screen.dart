@@ -333,16 +333,10 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart'; // For DateFormat
 import 'package:flutter_slidable/flutter_slidable.dart';
-// import 'package:app/app/utils/color_manager.dart'; // Assuming ColorManager and other utils
-// import 'package:app/app/utils/context_extensions.dart'; // Assuming context extensions
-import 'package:flutter_spinkit/flutter_spinkit.dart'; // For SpinKitFadingCircle
-// import 'package:flutter_slidable/flutter_slidable.dart'; // If you're using slidable
-// import 'package:app/app/export.dart'; // Or specific imports for ChatProvider, ChatCard, Contact, MessageScreen, AuthenticationProvider, FiltterProvider
-
-// (Placeholders for ColorManager, ContextExtensions, etc. as defined above if needed)
+import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:app/l10n/app_localizations.dart';
 
 class ChatScreen extends StatefulWidget {
-  // Renamed from _ContactScreenState to ChatScreen
   const ChatScreen({super.key});
 
   @override
@@ -379,24 +373,17 @@ class _ChatScreenState extends State<ChatScreen> with SingleTickerProviderStateM
     super.dispose();
   }
 
-  //  Navigation to MessageScreen from a ChatCard
   void _onChatTapped(ChatModel chatItem) {
-    // You need to fetch the full Contact object for the chat partner
-    // This assumes you have access to a list of all users/contacts.
-    // For simplicity, we'll create a Contact from the chatItem's metadata,
-    // but in a real app, you might look this up from your main user list.
     final contact = Contact(
       id: chatItem.chatPartnerId,
       name: chatItem.name,
-      role: 'Chat Partner', // Placeholder role
-      profileImage: null, // You'd fetch this if available
-      status: '', // You'd fetch this if available
+      role: 'Chat Partner',
+      profileImage: null,
+      status: '',
     );
-
     Navigator.of(context).push(MaterialPageRoute(builder: (context) => MessageScreen(contact: contact)));
   }
 
-  //  Navigation to MessageScreen from a ContactCard
   void _onContactTapped(Contact contact) {
     Navigator.of(context).push(MaterialPageRoute(builder: (context) => MessageScreen(contact: contact)));
   }
@@ -404,7 +391,8 @@ class _ChatScreenState extends State<ChatScreen> with SingleTickerProviderStateM
   @override
   Widget build(BuildContext context) {
     final FiltterProvider filterProvider = Provider.of<FiltterProvider>(context, listen: false);
-    final ChatProvider chatProvider = Provider.of<ChatProvider>(context); // Listen to changes for contactsList
+    final ChatProvider chatProvider = Provider.of<ChatProvider>(context);
+    final l10n = AppLocalizations.of(context)!;
 
     final String? currentUserId = filterProvider.firebaseUser?.uid;
 
@@ -414,7 +402,7 @@ class _ChatScreenState extends State<ChatScreen> with SingleTickerProviderStateM
       child: Column(
         children: [
           SizedBox(height: context.verticalSize(60)),
-          Center(child: Text('Chats', style: context.semiBold20(color: ColorManager.blackMedium))),
+          Center(child: Text(l10n.chatsTitle, style: context.semiBold20(color: ColorManager.blackMedium))),
           SizedBox(height: context.verticalSize(20)),
           // Padding(
           //   padding: context.padding(horizontal: 24, vertical: 16),
@@ -460,13 +448,16 @@ class _ChatScreenState extends State<ChatScreen> with SingleTickerProviderStateM
                         builder: (context, snapshot) {
                           if (snapshot.hasError) {
                             return Center(
-                              child: Text("Error: ${snapshot.error}", style: const TextStyle(color: Colors.red)),
+                              child: Text(
+                                "${l10n.errorPrefix}: ${snapshot.error}",
+                                style: const TextStyle(color: Colors.red),
+                              ),
                             );
                           } else if (snapshot.connectionState == ConnectionState.waiting) {
                             return const Center(child: CircularProgressIndicator());
                           } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
                             return Center(
-                              child: Text("No active chats.", style: TextStyle(color: ColorManager.grayText)),
+                              child: Text(l10n.noActiveChats, style: TextStyle(color: ColorManager.grayText)),
                             );
                           }
 
@@ -478,8 +469,7 @@ class _ChatScreenState extends State<ChatScreen> with SingleTickerProviderStateM
                             itemBuilder: (context, index) {
                               final chatItem = snapshot.data![index];
                               return Slidable(
-                                // Re-enabled Slidable
-                                key: ValueKey(chatItem.chatRoomId), // Use unique key
+                                key: ValueKey(chatItem.chatRoomId),
                                 endActionPane: ActionPane(
                                   motion: const DrawerMotion(),
                                   children: [
@@ -493,7 +483,7 @@ class _ChatScreenState extends State<ChatScreen> with SingleTickerProviderStateM
                                       backgroundColor: Colors.orange,
                                       foregroundColor: Colors.white,
                                       icon: chatItem.isMute ? Icons.volume_up : Icons.volume_off,
-                                      label: chatItem.isMute ? 'UnMute' : 'Mute',
+                                      label: chatItem.isMute ? l10n.unmute : l10n.mute,
                                     ),
                                     SlidableAction(
                                       onPressed:
@@ -501,7 +491,7 @@ class _ChatScreenState extends State<ChatScreen> with SingleTickerProviderStateM
                                       backgroundColor: Colors.red,
                                       foregroundColor: Colors.white,
                                       icon: Icons.delete,
-                                      label: 'Delete',
+                                      label: l10n.delete,
                                     ),
                                   ],
                                 ),
@@ -509,7 +499,7 @@ class _ChatScreenState extends State<ChatScreen> with SingleTickerProviderStateM
                                   name: chatItem.name,
                                   lastMessage: chatItem.message,
                                   time: DateFormat('MMM d, hh:mm a').format(chatItem.time.toDate()),
-                                  profileImage: "", // You'd fetch this from the actual contact
+                                  profileImage: "",
                                   onTap: () => _onChatTapped(chatItem),
                                   isMute: chatItem.isMute,
                                 ),
@@ -518,9 +508,7 @@ class _ChatScreenState extends State<ChatScreen> with SingleTickerProviderStateM
                           );
                         },
                       )
-                      : Center(
-                        child: Text("Please login to see chats.", style: TextStyle(color: ColorManager.grayText)),
-                      ),
+                      : Center(child: Text(l10n.pleaseLoginToSeeChats, style: TextStyle(color: ColorManager.grayText))),
             ),
           ),
 
@@ -616,9 +604,6 @@ class _ChatScreenState extends State<ChatScreen> with SingleTickerProviderStateM
   }
 }
 
-// Ensure you have this import for Slidable
-
-// Assuming you have this widget for displaying individual contacts
 class ContactCardNew extends StatelessWidget {
   final String name;
   final String role;

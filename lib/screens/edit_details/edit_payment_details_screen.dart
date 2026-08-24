@@ -11,6 +11,7 @@ import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
+import 'package:app/l10n/app_localizations.dart';
 
 class EditPaymentDetailsScreen extends StatefulWidget {
   const EditPaymentDetailsScreen({super.key});
@@ -49,7 +50,6 @@ class _EditPaymentDetailsScreenState extends State<EditPaymentDetailsScreen> {
         ],
       );
 
-      print('1212121212121212');
       if (croppedFile != null) {
         setState(() {
           selectedImage = File(croppedFile.path);
@@ -59,15 +59,15 @@ class _EditPaymentDetailsScreenState extends State<EditPaymentDetailsScreen> {
     }
   }
 
-  void _confirmRemoveImage() {
+  void _confirmRemoveImage(AppLocalizations l10n) {
     showDialog(
       context: context,
       builder:
           (context) => AlertDialog(
-            title: const Text('Remove photo?'),
-            content: const Text('Are you sure you want to remove the uploaded photo?'),
+            title: Text(l10n.removePhotoTitle),
+            content: Text(l10n.removePhotoDesc),
             actions: [
-              TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel')),
+              TextButton(onPressed: () => Navigator.pop(context), child: Text(l10n.cancel)),
               TextButton(
                 onPressed: () {
                   setState(() {
@@ -75,7 +75,7 @@ class _EditPaymentDetailsScreenState extends State<EditPaymentDetailsScreen> {
                   });
                   Navigator.pop(context);
                 },
-                child: const Text('Remove'),
+                child: Text(l10n.remove),
               ),
             ],
           ),
@@ -99,12 +99,14 @@ class _EditPaymentDetailsScreenState extends State<EditPaymentDetailsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Scaffold(
       backgroundColor: ColorManager.kPrimaryBlack,
       appBar: AppBar(
         backgroundColor: ColorManager.white,
         elevation: 0.5,
-        title: Text("Edit Payment Information", style: context.semiBold20(color: ColorManager.blackMedium)),
+        title: Text(l10n.editPaymentInfo, style: context.semiBold20(color: ColorManager.blackMedium)),
         centerTitle: true,
         leading: GestureDetector(
           onTap: () {
@@ -133,7 +135,7 @@ class _EditPaymentDetailsScreenState extends State<EditPaymentDetailsScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         SizedBox(height: context.verticalSize(20)),
-                        Text("Transfer Date", style: context.semiBold14(color: ColorManager.blackMedium)),
+                        Text(l10n.transferDate, style: context.semiBold14(color: ColorManager.blackMedium)),
                         SizedBox(height: context.verticalSize(8)),
                         InkWell(
                           onTap: () => _selectDate(context),
@@ -147,7 +149,7 @@ class _EditPaymentDetailsScreenState extends State<EditPaymentDetailsScreen> {
                             alignment: Alignment.centerLeft,
                             padding: const EdgeInsets.symmetric(horizontal: 16),
                             child: Text(
-                              _selectedDate != null ? '${_selectedDate!.toLocal()}'.split(' ')[0] : 'Transfer Date',
+                              _selectedDate != null ? '${_selectedDate!.toLocal()}'.split(' ')[0] : l10n.transferDate,
                               style: TextStyle(
                                 color: _selectedDate != null ? ColorManager.blackMedium : ColorManager.grayText,
                                 fontSize: context.fontSize(14),
@@ -168,18 +170,18 @@ class _EditPaymentDetailsScreenState extends State<EditPaymentDetailsScreen> {
                             ),
                           ),
                         SizedBox(height: context.verticalSize(20)),
-                        Text("Ref No", style: context.semiBold14(color: ColorManager.blackMedium)),
+                        Text(l10n.refNo, style: context.semiBold14(color: ColorManager.blackMedium)),
                         SizedBox(height: context.verticalSize(8)),
                         CustomTextField(
                           radius: 30,
                           height: context.verticalSize(40),
                           controller: acc.refNoController,
                           inputType: TextInputType.name,
-                          hintText: 'Ref No',
+                          hintText: l10n.refNo,
                           validator: (value) {
                             if (acc.refNoController.text.isEmpty) {
                               setState(() {
-                                refNoError = "Ref Number is required";
+                                refNoError = l10n.reqRefNo;
                               });
                               return '';
                             }
@@ -190,18 +192,18 @@ class _EditPaymentDetailsScreenState extends State<EditPaymentDetailsScreen> {
                           },
                           errorMessage: refNoError,
                         ),
-                        Text("Account Number", style: context.semiBold14(color: ColorManager.blackMedium)),
+                        Text(l10n.accountNumber, style: context.semiBold14(color: ColorManager.blackMedium)),
                         SizedBox(height: context.verticalSize(8)),
                         CustomTextField(
                           radius: 30,
                           height: context.verticalSize(40),
                           controller: acc.accountNumberController,
                           inputType: TextInputType.name,
-                          hintText: 'Account Number',
+                          hintText: l10n.accountNumber,
                           validator: (value) {
                             if (acc.accountNumberController.text.isEmpty) {
                               setState(() {
-                                accountNumberError = "Account Number is required";
+                                accountNumberError = l10n.reqAccountNumber;
                               });
                               return '';
                             }
@@ -212,23 +214,23 @@ class _EditPaymentDetailsScreenState extends State<EditPaymentDetailsScreen> {
                           },
                           errorMessage: accountNumberError,
                         ),
-                        Text("Sender Name", style: context.semiBold14(color: ColorManager.blackMedium)),
+                        Text(l10n.senderName, style: context.semiBold14(color: ColorManager.blackMedium)),
                         SizedBox(height: context.verticalSize(8)),
                         CustomTextField(
                           radius: 30,
                           height: context.verticalSize(40),
                           controller: acc.senderNameController,
                           inputType: TextInputType.name,
-                          hintText: 'Name',
+                          hintText: l10n.name,
                           validator: (value) {
                             if (acc.senderNameController.text.isEmpty) {
                               setState(() {
-                                nameError = "Name is required";
+                                nameError = l10n.reqName;
                               });
                               return '';
                             } else if ((value?.length ?? 0) > 100) {
                               setState(() {
-                                nameError = "Must be 1–100 characters";
+                                nameError = l10n.reqNameLength;
                               });
                               return '';
                             }
@@ -239,18 +241,18 @@ class _EditPaymentDetailsScreenState extends State<EditPaymentDetailsScreen> {
                           },
                           errorMessage: nameError,
                         ),
-                        Text("Amount", style: context.semiBold14(color: ColorManager.blackMedium)),
+                        Text(l10n.amount, style: context.semiBold14(color: ColorManager.blackMedium)),
                         SizedBox(height: context.verticalSize(8)),
                         CustomTextField(
                           radius: 30,
                           height: context.verticalSize(40),
                           controller: acc.amountController,
                           inputType: TextInputType.number,
-                          hintText: 'Amount',
+                          hintText: l10n.amount,
                           validator: (value) {
                             if (acc.amountController.text.isEmpty) {
                               setState(() {
-                                amountError = "Input valid amount";
+                                amountError = l10n.reqValidAmount;
                               });
                               return '';
                             }
@@ -262,18 +264,18 @@ class _EditPaymentDetailsScreenState extends State<EditPaymentDetailsScreen> {
                           errorMessage: amountError,
                         ),
 
-                        Text("Service Provider", style: context.semiBold14(color: ColorManager.blackMedium)),
+                        Text(l10n.serviceProvider, style: context.semiBold14(color: ColorManager.blackMedium)),
                         SizedBox(height: context.verticalSize(8)),
                         CustomTextField(
                           radius: 30,
                           height: context.verticalSize(40),
                           controller: acc.serviceProviderController,
                           inputType: TextInputType.name,
-                          hintText: 'Service Provider',
+                          hintText: l10n.serviceProvider,
                           validator: (value) {
                             if (acc.serviceProviderController.text.isEmpty) {
                               setState(() {
-                                serviceProviderError = "Service Provider is required";
+                                serviceProviderError = l10n.reqServiceProvider;
                               });
                               return '';
                             }
@@ -290,7 +292,7 @@ class _EditPaymentDetailsScreenState extends State<EditPaymentDetailsScreen> {
                             GestureDetector(
                               onTap: () {
                                 if (selectedImage != null) {
-                                  _confirmRemoveImage();
+                                  _confirmRemoveImage(l10n);
                                 }
                               },
                               child: Container(
@@ -315,8 +317,8 @@ class _EditPaymentDetailsScreenState extends State<EditPaymentDetailsScreen> {
                                       setState(() => _isBottomSheetVisible = true);
                                       ConfirmationAlert.showConfirmationAlert(
                                         context: context,
-                                        title: 'Choose photo source',
-                                        message: "Camera",
+                                        title: l10n.choosePhotoSource,
+                                        message: l10n.camera,
                                         messageColor: ColorManager.kAleartTextColor,
                                         onTap2: () {
                                           setState(() => _isBottomSheetVisible = false);
@@ -327,27 +329,22 @@ class _EditPaymentDetailsScreenState extends State<EditPaymentDetailsScreen> {
                                                       (context) => CustomCameraNw(
                                                         onImageSelected: (File image) {
                                                           setState(() {
-                                                            selectedImage = image; // Update parent state
+                                                            selectedImage = image;
                                                           });
                                                         },
                                                       ),
                                                 ),
                                               )
                                               .then((isSuccess) {
-                                                if (isSuccess == true) {
-                                                  Navigator.pop(context);
-                                                } else {
-                                                  Navigator.pop(context);
-                                                }
+                                                Navigator.pop(context);
                                               });
                                         },
-                                        actionText: "Select from gallery",
+                                        actionText: l10n.selectFromGallery,
                                         actionColor: ColorManager.kAleartTextColor,
                                         isCancelVisible: true,
                                         cancelColor: ColorManager.kAleartCancelTextColor,
                                         onTap: () {
                                           setState(() => _isBottomSheetVisible = false);
-                                          print('&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&77777778899999');
                                           _pickImage();
                                         },
                                         cancelOnTap: () {
@@ -372,14 +369,18 @@ class _EditPaymentDetailsScreenState extends State<EditPaymentDetailsScreen> {
                         CenterTextIconButton(
                           onPress: () async {
                             if (informationFormKey.currentState!.validate()) {
-                              print('###########################');
+                              if (_selectedDate == null) {
+                                setState(() {
+                                  _dateErrorText = l10n.reqSelectDate;
+                                });
+                                return;
+                              }
                               await acc.addPaymentDetails(_selectedDate!.toLocal(), selectedImage);
                             }
                           },
                           isGradientColor: true,
                           gradientColors: ColorManager.gradientButtons2,
-                          // isLoading: auth.getisCreatingUser,
-                          buttonText: 'Continue',
+                          buttonText: l10n.continueText,
                         ),
                         SizedBox(height: context.verticalSize(50)),
                       ],
@@ -393,9 +394,7 @@ class _EditPaymentDetailsScreenState extends State<EditPaymentDetailsScreen> {
             Positioned.fill(
               child: BackdropFilter(
                 filter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0),
-                child: Container(
-                  color: Colors.black.withOpacity(0.5), // Optional overlay
-                ),
+                child: Container(color: Colors.black.withOpacity(0.5)),
               ),
             ),
         ],
