@@ -24,6 +24,7 @@ import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:app/l10n/app_localizations.dart';
 import 'package:app/providers/service_providers/onesignal_service.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart'; // Added import
 
 RemoteMessage? _initialMessage;
 
@@ -36,6 +37,7 @@ Future<void> handleBackgroundMessage(RemoteMessage remoteMessage) async {
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await dotenv.load(fileName: ".env");
   OneSignalService.initialize();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   FirebaseMessaging.onBackgroundMessage(handleBackgroundMessage);
@@ -55,7 +57,7 @@ void main() async {
     ),
   );
   SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]).then(
-        (value) => runApp(
+    (value) => runApp(
       MultiProvider(
         providers: [
           ChangeNotifierProvider(create: (_) => AuthenticationProvider()),
@@ -114,11 +116,7 @@ class _MyAppState extends State<MyApp> {
             GlobalWidgetsLocalizations.delegate,
             GlobalCupertinoLocalizations.delegate,
           ],
-          supportedLocales: const [
-            Locale('en', ''),
-            Locale('si', ''),
-            Locale('ta', ''),
-          ],
+          supportedLocales: const [Locale('en', ''), Locale('si', ''), Locale('ta', '')],
           theme: ThemeData(
             colorScheme: ColorScheme.fromSeed(seedColor: ColorManager.kPrimary, primary: ColorManager.kPrimary),
             useMaterial3: false,

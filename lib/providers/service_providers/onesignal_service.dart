@@ -1,11 +1,11 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:onesignal_flutter/onesignal_flutter.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 class OneSignalService {
-  static const String appId = "4d85a755-9a30-4b60-a359-5b2f728000bb";
-  static const String restApiKey =
-      "os_v2_app_jwc2ovm2gbfwbi2zlmxxfaaaxoupi35ikuhunp4h5qt22pydfj5n7xstr2iynepymle77s64765fe76hbmkmfv45qbs7t2ecdtcjkli";
+  static String get appId => dotenv.env['ONESIGNAL_APP_ID'] ?? '';
+  static String get restApiKey => dotenv.env['ONESIGNAL_REST_API_KEY'] ?? '';
 
   static void initialize() {
     // Initialize OneSignal
@@ -16,7 +16,7 @@ class OneSignalService {
     OneSignal.Notifications.requestPermission(true);
   }
 
-  /// Links the device to a specific user ID (so we can send notifications to them specifically)
+  /// Links the device to a specific user ID
   static void loginUser(String uid) {
     OneSignal.login(uid);
   }
@@ -34,7 +34,10 @@ class OneSignalService {
   }) async {
     final url = Uri.parse('https://api.onesignal.com/notifications');
 
-    final headers = {'Content-Type': 'application/json; charset=utf-8', 'Authorization': 'Basic $restApiKey'};
+    final headers = {
+      'Content-Type': 'application/json; charset=utf-8',
+      'Authorization': 'Basic $restApiKey'
+    };
 
     final body = jsonEncode({
       "app_id": appId,
