@@ -25,6 +25,21 @@ class AuthenticationProvider extends ChangeNotifier {
   TextEditingController confirmPasswordController = TextEditingController();
   TextEditingController noteController = TextEditingController();
 
+  void clearData() {
+    firstNameController.clear();
+    lastNameController.clear();
+    emailController.clear();
+    idCardController.clear();
+    contactController.clear();
+    whatsappController.clear();
+    passwordController.clear();
+    confirmPasswordController.clear();
+    noteController.clear();
+    filterDetails = FilterModel();
+    _errorMessage = null;
+    notifyListeners();
+  }
+
   @override
   void dispose() {
     firstNameController.dispose();

@@ -11,7 +11,9 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-
+  flutter_localizations:
+    sdk: flutter
+  intl: ^0.20.2
   cupertino_icons: ^1.0.8
   provider: ^6.1.5+1
   fluttertoast: ^8.2.12
@@ -23,7 +25,6 @@ dependencies:
   image_picker: ^1.2.0
   image_cropper: ^9.1.0
   camera: ^0.11.2
-  intl: ^0.20.2
   http_parser: ^4.1.2
   firebase_auth: ^6.1.0
   firebase_core: ^4.1.1
@@ -58,11 +59,10 @@ flutter_launcher_icons:
 flutter:
 
   uses-material-design: true
+  generate: true
   assets:
     - assets/images/
-    - assets/svg/
     - assets/videos/
-    - assets/lottie/
     - assets/videos/splash_animation.mp4
     
 

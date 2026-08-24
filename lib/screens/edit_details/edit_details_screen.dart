@@ -16,6 +16,9 @@ import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
+import 'package:app/l10n/app_localizations.dart';
+import 'package:app/app/utils/translation_service.dart';
+import 'package:app/app/widgets/language_selector.dart';
 
 class EditDetailsScreen extends StatefulWidget {
   const EditDetailsScreen({super.key});
@@ -167,15 +170,15 @@ class _EditDetailsScreenState extends State<EditDetailsScreen> {
     }
   }
 
-  void _confirmRemoveImage() {
+  void _confirmRemoveImage(AppLocalizations l10n) {
     showDialog(
       context: context,
       builder:
           (context) => AlertDialog(
-            title: const Text('Remove photo?'),
-            content: const Text('Are you sure you want to remove the uploaded photo?'),
+            title: Text(l10n.removePhotoTitle),
+            content: Text(l10n.removePhotoDesc),
             actions: [
-              TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel')),
+              TextButton(onPressed: () => Navigator.pop(context), child: Text(l10n.cancel)),
               TextButton(
                 onPressed: () {
                   setState(() {
@@ -183,7 +186,7 @@ class _EditDetailsScreenState extends State<EditDetailsScreen> {
                   });
                   Navigator.pop(context);
                 },
-                child: const Text('Remove'),
+                child: Text(l10n.remove),
               ),
             ],
           ),
@@ -198,6 +201,7 @@ class _EditDetailsScreenState extends State<EditDetailsScreen> {
     VoidCallback onConfirm,
     VoidCallback onCancel,
   ) {
+    final l10n = AppLocalizations.of(context)!;
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -214,7 +218,7 @@ class _EditDetailsScreenState extends State<EditDetailsScreen> {
             actions: [
               TextButton(
                 onPressed: onCancel,
-                child: Text('Cancel', style: context.semiBold14(color: ColorManager.black)),
+                child: Text(l10n.cancel, style: context.semiBold14(color: ColorManager.black)),
               ),
               TextButton(
                 onPressed: onConfirm,
@@ -226,6 +230,7 @@ class _EditDetailsScreenState extends State<EditDetailsScreen> {
   }
 
   Future<bool?> _saveAlertDialog(BuildContext context, String title, String content, String confirmText) {
+    final l10n = AppLocalizations.of(context)!;
     return showDialog(
       context: context,
       barrierDismissible: false,
@@ -242,7 +247,7 @@ class _EditDetailsScreenState extends State<EditDetailsScreen> {
             actions: [
               TextButton(
                 onPressed: () => Navigator.pop(context, false),
-                child: Text('Cancel', style: context.semiBold14(color: ColorManager.black)),
+                child: Text(l10n.cancel, style: context.semiBold14(color: ColorManager.black)),
               ),
               TextButton(
                 onPressed: () => Navigator.pop(context, true),
@@ -324,11 +329,12 @@ class _EditDetailsScreenState extends State<EditDetailsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       backgroundColor: ColorManager.kPrimaryBlack,
       appBar: AppBar(
         backgroundColor: ColorManager.kPrimaryBlack,
-        title: Text("Edit information", style: context.semiBold20(color: ColorManager.blackMedium)),
+        title: Text(l10n.editInformation, style: context.semiBold20(color: ColorManager.blackMedium)),
         centerTitle: true,
         leading: GestureDetector(
           onTap: () {
@@ -341,36 +347,29 @@ class _EditDetailsScreenState extends State<EditDetailsScreen> {
                     accProvider.appUser?.isPhoneHide != accProvider.isContactVisible ||
                     accProvider.appUser?.isWhatsappHide != accProvider.isWhatsappVisible ||
                     accProvider.appUser?.isSchoolHide != accProvider.isSchoolVisible)
-                ? _confirmAlertDialog(
-                  context,
-                  'Are you sure you want to go back?',
-                  'You have unsaved changes. This will undo your changes to previous Stage',
-                  'GO BACK',
-                  () {
-                    List<String> parts = (accProvider.appUser?.displayName ?? "").split(' ');
-                    accProvider.firstNameController.text = parts[0];
-                    accProvider.lastNameController.text = parts.length > 1 ? parts[1] : '';
-                    accProvider.contactController.text =
-                        accProvider.appUser?.phone != null ? accProvider.appUser!.phone.toString() : '';
-                    accProvider.whatsappController.text =
-                        accProvider.appUser?.whatsapp != null ? accProvider.appUser!.whatsapp.toString() : '';
-                    accProvider.isContactVisible = accProvider.appUser?.isPhoneHide ?? false;
-                    accProvider.isWhatsappVisible = accProvider.appUser?.isWhatsappHide ?? false;
-                    accProvider.isSchoolVisible = accProvider.appUser?.isSchoolHide ?? false;
-                    accProvider.noteController.text = accProvider.appUser?.note ?? '';
-                    Navigator.of(context)
-                      ..pop()
-                      ..pop();
-                  },
-                  () => Navigator.of(context).pop(),
-                )
+                ? _confirmAlertDialog(context, l10n.goBackConfirmTitle, l10n.goBackConfirmDesc, l10n.goBack, () {
+                  List<String> parts = (accProvider.appUser?.displayName ?? "").split(' ');
+                  accProvider.firstNameController.text = parts[0];
+                  accProvider.lastNameController.text = parts.length > 1 ? parts[1] : '';
+                  accProvider.contactController.text =
+                      accProvider.appUser?.phone != null ? accProvider.appUser!.phone.toString() : '';
+                  accProvider.whatsappController.text =
+                      accProvider.appUser?.whatsapp != null ? accProvider.appUser!.whatsapp.toString() : '';
+                  accProvider.isContactVisible = accProvider.appUser?.isPhoneHide ?? false;
+                  accProvider.isWhatsappVisible = accProvider.appUser?.isWhatsappHide ?? false;
+                  accProvider.isSchoolVisible = accProvider.appUser?.isSchoolHide ?? false;
+                  accProvider.noteController.text = accProvider.appUser?.note ?? '';
+                  Navigator.of(context)
+                    ..pop()
+                    ..pop();
+                }, () => Navigator.of(context).pop())
                 : Navigator.of(context).pop();
           },
           child: Icon(Icons.arrow_back, color: ColorManager.blackMedium),
         ),
       ),
       body:
-          isDataLoading // ADDED
+          isDataLoading
               ? Center(child: SpinKitFadingCircle(color: ColorManager.kPrimary, size: 40))
               : Stack(
                 children: [
@@ -405,7 +404,7 @@ class _EditDetailsScreenState extends State<EditDetailsScreen> {
                                           GestureDetector(
                                             onTap: () {
                                               if (selectedImage != null) {
-                                                _confirmRemoveImage();
+                                                _confirmRemoveImage(l10n);
                                               }
                                             },
                                             child: CircleAvatar(
@@ -432,8 +431,8 @@ class _EditDetailsScreenState extends State<EditDetailsScreen> {
                                                 setState(() => _isBottomSheetVisible = true);
                                                 ConfirmationAlert.showConfirmationAlert(
                                                   context: context,
-                                                  title: 'Choose photo source',
-                                                  message: "Camera",
+                                                  title: l10n.choosePhotoSource,
+                                                  message: l10n.camera,
                                                   messageColor: ColorManager.kAleartTextColor,
                                                   onTap2: () {
                                                     setState(() => _isBottomSheetVisible = false);
@@ -458,7 +457,7 @@ class _EditDetailsScreenState extends State<EditDetailsScreen> {
                                                           }
                                                         });
                                                   },
-                                                  actionText: "Select from gallery",
+                                                  actionText: l10n.selectFromGallery,
                                                   actionColor: ColorManager.kAleartTextColor,
                                                   isCancelVisible: true,
                                                   cancelColor: ColorManager.kAleartCancelTextColor,
@@ -486,7 +485,10 @@ class _EditDetailsScreenState extends State<EditDetailsScreen> {
                                 SizedBox(height: context.verticalSize(23)),
                                 Align(
                                   alignment: Alignment.centerLeft,
-                                  child: Text("Legal Name", style: context.semiBold14(color: ColorManager.blackMedium)),
+                                  child: Text(
+                                    l10n.legalName,
+                                    style: context.semiBold14(color: ColorManager.blackMedium),
+                                  ),
                                 ),
                                 SizedBox(height: context.verticalSize(8)),
                                 CustomTextField(
@@ -494,21 +496,16 @@ class _EditDetailsScreenState extends State<EditDetailsScreen> {
                                   height: context.verticalSize(40),
                                   controller: acc.firstNameController,
                                   inputType: TextInputType.name,
-                                  hintText: 'First Name',
+                                  hintText: l10n.firstName,
                                   validator: (value) {
                                     if (acc.firstNameController.text.isEmpty) {
                                       setState(() {
-                                        firstNameError = "First Name is required";
+                                        firstNameError = l10n.reqFirstName;
                                       });
                                       return '';
                                     } else if (!RegExp(r'^[a-zA-Z\s]+$').hasMatch(value!)) {
                                       setState(() {
-                                        firstNameError = "Please enter a valid First Name";
-                                      });
-                                      return '';
-                                    } else if (value.length > 30) {
-                                      setState(() {
-                                        firstNameError = "Must be 1–30 characters";
+                                        firstNameError = l10n.reqValidFirstName;
                                       });
                                       return '';
                                     }
@@ -524,21 +521,16 @@ class _EditDetailsScreenState extends State<EditDetailsScreen> {
                                   height: context.verticalSize(40),
                                   controller: acc.lastNameController,
                                   inputType: TextInputType.name,
-                                  hintText: 'Last Name',
+                                  hintText: l10n.lastName,
                                   validator: (value) {
                                     if (acc.lastNameController.text.isEmpty) {
                                       setState(() {
-                                        lastNameError = "Last Name is required";
+                                        lastNameError = l10n.reqLastName;
                                       });
                                       return '';
                                     } else if (!RegExp(r'^[a-zA-Z\s]+$').hasMatch(value!)) {
                                       setState(() {
-                                        lastNameError = "Please enter a valid Last Name";
-                                      });
-                                      return '';
-                                    } else if (value.length > 30) {
-                                      setState(() {
-                                        lastNameError = "Must be 1–30 characters";
+                                        lastNameError = l10n.reqValidLastName;
                                       });
                                       return '';
                                     }
@@ -553,7 +545,10 @@ class _EditDetailsScreenState extends State<EditDetailsScreen> {
                                 Row(
                                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                   children: [
-                                    Text("Contact Number", style: context.semiBold14(color: ColorManager.blackMedium)),
+                                    Text(
+                                      l10n.contactNumber,
+                                      style: context.semiBold14(color: ColorManager.blackMedium),
+                                    ),
                                     GestureDetector(
                                       onTap: () {
                                         setState(() {
@@ -563,7 +558,7 @@ class _EditDetailsScreenState extends State<EditDetailsScreen> {
                                       child: Row(
                                         children: [
                                           Text(
-                                            "Hide",
+                                            l10n.hide,
                                             style: context.semiBold14(
                                               color:
                                                   acc.isContactVisible
@@ -593,16 +588,16 @@ class _EditDetailsScreenState extends State<EditDetailsScreen> {
                                   height: context.verticalSize(40),
                                   controller: acc.contactController,
                                   inputType: TextInputType.number,
-                                  hintText: 'Contact Number',
+                                  hintText: l10n.contactNumber,
                                   validator: (value) {
                                     if (acc.contactController.text.isEmpty) {
                                       setState(() {
-                                        contactError = "Contact number is required";
+                                        contactError = l10n.reqContact;
                                       });
                                       return '';
                                     } else if (value!.length < 5 || value.length > 20) {
                                       setState(() {
-                                        contactError = "Enter Valid Contact number";
+                                        contactError = l10n.reqValidContact;
                                       });
                                       return '';
                                     }
@@ -619,7 +614,7 @@ class _EditDetailsScreenState extends State<EditDetailsScreen> {
                                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                   children: [
                                     Text(
-                                      "WhatsApp Number (Optional)",
+                                      l10n.whatsappOptional,
                                       style: context.semiBold14(color: ColorManager.blackMedium),
                                     ),
                                     GestureDetector(
@@ -631,7 +626,7 @@ class _EditDetailsScreenState extends State<EditDetailsScreen> {
                                       child: Row(
                                         children: [
                                           Text(
-                                            "Hide",
+                                            l10n.hide,
                                             style: context.semiBold14(
                                               color:
                                                   acc.isWhatsappVisible
@@ -663,12 +658,12 @@ class _EditDetailsScreenState extends State<EditDetailsScreen> {
                                   height: context.verticalSize(40),
                                   controller: acc.whatsappController,
                                   inputType: TextInputType.number,
-                                  hintText: 'WhatsApp Number',
+                                  hintText: l10n.whatsappNumber,
                                   validator: (value) {
                                     if (value != null && value.isNotEmpty) {
                                       if (value.length < 5 || value.length > 20) {
                                         setState(() {
-                                          whatsappError = "Enter Valid WhatsApp number";
+                                          whatsappError = l10n.reqValidWhatsapp;
                                         });
                                         return '';
                                       }
@@ -686,7 +681,10 @@ class _EditDetailsScreenState extends State<EditDetailsScreen> {
                                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                   children: [
                                     Text(
-                                      "Setup your ${(filterDetails.job == "Provincial School Teacher" || filterDetails.job == "National School Teacher") ? "Schooling" : "Office"} Details",
+                                      (filterDetails.job == "Provincial School Teacher" ||
+                                              filterDetails.job == "National School Teacher")
+                                          ? l10n.setupSchoolingDetails
+                                          : l10n.setupOfficeDetails,
                                       style: context.semiBold14(color: ColorManager.blackMedium),
                                     ),
                                     GestureDetector(
@@ -698,7 +696,7 @@ class _EditDetailsScreenState extends State<EditDetailsScreen> {
                                       child: Row(
                                         children: [
                                           Text(
-                                            "Hide",
+                                            l10n.hide,
                                             style: context.semiBold14(
                                               color:
                                                   acc.isSchoolVisible
@@ -734,7 +732,7 @@ class _EditDetailsScreenState extends State<EditDetailsScreen> {
                                   child: DropdownButton<String>(
                                     value: filterDetails.province.isNotEmpty ? filterDetails.province : null,
                                     hint: Text(
-                                      "Select Province",
+                                      l10n.selectProvince,
                                       style: context.regular14(color: ColorManager.disabledText),
                                     ),
                                     items:
@@ -743,7 +741,7 @@ class _EditDetailsScreenState extends State<EditDetailsScreen> {
                                               (province) => DropdownMenuItem(
                                                 value: province,
                                                 child: Text(
-                                                  province,
+                                                  TranslationService.translate(context, province), 
                                                   style: context.regular14(color: ColorManager.disabledText),
                                                 ),
                                               ),
@@ -793,7 +791,7 @@ class _EditDetailsScreenState extends State<EditDetailsScreen> {
                                       child: DropdownButton<String>(
                                         value: filterDetails.district.isNotEmpty ? filterDetails.district : null,
                                         hint: Text(
-                                          "Select District",
+                                          l10n.selectDistrict,
                                           style: context.regular14(color: ColorManager.disabledText),
                                         ),
                                         items:
@@ -804,7 +802,7 @@ class _EditDetailsScreenState extends State<EditDetailsScreen> {
                                                   (district) => DropdownMenuItem(
                                                     value: district,
                                                     child: Text(
-                                                      district,
+                                                      TranslationService.translate(context, district), 
                                                       style: context.regular14(color: ColorManager.blackMedium),
                                                     ),
                                                   ),
@@ -886,7 +884,10 @@ class _EditDetailsScreenState extends State<EditDetailsScreen> {
                                                     : null
                                                 : null,
                                         hint: Text(
-                                          "Select  ${(filterDetails.job == "Provincial School Teacher" || filterDetails.job == "National School Teacher") ? "Kalapa" : "Institution Type"}",
+                                          (filterDetails.job == "Provincial School Teacher" ||
+                                                  filterDetails.job == "National School Teacher")
+                                              ? l10n.selectKalapa
+                                              : l10n.selectInstitutionType,
                                           style: context.regular14(color: ColorManager.disabledText),
                                         ),
                                         items:
@@ -900,7 +901,10 @@ class _EditDetailsScreenState extends State<EditDetailsScreen> {
                                                           (kalapa) => DropdownMenuItem(
                                                             value: kalapa,
                                                             child: Text(
-                                                              kalapa,
+                                                              TranslationService.translate(
+                                                                context,
+                                                                kalapa,
+                                                              ), 
                                                               style: context.regular14(
                                                                 color: ColorManager.disabledText,
                                                               ),
@@ -918,7 +922,10 @@ class _EditDetailsScreenState extends State<EditDetailsScreen> {
                                                           (institute) => DropdownMenuItem(
                                                             value: institute,
                                                             child: Text(
-                                                              institute,
+                                                              TranslationService.translate(
+                                                                context,
+                                                                institute,
+                                                              ), 
                                                               style: context.regular14(
                                                                 color: ColorManager.disabledText,
                                                               ),
@@ -935,7 +942,10 @@ class _EditDetailsScreenState extends State<EditDetailsScreen> {
                                                           (institute) => DropdownMenuItem(
                                                             value: institute,
                                                             child: Text(
-                                                              institute,
+                                                              TranslationService.translate(
+                                                                context,
+                                                                institute,
+                                                              ), 
                                                               style: context.regular14(
                                                                 color: ColorManager.disabledText,
                                                               ),
@@ -952,7 +962,10 @@ class _EditDetailsScreenState extends State<EditDetailsScreen> {
                                                           (policeDivisions) => DropdownMenuItem(
                                                             value: policeDivisions,
                                                             child: Text(
-                                                              policeDivisions,
+                                                              TranslationService.translate(
+                                                                context,
+                                                                policeDivisions,
+                                                              ), 
                                                               style: context.regular14(
                                                                 color: ColorManager.disabledText,
                                                               ),
@@ -968,7 +981,10 @@ class _EditDetailsScreenState extends State<EditDetailsScreen> {
                                                           (dsDivisions) => DropdownMenuItem(
                                                             value: dsDivisions,
                                                             child: Text(
-                                                              dsDivisions,
+                                                              TranslationService.translate(
+                                                                context,
+                                                                dsDivisions,
+                                                              ), 
                                                               style: context.regular14(
                                                                 color: ColorManager.disabledText,
                                                               ),
@@ -1078,7 +1094,10 @@ class _EditDetailsScreenState extends State<EditDetailsScreen> {
                                                     : null
                                                 : null,
                                         hint: Text(
-                                          "Select ${(filterDetails.job == "Provincial School Teacher" || filterDetails.job == "National School Teacher") ? "kottasa" : "Office"}",
+                                          (filterDetails.job == "Provincial School Teacher" ||
+                                                  filterDetails.job == "National School Teacher")
+                                              ? l10n.selectKottasa
+                                              : l10n.selectOffice,
                                           style: context.regular14(color: ColorManager.disabledText),
                                         ),
                                         items:
@@ -1090,7 +1109,10 @@ class _EditDetailsScreenState extends State<EditDetailsScreen> {
                                                           (kottasa) => DropdownMenuItem(
                                                             value: kottasa,
                                                             child: Text(
-                                                              kottasa,
+                                                              TranslationService.translate(
+                                                                context,
+                                                                kottasa,
+                                                              ), 
                                                               style: context.regular14(color: ColorManager.blackMedium),
                                                             ),
                                                           ),
@@ -1105,7 +1127,10 @@ class _EditDetailsScreenState extends State<EditDetailsScreen> {
                                                           (kottasa) => DropdownMenuItem(
                                                             value: kottasa,
                                                             child: Text(
-                                                              kottasa,
+                                                              TranslationService.translate(
+                                                                context,
+                                                                kottasa,
+                                                              ), 
                                                               style: context.regular14(color: ColorManager.blackMedium),
                                                             ),
                                                           ),
@@ -1120,7 +1145,10 @@ class _EditDetailsScreenState extends State<EditDetailsScreen> {
                                                           (office) => DropdownMenuItem(
                                                             value: office,
                                                             child: Text(
-                                                              office,
+                                                              TranslationService.translate(
+                                                                context,
+                                                                office,
+                                                              ), 
                                                               style: context.regular14(color: ColorManager.blackMedium),
                                                             ),
                                                           ),
@@ -1135,7 +1163,10 @@ class _EditDetailsScreenState extends State<EditDetailsScreen> {
                                                           (office) => DropdownMenuItem(
                                                             value: office,
                                                             child: Text(
-                                                              office,
+                                                              TranslationService.translate(
+                                                                context,
+                                                                office,
+                                                              ), 
                                                               style: context.regular14(color: ColorManager.blackMedium),
                                                             ),
                                                           ),
@@ -1150,7 +1181,10 @@ class _EditDetailsScreenState extends State<EditDetailsScreen> {
                                                           (office) => DropdownMenuItem(
                                                             value: office,
                                                             child: Text(
-                                                              office,
+                                                              TranslationService.translate(
+                                                                context,
+                                                                office,
+                                                              ), 
                                                               style: context.regular14(color: ColorManager.blackMedium),
                                                             ),
                                                           ),
@@ -1164,7 +1198,10 @@ class _EditDetailsScreenState extends State<EditDetailsScreen> {
                                                           (office) => DropdownMenuItem(
                                                             value: office,
                                                             child: Text(
-                                                              office,
+                                                              TranslationService.translate(
+                                                                context,
+                                                                office,
+                                                              ), 
                                                               style: context.regular14(color: ColorManager.blackMedium),
                                                             ),
                                                           ),
@@ -1231,7 +1268,7 @@ class _EditDetailsScreenState extends State<EditDetailsScreen> {
                                                 ? filterDetails.nationalSchool
                                                 : null,
                                         hint: Text(
-                                          "Select School",
+                                          l10n.selectSchool,
                                           style: context.regular14(color: ColorManager.disabledText),
                                         ),
                                         items:
@@ -1248,7 +1285,7 @@ class _EditDetailsScreenState extends State<EditDetailsScreen> {
                                                   (school) => DropdownMenuItem(
                                                     value: school,
                                                     child: Text(
-                                                      school,
+                                                      TranslationService.translate(context, school), 
                                                       style: context.regular14(color: ColorManager.blackMedium),
                                                     ),
                                                   ),
@@ -1283,7 +1320,10 @@ class _EditDetailsScreenState extends State<EditDetailsScreen> {
                                 Align(
                                   alignment: Alignment.centerLeft,
                                   child: Text(
-                                    "Setup your ${filterDetails.job == "Provincial School Teacher" || filterDetails.job == "National School Teacher" ? "Subject Details" : "Grade Details"}",
+                                    (filterDetails.job == "Provincial School Teacher" ||
+                                            filterDetails.job == "National School Teacher")
+                                        ? l10n.setupSubjectDetails
+                                        : l10n.setupGradeDetails,
                                     style: context.semiBold14(color: ColorManager.blackMedium),
                                   ),
                                 ),
@@ -1307,7 +1347,10 @@ class _EditDetailsScreenState extends State<EditDetailsScreen> {
                                             ? filterDetails.grade
                                             : null,
                                     hint: Text(
-                                      "Select ${(filterDetails.job == "Provincial School Teacher" || filterDetails.job == "National School Teacher") ? "Scheme" : "Grade"}",
+                                      (filterDetails.job == "Provincial School Teacher" ||
+                                              filterDetails.job == "National School Teacher")
+                                          ? l10n.selectScheme
+                                          : l10n.selectGrade,
                                       style: context.regular14(color: ColorManager.disabledText),
                                     ),
                                     items:
@@ -1319,7 +1362,7 @@ class _EditDetailsScreenState extends State<EditDetailsScreen> {
                                               (value) => DropdownMenuItem(
                                                 value: value,
                                                 child: Text(
-                                                  value,
+                                                  TranslationService.translate(context, value), 
                                                   style: context.regular14(color: ColorManager.disabledText),
                                                 ),
                                               ),
@@ -1378,7 +1421,7 @@ class _EditDetailsScreenState extends State<EditDetailsScreen> {
                                       child: DropdownButton<String>(
                                         value: filterDetails.subject.isNotEmpty ? filterDetails.subject : null,
                                         hint: Text(
-                                          "Select Subject",
+                                          l10n.selectSubject,
                                           style: context.regular14(color: ColorManager.disabledText),
                                         ),
                                         items:
@@ -1389,7 +1432,7 @@ class _EditDetailsScreenState extends State<EditDetailsScreen> {
                                                   (subject) => DropdownMenuItem(
                                                     value: subject,
                                                     child: Text(
-                                                      subject,
+                                                      TranslationService.translate(context, subject), 
                                                       style: context.regular14(color: ColorManager.blackMedium),
                                                     ),
                                                   ),
@@ -1464,7 +1507,7 @@ class _EditDetailsScreenState extends State<EditDetailsScreen> {
                                                     ? filterDetails.subjectMedium
                                                     : null,
                                             hint: Text(
-                                              "Select Subject Medium",
+                                              l10n.selectSubjectMedium,
                                               style: context.regular14(color: ColorManager.disabledText),
                                             ),
                                             items:
@@ -1473,7 +1516,7 @@ class _EditDetailsScreenState extends State<EditDetailsScreen> {
                                                       (medium) => DropdownMenuItem(
                                                         value: medium,
                                                         child: Text(
-                                                          medium,
+                                                          TranslationService.translate(context, medium),
                                                           style: context.regular14(color: ColorManager.blackMedium),
                                                         ),
                                                       ),
@@ -1512,7 +1555,7 @@ class _EditDetailsScreenState extends State<EditDetailsScreen> {
                                 Align(
                                   alignment: Alignment.centerLeft,
                                   child: Text(
-                                    "Select your choice",
+                                    l10n.selectYourChoice,
                                     style: context.semiBold14(color: ColorManager.blackMedium),
                                   ),
                                 ),
@@ -1520,7 +1563,7 @@ class _EditDetailsScreenState extends State<EditDetailsScreen> {
                                 Align(
                                   alignment: Alignment.centerLeft,
                                   child: Text(
-                                    "Your Transfer first choice District",
+                                    l10n.transferChoice1,
                                     style: context.semiBold14(color: ColorManager.grayText),
                                   ),
                                 ),
@@ -1536,7 +1579,7 @@ class _EditDetailsScreenState extends State<EditDetailsScreen> {
                                   child: DropdownButton<String>(
                                     value: filterDetails.choice1.isNotEmpty ? filterDetails.choice1 : null,
                                     hint: Text(
-                                      "Select 1st choice",
+                                      l10n.selectChoice1,
                                       style: context.regular14(color: ColorManager.disabledText),
                                     ),
                                     items:
@@ -1545,7 +1588,7 @@ class _EditDetailsScreenState extends State<EditDetailsScreen> {
                                               (district) => DropdownMenuItem(
                                                 value: district,
                                                 child: Text(
-                                                  district,
+                                                  TranslationService.translate(context, district), 
                                                   style: context.regular14(color: ColorManager.blackMedium),
                                                 ),
                                               ),
@@ -1570,7 +1613,7 @@ class _EditDetailsScreenState extends State<EditDetailsScreen> {
                                     ? Align(
                                       alignment: Alignment.centerLeft,
                                       child: Text(
-                                        "Your Transfer Second choice District",
+                                        l10n.transferChoice2,
                                         style: context.semiBold14(color: ColorManager.grayText),
                                       ),
                                     )
@@ -1589,7 +1632,7 @@ class _EditDetailsScreenState extends State<EditDetailsScreen> {
                                       child: DropdownButton<String>(
                                         value: filterDetails.choice2.isNotEmpty ? filterDetails.choice2 : null,
                                         hint: Text(
-                                          "Select 2nd choice",
+                                          l10n.selectChoice2,
                                           style: context.regular14(color: ColorManager.disabledText),
                                         ),
                                         items:
@@ -1598,7 +1641,7 @@ class _EditDetailsScreenState extends State<EditDetailsScreen> {
                                                   (district) => DropdownMenuItem(
                                                     value: district,
                                                     child: Text(
-                                                      district,
+                                                      TranslationService.translate(context, district), 
                                                       style: context.regular14(color: ColorManager.blackMedium),
                                                     ),
                                                   ),
@@ -1622,7 +1665,7 @@ class _EditDetailsScreenState extends State<EditDetailsScreen> {
                                     ? Align(
                                       alignment: Alignment.centerLeft,
                                       child: Text(
-                                        "Your Transfer third choice District",
+                                        l10n.transferChoice3,
                                         style: context.semiBold14(color: ColorManager.grayText),
                                       ),
                                     )
@@ -1641,7 +1684,7 @@ class _EditDetailsScreenState extends State<EditDetailsScreen> {
                                       child: DropdownButton<String>(
                                         value: filterDetails.choice3.isNotEmpty ? filterDetails.choice3 : null,
                                         hint: Text(
-                                          "Select 3rd choice",
+                                          l10n.selectChoice3,
                                           style: context.regular14(color: ColorManager.disabledText),
                                         ),
                                         items:
@@ -1650,7 +1693,7 @@ class _EditDetailsScreenState extends State<EditDetailsScreen> {
                                                   (district) => DropdownMenuItem(
                                                     value: district,
                                                     child: Text(
-                                                      district,
+                                                      TranslationService.translate(context, district), 
                                                       style: context.regular14(color: ColorManager.blackMedium),
                                                     ),
                                                   ),
@@ -1682,7 +1725,7 @@ class _EditDetailsScreenState extends State<EditDetailsScreen> {
                                 Align(
                                   alignment: Alignment.centerLeft,
                                   child: Text(
-                                    "Add any Special note",
+                                    l10n.addSpecialNote,
                                     style: context.semiBold14(color: ColorManager.blackMedium),
                                   ),
                                 ),
@@ -1692,10 +1735,10 @@ class _EditDetailsScreenState extends State<EditDetailsScreen> {
                                   height: context.verticalSize(40),
                                   controller: acc.noteController,
                                   inputType: TextInputType.emailAddress,
-                                  hintText: 'note',
+                                  hintText: l10n.note,
                                   validator: (value) {},
                                 ),
-                                SizedBox(height: context.verticalSize(50)),
+                                SizedBox(height: context.verticalSize(30)),
                                 CenterTextIconButton(
                                   onPress: () async {
                                     if (informationFormKey.currentState!.validate() &&
@@ -1746,7 +1789,7 @@ class _EditDetailsScreenState extends State<EditDetailsScreen> {
                                           context,
                                           'Confirm Changes',
                                           summary,
-                                          'Save',
+                                          l10n.save,
                                         );
 
                                         if (shouldSave == true) {
@@ -1770,7 +1813,7 @@ class _EditDetailsScreenState extends State<EditDetailsScreen> {
                                         (filterDetails.job == "National School Teacher" &&
                                             filterDetails.nationalSchool == '')) {
                                       setState(() {
-                                        schoolError = 'Select your school';
+                                        schoolError = l10n.reqSelectSchool;
                                       });
                                     } else {
                                       setState(() {
@@ -1784,14 +1827,14 @@ class _EditDetailsScreenState extends State<EditDetailsScreen> {
                                         filterDetails.policeStations == '' &&
                                         filterDetails.gramaNiladhariDivision == '') {
                                       setState(() {
-                                        schoolError = 'Select your office';
+                                        schoolError = l10n.reqSelectOffice;
                                       });
                                     }
                                     if (filterDetails.scheme != "PRIMARY" &&
                                         filterDetails.subject == '' &&
                                         filterDetails.grade == "") {
                                       setState(() {
-                                        subjectError = 'Select your subject';
+                                        subjectError = l10n.reqSelectSubject;
                                       });
                                     } else {
                                       setState(() {
@@ -1802,7 +1845,7 @@ class _EditDetailsScreenState extends State<EditDetailsScreen> {
                                             filterDetails.job == "National School Teacher") &&
                                         filterDetails.subjectMedium == '') {
                                       setState(() {
-                                        subjectMediumError = 'Select your subject medium';
+                                        subjectMediumError = l10n.reqSelectMedium;
                                       });
                                     } else {
                                       setState(() {
@@ -1811,7 +1854,7 @@ class _EditDetailsScreenState extends State<EditDetailsScreen> {
                                     }
                                     if (filterDetails.choice1 == '') {
                                       setState(() {
-                                        choiceError = 'Select at least 1 choice';
+                                        choiceError = l10n.reqSelectChoice;
                                       });
                                     } else {
                                       setState(() {
@@ -1819,11 +1862,11 @@ class _EditDetailsScreenState extends State<EditDetailsScreen> {
                                       });
                                     }
                                   },
-                                  isGradientColor: true,
-                                  gradientColors: ColorManager.gradientButtons2,
-                                  buttonText: 'Continue',
+                                  buttonText: l10n.saveChanges,
+                                  gradientColors:
+                                      hasUnsavedChanges ? ColorManager.gradientButtons2 : ColorManager.gradientGray,
                                 ),
-                                SizedBox(height: context.verticalSize(50)),
+                                SizedBox(height: context.verticalSize(40)),
                               ],
                             ),
                           );

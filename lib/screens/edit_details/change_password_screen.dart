@@ -8,6 +8,7 @@ import 'package:app/app/widgets/custom_text_field.dart';
 import 'package:app/providers/account_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:app/l10n/app_localizations.dart';
 
 class ChangePasswordScreen extends StatefulWidget {
   const ChangePasswordScreen({super.key});
@@ -31,10 +32,12 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Scaffold(
       backgroundColor: ColorManager.kPrimaryBlack,
       appBar: AppBar(
-        title: Text('Change Password', style: context.semiBold20(color: ColorManager.blackMedium)),
+        title: Text(l10n.changePasswordTitle, style: context.semiBold20(color: ColorManager.blackMedium)),
         backgroundColor: ColorManager.white,
         elevation: 0.5,
         iconTheme: IconThemeData(color: ColorManager.blackMedium),
@@ -49,7 +52,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
               SizedBox(height: context.verticalSize(20)),
               Align(
                 alignment: Alignment.centerLeft,
-                child: Text("Current Password", style: context.semiBold14(color: ColorManager.blackMedium)),
+                child: Text(l10n.currentPassword, style: context.semiBold14(color: ColorManager.blackMedium)),
               ),
               SizedBox(height: context.verticalSize(4)),
               CustomTextField(
@@ -61,7 +64,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                 validator: (value) {
                   if (currentPasswordController.text.isEmpty) {
                     setState(() {
-                      errorMessage = "Current Password is required";
+                      errorMessage = l10n.reqCurrentPassword;
                     });
                     return '';
                   }
@@ -83,7 +86,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
               SizedBox(height: context.verticalSize(4)),
               Align(
                 alignment: Alignment.centerLeft,
-                child: Text("New Password", style: context.semiBold14(color: ColorManager.blackMedium)),
+                child: Text(l10n.newPassword, style: context.semiBold14(color: ColorManager.blackMedium)),
               ),
               SizedBox(height: context.verticalSize(4)),
               CustomTextField(
@@ -95,33 +98,32 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     setState(() {
-                      errorNewPasswordMessage = "New Password is required";
+                      errorNewPasswordMessage = l10n.reqNewPassword;
                     });
                     return '';
                   } else if (value.length < 8) {
                     setState(() {
-                      errorNewPasswordMessage =
-                          "Password must be 8+ characters, include a number, uppercase letter & special character";
+                      errorNewPasswordMessage = l10n.reqPasswordLength;
                     });
                     return '';
                   } else if (value.length > 64) {
                     setState(() {
-                      errorNewPasswordMessage = "New Password must be 8–64 characters long";
+                      errorNewPasswordMessage = l10n.reqPasswordLength64;
                     });
                     return '';
                   } else if (!RegExp(r'^(?=.*[A-Z])').hasMatch(value)) {
                     setState(() {
-                      errorNewPasswordMessage = "Must include at least one uppercase letter";
+                      errorNewPasswordMessage = l10n.reqUppercase;
                     });
                     return '';
                   } else if (!RegExp(r'^(?=.*\d)').hasMatch(value)) {
                     setState(() {
-                      errorNewPasswordMessage = "Must include at least one number";
+                      errorNewPasswordMessage = l10n.reqNumber;
                     });
                     return '';
                   } else if (!RegExp(r'^(?=.*[!@#\$&*~%^()_\-+=<>?])').hasMatch(value)) {
                     setState(() {
-                      errorNewPasswordMessage = "Must include at least one special character";
+                      errorNewPasswordMessage = l10n.reqSpecialChar;
                     });
                     return '';
                   }
@@ -143,7 +145,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
               SizedBox(height: context.verticalSize(10)),
               Align(
                 alignment: Alignment.centerLeft,
-                child: Text("Confirm Password", style: context.semiBold14(color: ColorManager.blackMedium)),
+                child: Text(l10n.confirmPassword, style: context.semiBold14(color: ColorManager.blackMedium)),
               ),
               SizedBox(height: context.verticalSize(4)),
               CustomTextField(
@@ -155,12 +157,12 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                 validator: (value) {
                   if (confirmPasswordController.text.isEmpty) {
                     setState(() {
-                      errorConfirmPasswordMessage = "Confirm Password is required";
+                      errorConfirmPasswordMessage = l10n.reqConfirmPassword;
                     });
                     return '';
                   } else if (value != newPasswordController.text) {
                     setState(() {
-                      errorConfirmPasswordMessage = "Passwords do not match!";
+                      errorConfirmPasswordMessage = l10n.reqPasswordMatch;
                     });
                     return '';
                   }
@@ -188,17 +190,17 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                     try {
                       await accProvider.changePassword(currentPassword: currentPassword, newPassword: newPassword);
                       Navigator.pop(context);
-                      toastSuccessMessage('Password changed successfully.');
+                      toastSuccessMessage(l10n.passwordChangedSuccess);
                     } catch (e) {
                       setState(() {
-                        errorMessage = "Current password is incorrect.";
+                        errorMessage = l10n.currentPasswordIncorrect;
                       });
                     }
                   }
                 },
                 isGradientColor: true,
                 gradientColors: ColorManager.gradientButtons2,
-                buttonText: 'Change Password',
+                buttonText: l10n.changePasswordTitle,
                 isLoading: accProvider.isLoading,
               ),
             ],

@@ -6,12 +6,13 @@ import 'package:app/providers/filtter_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import 'package:app/l10n/app_localizations.dart';
 
 import '../../../../app/models/chat/contact.dart';
 import '../../../../providers/chat_provider.dart';
 
 class MessageScreen extends StatefulWidget {
-  final Contact? contact; // The user you're chatting with
+  final Contact? contact;
 
   const MessageScreen({super.key, required this.contact});
 
@@ -21,19 +22,15 @@ class MessageScreen extends StatefulWidget {
 
 class _MessageScreenState extends State<MessageScreen> {
   final TextEditingController _messageController = TextEditingController();
-  ScrollController _scrollController = ScrollController(); // To scroll to the bottom
+  ScrollController _scrollController = ScrollController();
 
-  // Get current user's UID (you'll need your AuthenticationProvider for this)
-  String? _currentUserId; // To be initialized in initState
+  String? _currentUserId;
 
   @override
   void initState() {
     super.initState();
-    // Fetch current user's ID from your AuthenticationProvider
     _currentUserId = Provider.of<FiltterProvider>(context, listen: false).firebaseUser?.uid;
 
-    // Listen for new messages and scroll to bottom
-    // This is handled by the StreamBuilder and the ScrollController
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (_scrollController.hasClients) {
         _scrollController.jumpTo(_scrollController.position.maxScrollExtent);
@@ -48,7 +45,6 @@ class _MessageScreenState extends State<MessageScreen> {
     super.dispose();
   }
 
-  //  Build individual message item
   Widget _buildMessageItem(Message message, String currentUserId) {
     bool isCurrentUser = message.senderId == currentUserId;
 
@@ -84,16 +80,16 @@ class _MessageScreenState extends State<MessageScreen> {
     );
   }
 
-  Widget _buildDateHeader(DateTime date) {
+  Widget _buildDateHeader(DateTime date, AppLocalizations l10n) {
     String formattedDate;
 
     final now = DateTime.now();
     final yesterday = now.subtract(const Duration(days: 1));
 
     if (date.year == now.year && date.month == now.month && date.day == now.day) {
-      formattedDate = "Today";
+      formattedDate = l10n.today;
     } else if (date.year == yesterday.year && date.month == yesterday.month && date.day == yesterday.day) {
-      formattedDate = "Yesterday";
+      formattedDate = l10n.yesterday;
     } else {
       formattedDate = DateFormat('MMMM d, yyyy').format(date);
     }
@@ -114,20 +110,16 @@ class _MessageScreenState extends State<MessageScreen> {
   Widget build(BuildContext context) {
     final ChatProvider chatProvider = Provider.of<ChatProvider>(context, listen: false);
     final accProvider = Provider.of<AccountProvider>(context, listen: false);
-    // Ensure we have both current user and contact to chat
+    final l10n = AppLocalizations.of(context)!;
+
     if (_currentUserId == null || widget.contact == null) {
       return Scaffold(
         appBar: AppBar(
-          title: Text('Error', style: TextStyle(color: ColorManager.blackMedium)),
+          title: Text(l10n.errorPrefix, style: TextStyle(color: ColorManager.blackMedium)),
           backgroundColor: ColorManager.white,
           iconTheme: IconThemeData(color: ColorManager.blackMedium),
         ),
-        body: Center(
-          child: Text(
-            'Cannot load chat. Missing user ID or contact.',
-            style: TextStyle(color: ColorManager.blackMedium),
-          ),
-        ),
+        body: Center(child: Text(l10n.cannotLoadChat, style: TextStyle(color: ColorManager.blackMedium))),
       );
     }
 
@@ -149,9 +141,6 @@ class _MessageScreenState extends State<MessageScreen> {
               children: [
                 CircleAvatar(
                   radius: 30,
-                  // Use widget.contact?.profileImage if available, else a placeholder
-                  // backgroundImage: widget.contact?.profileImage != null && widget.contact!.profileImage!.isNotEmpty
-                  //     ? NetworkImage(widget.contact!.profileImage!) : const AssetImage('assets/images/default_user.png'),
                   backgroundColor: ColorManager.kPrimary,
                   child:
                       widget.contact?.name?.isNotEmpty == true
@@ -163,7 +152,7 @@ class _MessageScreenState extends State<MessageScreen> {
                 ),
                 const SizedBox(height: 6),
                 Text(
-                  widget.contact?.name ?? "Unknown User",
+                  widget.contact?.name ?? l10n.unknownUser,
                   style: TextStyle(color: ColorManager.blackMedium, fontSize: 18, fontWeight: FontWeight.bold),
                 ),
               ],
@@ -178,14 +167,15 @@ class _MessageScreenState extends State<MessageScreen> {
               stream: chatProvider.getMessages(_currentUserId!, widget.contact!.id),
               builder: (context, snapshot) {
                 if (snapshot.hasError) {
-                  return Center(child: Text("Error: ${snapshot.error}", style: TextStyle(color: ColorManager.red)));
+                  return Center(
+                    child: Text("${l10n.errorPrefix}: ${snapshot.error}", style: TextStyle(color: ColorManager.red)),
+                  );
                 } else if (snapshot.connectionState == ConnectionState.waiting) {
                   return const Center(child: CircularProgressIndicator());
                 } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                  return Center(child: Text("Say hello!", style: TextStyle(color: ColorManager.grayText)));
+                  return Center(child: Text(l10n.sayHello, style: TextStyle(color: ColorManager.grayText)));
                 }
 
-                // If data exists, display messages
                 WidgetsBinding.instance.addPostFrameCallback((_) {
                   if (_scrollController.hasClients) {
                     _scrollController.animateTo(
@@ -218,7 +208,7 @@ class _MessageScreenState extends State<MessageScreen> {
                     }
                     return Column(
                       children: [
-                        if (showDateHeader) _buildDateHeader(message.time.toDate()),
+                        if (showDateHeader) _buildDateHeader(message.time.toDate(), l10n),
                         _buildMessageItem(message, _currentUserId!),
                       ],
                     );
@@ -242,9 +232,9 @@ class _MessageScreenState extends State<MessageScreen> {
                         autocorrect: false,
                         enableSuggestions: false,
                         keyboardType: TextInputType.multiline,
-                        maxLines: null, // Allows the box to expand as the user types
+                        maxLines: null,
                         decoration: InputDecoration(
-                          hintText: 'Message...',
+                          hintText: l10n.messageHint,
                           hintStyle: TextStyle(color: ColorManager.grayText),
                           contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                           border: InputBorder.none,
@@ -253,7 +243,6 @@ class _MessageScreenState extends State<MessageScreen> {
                     ),
                   ),
                   const SizedBox(width: 8),
-                  // Round Send Button
                   GestureDetector(
                     onTap: () => _sendMessage(chatProvider: chatProvider, accProvider: accProvider),
                     child: CircleAvatar(
@@ -340,7 +329,7 @@ class _MessageScreenState extends State<MessageScreen> {
         senderName: "${accProvider.appUser!.firstName}",
         senderId: _currentUserId!,
       );
-      _messageController.clear(); // Clear input after sending
+      _messageController.clear();
     }
   }
 }

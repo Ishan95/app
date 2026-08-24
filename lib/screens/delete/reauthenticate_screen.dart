@@ -2,6 +2,7 @@ import 'package:app/app/themes/text_themes.dart';
 import 'package:app/app/utils/color_manager.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:app/l10n/app_localizations.dart';
 
 class ReauthenticateScreen extends StatefulWidget {
   const ReauthenticateScreen({super.key});
@@ -15,12 +16,12 @@ class _ReauthenticateScreenState extends State<ReauthenticateScreen> {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   String? _errorMessage;
 
-  Future<void> _reauthenticate() async {
+  Future<void> _reauthenticate(AppLocalizations l10n) async {
     try {
       final user = _auth.currentUser;
       if (user == null) {
         setState(() {
-          _errorMessage = "No user is currently logged in.";
+          _errorMessage = l10n.noUserLoggedIn;
         });
         return;
       }
@@ -28,24 +29,26 @@ class _ReauthenticateScreenState extends State<ReauthenticateScreen> {
       final credential = EmailAuthProvider.credential(email: user.email!, password: _passwordController.text.trim());
 
       await user.reauthenticateWithCredential(credential);
-      Navigator.pop(context, true); // Return success to the previous screen
+      Navigator.pop(context, true);
     } on FirebaseAuthException catch (e) {
       setState(() {
         _errorMessage = e.message;
       });
     } catch (e) {
       setState(() {
-        _errorMessage = "An unexpected error occurred.";
+        _errorMessage = l10n.unexpectedError;
       });
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Scaffold(
       backgroundColor: ColorManager.kPrimaryBlack,
       appBar: AppBar(
-        title: Text("Delete User", style: TextStyle(color: ColorManager.blackMedium)),
+        title: Text(l10n.deleteUser, style: TextStyle(color: ColorManager.blackMedium)),
         backgroundColor: ColorManager.white,
         iconTheme: IconThemeData(color: ColorManager.blackMedium),
         elevation: 0.5,
@@ -55,14 +58,14 @@ class _ReauthenticateScreenState extends State<ReauthenticateScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text("Please enter your password to continue.", style: context.regular16(color: ColorManager.blackMedium)),
+            Text(l10n.enterPasswordToContinue, style: context.regular16(color: ColorManager.blackMedium)),
             SizedBox(height: 16),
             TextField(
               controller: _passwordController,
               obscureText: true,
               style: TextStyle(color: ColorManager.blackMedium),
               decoration: InputDecoration(
-                labelText: "Password",
+                labelText: l10n.password,
                 labelStyle: TextStyle(color: ColorManager.grayText),
                 errorText: _errorMessage,
                 filled: true,
@@ -74,13 +77,13 @@ class _ReauthenticateScreenState extends State<ReauthenticateScreen> {
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
-                onPressed: _reauthenticate,
+                onPressed: () => _reauthenticate(l10n),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: ColorManager.kPrimary,
                   padding: const EdgeInsets.symmetric(vertical: 14),
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(25)),
                 ),
-                child: Text("Delete User", style: context.semiBold14(color: ColorManager.white)),
+                child: Text(l10n.deleteUser, style: context.semiBold14(color: ColorManager.white)),
               ),
             ),
           ],

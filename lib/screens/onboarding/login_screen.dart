@@ -5,6 +5,8 @@ import 'package:app/screens/onboarding/get_details_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:app/l10n/app_localizations.dart';
+import 'package:app/app/widgets/language_selector.dart';
 
 import '../../../app/export.dart';
 
@@ -28,35 +30,27 @@ class _LoginScreenState extends State<LoginScreen> {
   String? emailError;
 
   Future<void> contactWhatsApp(String phone, String message) async {
-    // Ensure the phone number is in E.164 format
     if (!phone.startsWith('+')) {
-      phone = '+$phone'; // Add '+' if missing
+      phone = '+$phone';
     }
 
-    // Encode the message
     final encodedMessage = Uri.encodeComponent(message);
 
-    // Create WhatsApp URLs
-    // final uriApp = Uri.parse("whatsapp://send?phone=$phone&text=$encodedMessage");
     final uriApp = Uri.parse("https://api.whatsapp.com/send?phone=$phone&text=$encodedMessage");
     final uriWeb = Uri.parse("https://wa.me/$phone?text=$encodedMessage");
 
     try {
-      // 1. Try opening the WhatsApp app
       if (await canLaunchUrl(uriApp)) {
         print('$uriApp');
         await launchUrl(uriApp, mode: LaunchMode.externalApplication);
         return;
       }
 
-      // 2. Fallback to WhatsApp Web
       if (await canLaunchUrl(uriWeb)) {
         print('$uriWeb');
-        await launchUrl(uriWeb, mode: LaunchMode.platformDefault); // For iOS
+        await launchUrl(uriWeb, mode: LaunchMode.platformDefault);
         return;
       }
-
-      // 3. If both fail, print an error
       print("WhatsApp not available");
     } catch (e) {
       print("Error launching WhatsApp: $e");
@@ -66,11 +60,18 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     final authProvider = Provider.of<AuthenticationProvider>(context, listen: false);
+    final l10n = AppLocalizations.of(context)!;
+
     return Scaffold(
       resizeToAvoidBottomInset: false,
       backgroundColor: ColorManager.kPrimaryBlack,
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        actions: const [LanguageSelector(), SizedBox(width: 16)],
+      ),
       body: Padding(
-        padding: context.padding(horizontal: 24, top: 14, bottom: 44),
+        padding: context.padding(horizontal: 24, bottom: 44),
         child: Consumer<AuthenticationProvider>(
           builder: (context, auth, child) {
             return Form(
@@ -81,31 +82,31 @@ class _LoginScreenState extends State<LoginScreen> {
                 children: [
                   Align(
                     alignment: Alignment.center,
-                    child: Text("Welcome", style: context.semiBold20(color: ColorManager.blackMedium, fontSize: 30)),
+                    child: Text(l10n.welcome, style: context.semiBold20(color: ColorManager.blackMedium, fontSize: 30)),
                   ),
                   SizedBox(height: context.verticalSize(6)),
                   Align(
                     alignment: Alignment.center,
-                    child: Text("Log in to your account below", style: context.regular14(color: ColorManager.grayText)),
+                    child: Text(l10n.loginBelow, style: context.regular14(color: ColorManager.grayText)),
                   ),
                   SizedBox(height: context.verticalSize(90)),
-                  Text('Email', textAlign: TextAlign.left, style: context.semiBold14(color: ColorManager.grayText)),
+                  Text(l10n.email, textAlign: TextAlign.left, style: context.semiBold14(color: ColorManager.grayText)),
                   SizedBox(height: context.verticalSize(6)),
                   CustomTextField(
                     radius: 30,
                     height: 40,
                     controller: auth.emailController,
                     inputType: TextInputType.emailAddress,
-                    hintText: 'Email Address',
+                    hintText: l10n.emailAddress,
                     validator: (value) {
                       if (value == null || value.isEmpty) {
                         setState(() {
-                          emailError = "Email is required";
+                          emailError = l10n.reqEmail;
                         });
                         return '';
                       } else if (!RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(value!)) {
                         setState(() {
-                          emailError = "Enter a valid email address";
+                          emailError = l10n.reqValidEmail;
                         });
                         return '';
                       }
@@ -117,7 +118,11 @@ class _LoginScreenState extends State<LoginScreen> {
                     errorMessage: emailError,
                   ),
                   SizedBox(height: context.verticalSize(2)),
-                  Text("Password", textAlign: TextAlign.left, style: context.semiBold14(color: ColorManager.grayText)),
+                  Text(
+                    l10n.password,
+                    textAlign: TextAlign.left,
+                    style: context.semiBold14(color: ColorManager.grayText),
+                  ),
                   SizedBox(height: context.verticalSize(6)),
                   CustomTextField(
                     radius: 30,
@@ -125,12 +130,10 @@ class _LoginScreenState extends State<LoginScreen> {
                     controller: auth.passwordController,
                     obscure: _obscureText,
                     hintText: '*******',
-                    // interactiveSelection: false,
                     validator: (value) {
                       if (value == null || value.isEmpty) {
-                        // return "Password is required";
                         setState(() {
-                          passwordError = "Password is required";
+                          passwordError = l10n.reqPassword;
                         });
                         return '';
                       }
@@ -152,21 +155,34 @@ class _LoginScreenState extends State<LoginScreen> {
                   SizedBox(height: context.verticalSize(10)),
                   GestureDetector(
                     onTap: () {
+                      authProvider.clearData();
+                      setState(() {
+                        emailError = null;
+                        passwordError = null;
+                        _obscureText = true;
+                        _obscureDeviceID = true;
+                      });
+
                       Navigator.push(
                         context,
                         MaterialPageRoute<void>(
                           builder: (BuildContext context) => const GetDetailsScreen(isSignupEmail: true),
                         ),
-                      );
+                      ).then((_) {
+                        authProvider.clearData();
+                        setState(() {
+                          emailError = null;
+                          passwordError = null;
+                          _obscureText = true;
+                          _obscureDeviceID = true;
+                        });
+                      });
                     },
                     child: RichText(
                       text: TextSpan(
                         children: [
-                          TextSpan(
-                            text: "Don\'t have an account?    ",
-                            style: context.regular12(color: ColorManager.grayText),
-                          ),
-                          TextSpan(text: "Create a new account", style: context.bold12(color: ColorManager.kPrimary)),
+                          TextSpan(text: l10n.dontHaveAccount, style: context.regular12(color: ColorManager.grayText)),
+                          TextSpan(text: l10n.createNewAccount, style: context.bold12(color: ColorManager.kPrimary)),
                         ],
                       ),
                     ),
@@ -186,10 +202,10 @@ class _LoginScreenState extends State<LoginScreen> {
                           SizedBox(width: context.horizontalSize(10)),
                           !_obscureDeviceID
                               ? Text(auth.currentDeviceID, style: context.regular14(color: ColorManager.blackMedium))
-                              : SizedBox.shrink(),
+                              : const SizedBox.shrink(),
                         ],
                       )
-                      : SizedBox.shrink(),
+                      : const SizedBox.shrink(),
                   SizedBox(height: context.verticalSize(100)),
                   CenterTextIconButton(
                     onPress: () async {
@@ -198,38 +214,35 @@ class _LoginScreenState extends State<LoginScreen> {
                         password: auth.passwordController.text.trim(),
                       );
 
-                      // After signIn, check if the user is now logged in
-                      // (The provider's listener will handle UI updates for _user state)
                       if (authProvider.user != null && success) {
                         Navigator.pushAndRemoveUntil(
                           context,
-                          MaterialPageRoute<void>(builder: (BuildContext context) => Home(index: 0)),
+                          MaterialPageRoute<void>(builder: (BuildContext context) => const Home(index: 0)),
                           (route) => false,
                         );
                       } else {
                         if (mounted) {
-                          toastErrorMessage(auth.errorMessage ?? 'Login failed. Please try again.');
+                          toastErrorMessage(auth.errorMessage ?? l10n.loginFailed);
                         }
                       }
                     },
-                    // isLoading: auth.getIsSignIn,
-                    buttonText: "Log in",
+                    buttonText: l10n.logIn,
                     isLoading: auth.isLoading,
                   ),
                   SizedBox(height: context.verticalSize(50)),
                   Center(
                     child: GestureDetector(
                       onTap: () {
-                        contactWhatsApp("94713905383", "Hello, I need assistance with my account.");
+                        contactWhatsApp("94713905383", l10n.whatsappSupportMessage);
                       },
                       child: RichText(
                         text: TextSpan(
                           children: [
                             TextSpan(
-                              text: "Can't Log In or Create an Account?    ",
+                              text: l10n.cantLogInOrCreate,
                               style: context.regular12(color: ColorManager.grayText),
                             ),
-                            TextSpan(text: "Need Help?", style: context.bold12(color: ColorManager.kPrimary)),
+                            TextSpan(text: l10n.needHelp, style: context.bold12(color: ColorManager.kPrimary)),
                           ],
                         ),
                       ),

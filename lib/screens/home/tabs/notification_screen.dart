@@ -3,6 +3,7 @@ import 'package:app/providers/account_provider.dart';
 import 'package:app/screens/notification/tab_view.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:app/l10n/app_localizations.dart';
 
 class NotificationScreen extends StatefulWidget {
   const NotificationScreen({super.key});
@@ -23,6 +24,8 @@ class _NotificationScreenState extends State<NotificationScreen> with TickerProv
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return SizedBox(
       width: context.screenWidth,
       height: context.screenHeight - 10.0,
@@ -48,7 +51,7 @@ class _NotificationScreenState extends State<NotificationScreen> with TickerProv
           return Column(
             children: [
               SizedBox(height: context.verticalSize(40)),
-              Center(child: Text("Notifications", style: context.semiBold20(color: ColorManager.blackMedium))),
+              Center(child: Text(l10n.notifications, style: context.semiBold20(color: ColorManager.blackMedium))),
               SizedBox(height: context.verticalSize(20)),
               Padding(
                 padding: context.padding(horizontal: 24, vertical: 16),
@@ -73,17 +76,12 @@ class _NotificationScreenState extends State<NotificationScreen> with TickerProv
                       borderRadius: BorderRadius.circular(40.0),
                     ),
                     unselectedLabelColor: ColorManager.disabledText,
-                    tabs: const [Tab(text: "New"), Tab(text: "Read")],
+                    tabs: [Tab(text: l10n.newText), Tab(text: l10n.read)],
                   ),
                 ),
               ),
               SizedBox(height: context.verticalSize(10)),
-              _tabController!.index == 0
-                  ? Padding(
-                    padding: context.padding(horizontal: 24),
-                    // child:
-                  )
-                  : SizedBox.shrink(),
+              _tabController!.index == 0 ? Padding(padding: context.padding(horizontal: 24)) : SizedBox.shrink(),
               SizedBox(height: context.verticalSize(10)),
               Expanded(
                 child: Padding(

@@ -8,6 +8,8 @@ import 'package:app/providers/service_providers/static_data_service.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:app/l10n/app_localizations.dart';
+import 'package:app/app/utils/translation_service.dart';
 
 class FilterScreen extends StatefulWidget {
   const FilterScreen({super.key});
@@ -128,7 +130,7 @@ class _FilterScreenState extends State<FilterScreen> {
 
   void _hideList() {
     if (_focusNode.hasFocus) {
-      _focusNode.unfocus(); // lose focus
+      _focusNode.unfocus();
     }
     setState(() {
       showList = false;
@@ -143,6 +145,7 @@ class _FilterScreenState extends State<FilterScreen> {
     VoidCallback onConfirm,
     VoidCallback onCancel,
   ) {
+    final l10n = AppLocalizations.of(context)!;
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -159,7 +162,7 @@ class _FilterScreenState extends State<FilterScreen> {
             actions: [
               TextButton(
                 onPressed: onCancel,
-                child: Text('Cancel', style: context.semiBold14(color: ColorManager.blackMedium)),
+                child: Text(l10n.cancel, style: context.semiBold14(color: ColorManager.blackMedium)),
               ),
               TextButton(
                 onPressed: onConfirm,
@@ -171,6 +174,7 @@ class _FilterScreenState extends State<FilterScreen> {
   }
 
   Future<bool?> _saveAlertDialog(BuildContext context, String title, String content, String confirmText) {
+    final l10n = AppLocalizations.of(context)!;
     return showDialog(
       context: context,
       barrierDismissible: false,
@@ -187,7 +191,7 @@ class _FilterScreenState extends State<FilterScreen> {
             actions: [
               TextButton(
                 onPressed: () => Navigator.pop(context, false),
-                child: Text('Cancel', style: context.semiBold14(color: ColorManager.blackMedium)),
+                child: Text(l10n.cancel, style: context.semiBold14(color: ColorManager.blackMedium)),
               ),
               TextButton(
                 onPressed: () => Navigator.pop(context, true),
@@ -283,6 +287,7 @@ class _FilterScreenState extends State<FilterScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return GestureDetector(
       onTap: _hideList,
       behavior: HitTestBehavior.translucent,
@@ -292,16 +297,16 @@ class _FilterScreenState extends State<FilterScreen> {
         appBar: AppBar(
           backgroundColor: ColorManager.white,
           elevation: 0.5,
-          title: Text('Filter', style: context.semiBold20(color: ColorManager.blackMedium)),
+          title: Text(l10n.filter, style: context.semiBold20(color: ColorManager.blackMedium)),
           centerTitle: true,
           leading: GestureDetector(
             onTap: () {
               hasUnsavedChanges
                   ? _confirmAlertDialog(
                     context,
-                    'Are you sure you want to go back?',
-                    'You have unsaved changes. This will undo your changes to previous Stage',
-                    'GO BACK',
+                    l10n.goBackConfirmTitle,
+                    l10n.goBackConfirmDesc,
+                    l10n.goBack,
                     () =>
                         Navigator.of(context)
                           ..pop()
@@ -318,13 +323,13 @@ class _FilterScreenState extends State<FilterScreen> {
                 onPressed:
                     () => _confirmAlertDialog(
                       context,
-                      'Reset All Filters?',
-                      'This action will clear all of your currently selected filters and cannot be undone. You will have to re-select them to apply them again',
-                      'Reset',
+                      l10n.resetAllFiltersTitle,
+                      l10n.resetAllFiltersDesc,
+                      l10n.reset,
                       _resetFilters,
                       () => Navigator.of(context).pop(),
                     ),
-                child: Text('Reset', style: context.semiBold14(color: ColorManager.red)),
+                child: Text(l10n.reset, style: context.semiBold14(color: ColorManager.red)),
               ),
             SizedBox(width: 4),
           ],
@@ -342,10 +347,7 @@ class _FilterScreenState extends State<FilterScreen> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text(
-                          "Location Filter According to choice",
-                          style: context.semiBold14(color: ColorManager.blackMedium),
-                        ),
+                        Text(l10n.locationFilterChoice, style: context.semiBold14(color: ColorManager.blackMedium)),
                         Switch(
                           value: locationFilter,
                           activeColor: ColorManager.kPrimary,
@@ -376,7 +378,7 @@ class _FilterScreenState extends State<FilterScreen> {
                               child: DropdownButton<String>(
                                 value: filter.filterDetails.province.isNotEmpty ? filter.filterDetails.province : null,
                                 hint: Text(
-                                  "Select Province",
+                                  l10n.selectProvince,
                                   style: context.regular14(color: ColorManager.disabledText),
                                 ),
                                 items:
@@ -385,7 +387,7 @@ class _FilterScreenState extends State<FilterScreen> {
                                           (province) => DropdownMenuItem(
                                             value: province,
                                             child: Text(
-                                              province,
+                                              TranslationService.translate(context, province), // LOCALIZED
                                               style: context.regular14(color: ColorManager.blackMedium),
                                             ),
                                           ),
@@ -394,9 +396,9 @@ class _FilterScreenState extends State<FilterScreen> {
                                 onChanged: (value) async {
                                   setState(() {
                                     filter.filterDetails.province = value ?? '';
-                                    filter.filterDetails.district = ''; // reset district
-                                    filter.filterDetails.kalapa = ''; // reset kalapa
-                                    filter.filterDetails.school = ''; // reset School
+                                    filter.filterDetails.district = '';
+                                    filter.filterDetails.kalapa = '';
+                                    filter.filterDetails.school = '';
                                   });
                                   if (value != null && value.isNotEmpty) {
                                     await StaticDataService.fetchDistricts(filter.filterDetails, value);
@@ -412,7 +414,6 @@ class _FilterScreenState extends State<FilterScreen> {
 
                             SizedBox(height: context.verticalSize(filter.filterDetails.province.isNotEmpty ? 20 : 0)),
 
-                            // District Dropdown
                             filter.filterDetails.province.isNotEmpty
                                 ? Container(
                                   height: context.verticalSize(40),
@@ -426,7 +427,7 @@ class _FilterScreenState extends State<FilterScreen> {
                                     value:
                                         filter.filterDetails.district.isNotEmpty ? filter.filterDetails.district : null,
                                     hint: Text(
-                                      "Select District",
+                                      l10n.selectDistrict,
                                       style: context.regular14(color: ColorManager.disabledText),
                                     ),
                                     items:
@@ -440,7 +441,7 @@ class _FilterScreenState extends State<FilterScreen> {
                                               (district) => DropdownMenuItem(
                                                 value: district,
                                                 child: Text(
-                                                  district,
+                                                  TranslationService.translate(context, district), // LOCALIZED
                                                   style: context.regular14(color: ColorManager.blackMedium),
                                                 ),
                                               ),
@@ -449,8 +450,8 @@ class _FilterScreenState extends State<FilterScreen> {
                                     onChanged: (value) {
                                       setState(() {
                                         filter.filterDetails.district = value ?? '';
-                                        filter.filterDetails.kalapa = ''; // reset kalapa
-                                        filter.filterDetails.school = ''; // reset School
+                                        filter.filterDetails.kalapa = '';
+                                        filter.filterDetails.school = '';
                                       });
                                     },
                                     dropdownColor: ColorManager.white,
@@ -469,7 +470,10 @@ class _FilterScreenState extends State<FilterScreen> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
-                          "${(accProvider.appUser?.job == "Provincial School Teacher" || accProvider.appUser?.job == "National School Teacher") ? "School" : "Office"}  Filter",
+                          (accProvider.appUser?.job == "Provincial School Teacher" ||
+                                  accProvider.appUser?.job == "National School Teacher")
+                              ? l10n.schoolFilter
+                              : l10n.officeFilter,
                           style: context.semiBold14(color: ColorManager.blackMedium),
                         ),
                         Switch(
@@ -502,7 +506,7 @@ class _FilterScreenState extends State<FilterScreen> {
                                 focusNode: _focusNode,
                                 cursorColor: ColorManager.kPrimary,
                                 decoration: InputDecoration(
-                                  hintText: "Search a name...",
+                                  hintText: l10n.searchName,
                                   hintStyle: TextStyle(color: ColorManager.grayText),
                                   prefixIcon: Icon(Icons.search, color: ColorManager.grayText),
                                   enabledBorder: OutlineInputBorder(
@@ -518,7 +522,7 @@ class _FilterScreenState extends State<FilterScreen> {
                                 onChanged: (query) {
                                   _filterNames(query);
                                   setState(() {
-                                    showList = true; // show list when typing
+                                    showList = true;
                                   });
                                 },
                                 readOnly: false,
@@ -527,9 +531,7 @@ class _FilterScreenState extends State<FilterScreen> {
                             const SizedBox(height: 8),
                             if (showList)
                               Container(
-                                constraints: BoxConstraints(
-                                  maxHeight: 200, // limit dropdown height
-                                ),
+                                constraints: BoxConstraints(maxHeight: 200),
                                 decoration: BoxDecoration(
                                   color: ColorManager.white,
                                   borderRadius: BorderRadius.circular(8),
@@ -540,7 +542,7 @@ class _FilterScreenState extends State<FilterScreen> {
                                         ? Padding(
                                           padding: const EdgeInsets.all(16.0),
                                           child: Text(
-                                            "No results found",
+                                            l10n.noResultsFound,
                                             style: context.regular14(color: ColorManager.grayText),
                                           ),
                                         )
@@ -551,7 +553,7 @@ class _FilterScreenState extends State<FilterScreen> {
                                             final name = filteredNames[index];
                                             return ListTile(
                                               title: Text(
-                                                name,
+                                                TranslationService.translate(context, name), // LOCALIZED
                                                 style: context.regular14(color: ColorManager.blackMedium),
                                               ),
                                               onTap: () {
@@ -575,8 +577,8 @@ class _FilterScreenState extends State<FilterScreen> {
                         Text(
                           (accProvider.appUser?.job == "Provincial School Teacher" ||
                                   accProvider.appUser?.job == "National School Teacher")
-                              ? "Scheme & Subject Filter"
-                              : "Grade Filter",
+                              ? l10n.schemeSubjectFilter
+                              : l10n.gradeFilter,
                           style: context.semiBold14(color: ColorManager.blackMedium),
                         ),
                         Switch(
@@ -628,7 +630,10 @@ class _FilterScreenState extends State<FilterScreen> {
                                         ? filter.filterDetails.grade
                                         : null,
                                 hint: Text(
-                                  "Select ${(accProvider.appUser?.job == "Provincial School Teacher" || accProvider.appUser?.job == "National School Teacher") ? "Scheme" : "Grade"}",
+                                  (accProvider.appUser?.job == "Provincial School Teacher" ||
+                                          accProvider.appUser?.job == "National School Teacher")
+                                      ? l10n.selectScheme
+                                      : l10n.selectGrade,
                                   style: context.regular14(color: ColorManager.disabledText),
                                 ),
                                 items:
@@ -640,7 +645,7 @@ class _FilterScreenState extends State<FilterScreen> {
                                           (scheme) => DropdownMenuItem(
                                             value: scheme,
                                             child: Text(
-                                              scheme,
+                                              TranslationService.translate(context, scheme), // LOCALIZED
                                               style: context.regular14(color: ColorManager.blackMedium),
                                             ),
                                           ),
@@ -692,7 +697,7 @@ class _FilterScreenState extends State<FilterScreen> {
                                     value:
                                         filter.filterDetails.subject.isNotEmpty ? filter.filterDetails.subject : null,
                                     hint: Text(
-                                      "Select Subject",
+                                      l10n.selectSubject,
                                       style: context.regular14(color: ColorManager.disabledText),
                                     ),
                                     items:
@@ -703,7 +708,7 @@ class _FilterScreenState extends State<FilterScreen> {
                                               (subject) => DropdownMenuItem(
                                                 value: subject,
                                                 child: Text(
-                                                  subject,
+                                                  TranslationService.translate(context, subject), // LOCALIZED
                                                   style: context.regular14(color: ColorManager.blackMedium),
                                                 ),
                                               ),
@@ -736,7 +741,7 @@ class _FilterScreenState extends State<FilterScreen> {
 
                           if (summary == 'No filters selected.') {
                             toastErrorMessage("Please select at least one filter before saving.");
-                            return; // Don't proceed if no filters are selected
+                            return;
                           }
 
                           if (filterDetails.province.isNotEmpty && filterDetails.district.isEmpty) {
@@ -744,7 +749,7 @@ class _FilterScreenState extends State<FilterScreen> {
                             return;
                           }
 
-                          final shouldSave = await _saveAlertDialog(context, 'Confirm Filters', summary, 'Save');
+                          final shouldSave = await _saveAlertDialog(context, 'Confirm Filters', summary, l10n.save);
 
                           if (shouldSave == true) {
                             final prefs = await SharedPreferences.getInstance();
@@ -782,7 +787,7 @@ class _FilterScreenState extends State<FilterScreen> {
                           print('No changes to save.');
                         }
                       },
-                      buttonText: "Save Changes",
+                      buttonText: l10n.saveChanges,
                       gradientColors: hasUnsavedChanges ? ColorManager.gradientButtons2 : ColorManager.gradientGray,
                     ),
                   ],

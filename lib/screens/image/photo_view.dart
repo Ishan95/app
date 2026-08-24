@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:app/app/export.dart';
+import 'package:app/l10n/app_localizations.dart';
 
 class PhotoPreview extends StatelessWidget {
   final String imagePath;
@@ -10,12 +11,14 @@ class PhotoPreview extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Scaffold(
       backgroundColor: ColorManager.white,
       appBar: AppBar(
         backgroundColor: ColorManager.white,
         elevation: 0.5,
-        title: Text('Take a photo', style: context.semiBold20(color: ColorManager.blackMedium)),
+        title: Text(l10n.takePhotoTitle, style: context.semiBold20(color: ColorManager.blackMedium)),
         centerTitle: true,
         leading: IconButton(
           onPressed: () {
@@ -26,15 +29,12 @@ class PhotoPreview extends StatelessWidget {
       ),
       body: Column(
         children: [
-          /// **Image Preview with Rounded Corners**
           const SizedBox(height: 10),
           Expanded(
             child: Stack(
               children: [
-                // Center(
-                //   child:
                 ClipRRect(
-                  borderRadius: BorderRadius.circular(22), // Rounded Edges
+                  borderRadius: BorderRadius.circular(22),
                   child: Image.file(
                     File(imagePath),
                     fit: BoxFit.cover,
@@ -42,22 +42,15 @@ class PhotoPreview extends StatelessWidget {
                     height: MediaQuery.of(context).size.height * 0.5,
                   ),
                 ),
-                // ),
-
-                /// **Redo Button Inside Image (Top-Left)**
                 Positioned(
-                  top: 0, // Adjusted to reduce space
+                  top: 0,
                   left: 0,
                   child: SizedBox(
-                    // width: 88, // Set width
-                    height: 40, // Set height
+                    height: 40,
                     child: ElevatedButton.icon(
-                      onPressed: () => Navigator.pop(context), // Redo button action
+                      onPressed: () => Navigator.pop(context),
                       icon: const Icon(Icons.refresh, color: Colors.white, size: 20),
-                      label: const Text(
-                        "Redo",
-                        style: TextStyle(color: Colors.white, fontSize: 16), // Adjust text size
-                      ),
+                      label: Text(l10n.redo, style: const TextStyle(color: Colors.white, fontSize: 16)),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: ColorManager.kPrimary,
                         shape: RoundedRectangleBorder(
@@ -68,16 +61,14 @@ class PhotoPreview extends StatelessWidget {
                     ),
                   ),
                 ),
-
-                /// **Instruction Text**
                 isOnboard
                     ? const SizedBox()
                     : Positioned(
-                      bottom: 90, // Adjusted for better placement
+                      bottom: 90,
                       left: 15,
                       right: 15,
                       child: Text(
-                        "Before submitting your request, please make \nsure that the photo shows the charging station in its entirety",
+                        l10n.photoPreviewInstruction,
                         textAlign: TextAlign.center,
                         style: context.medium16(color: ColorManager.blackMedium),
                       ),

@@ -9,6 +9,8 @@ import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:provider/provider.dart';
 import 'package:app/app/export.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:app/l10n/app_localizations.dart';
+import 'package:app/app/utils/translation_service.dart';
 
 class GetDetailsScreen extends StatefulWidget {
   final bool isSignupEmail;
@@ -86,6 +88,7 @@ class _GetDetailsScreenState extends State<GetDetailsScreen> {
   }
 
   Future<bool?> _saveAlertDialog(BuildContext context, String title, String content, String confirmText) {
+    final l10n = AppLocalizations.of(context)!;
     return showDialog(
       context: context,
       barrierDismissible: false,
@@ -102,7 +105,7 @@ class _GetDetailsScreenState extends State<GetDetailsScreen> {
             actions: [
               TextButton(
                 onPressed: () => Navigator.pop(context, false),
-                child: Text('Cancel', style: context.semiBold14(color: ColorManager.black)),
+                child: Text(l10n.cancel, style: context.semiBold14(color: ColorManager.black)),
               ),
               TextButton(
                 onPressed: () => Navigator.pop(context, true),
@@ -138,6 +141,8 @@ class _GetDetailsScreenState extends State<GetDetailsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Scaffold(
       backgroundColor: ColorManager.kPrimaryBlack,
       body: SafeArea(
@@ -157,15 +162,21 @@ class _GetDetailsScreenState extends State<GetDetailsScreen> {
                                 children: [
                                   IconButton(
                                     onPressed: () {
+                                      auth.clearData();
                                       Navigator.of(context).pop();
                                     },
                                     icon: Icon(Icons.arrow_back, color: ColorManager.blackMedium),
                                   ),
-                                  Align(
-                                    alignment: Alignment.center,
-                                    child: Text(
-                                      "Add Basic Information",
-                                      style: context.boldNunito30(color: ColorManager.blackMedium),
+                                  Flexible(
+                                    child: FittedBox(
+                                      fit: BoxFit.scaleDown,
+                                      child: Align(
+                                        alignment: Alignment.center,
+                                        child: Text(
+                                          l10n.addBasicInfo,
+                                          style: context.boldNunito30(color: ColorManager.blackMedium),
+                                        ),
+                                      ),
                                     ),
                                   ),
                                 ],
@@ -174,7 +185,7 @@ class _GetDetailsScreenState extends State<GetDetailsScreen> {
                               Align(
                                 alignment: Alignment.center,
                                 child: Text(
-                                  "Welcome! To get started, we need a few basic details to finish setting up your account.",
+                                  l10n.welcomeText,
                                   style: context.regularMulish14(color: ColorManager.grayText),
                                   textAlign: TextAlign.center,
                                 ),
@@ -182,7 +193,7 @@ class _GetDetailsScreenState extends State<GetDetailsScreen> {
                               SizedBox(height: context.verticalSize(23)),
                               Align(
                                 alignment: Alignment.centerLeft,
-                                child: Text("Legal Name", style: context.semiBold14(color: ColorManager.blackMedium)),
+                                child: Text(l10n.legalName, style: context.semiBold14(color: ColorManager.blackMedium)),
                               ),
                               SizedBox(height: context.verticalSize(8)),
                               CustomTextField(
@@ -190,16 +201,16 @@ class _GetDetailsScreenState extends State<GetDetailsScreen> {
                                 height: context.verticalSize(40),
                                 controller: auth.firstNameController,
                                 inputType: TextInputType.name,
-                                hintText: 'First Name',
+                                hintText: l10n.firstName,
                                 validator: (value) {
                                   if (auth.firstNameController.text.isEmpty) {
                                     setState(() {
-                                      firstNameError = "First Name is required";
+                                      firstNameError = l10n.reqFirstName;
                                     });
                                     return '';
                                   } else if (!RegExp(r'^[a-zA-Z\s]+$').hasMatch(value!)) {
                                     setState(() {
-                                      firstNameError = "Please enter a valid First Name";
+                                      firstNameError = l10n.reqValidFirstName;
                                     });
                                     return '';
                                   } else if (value.length > 30) {
@@ -220,16 +231,16 @@ class _GetDetailsScreenState extends State<GetDetailsScreen> {
                                 height: context.verticalSize(40),
                                 controller: auth.lastNameController,
                                 inputType: TextInputType.name,
-                                hintText: 'Last Name',
+                                hintText: l10n.lastName,
                                 validator: (value) {
                                   if (auth.lastNameController.text.isEmpty) {
                                     setState(() {
-                                      lastNameError = "Last Name is required";
+                                      lastNameError = l10n.reqLastName;
                                     });
                                     return '';
                                   } else if (!RegExp(r'^[a-zA-Z\s]+$').hasMatch(value!)) {
                                     setState(() {
-                                      lastNameError = "Please enter a valid Last Name";
+                                      lastNameError = l10n.reqValidLastName;
                                     });
                                     return '';
                                   } else if (value.length > 30) {
@@ -246,17 +257,10 @@ class _GetDetailsScreenState extends State<GetDetailsScreen> {
                                 errorMessage: lastNameError,
                               ),
                               SizedBox(height: context.verticalSize(2)),
-                              Align(
-                                alignment: Alignment.centerLeft,
-                                child: Text(
-                                  "Enter your full name as it appears on official documents.",
-                                  style: context.semiBold14(color: ColorManager.disabledText, fontSize: 13),
-                                ),
-                              ),
                               SizedBox(height: context.verticalSize(30)),
                               Align(
                                 alignment: Alignment.centerLeft,
-                                child: Text("Email", style: context.semiBold14(color: ColorManager.blackMedium)),
+                                child: Text(l10n.email, style: context.semiBold14(color: ColorManager.blackMedium)),
                               ),
                               SizedBox(height: context.verticalSize(8)),
                               CustomTextField(
@@ -264,16 +268,16 @@ class _GetDetailsScreenState extends State<GetDetailsScreen> {
                                 height: context.verticalSize(40),
                                 controller: auth.emailController,
                                 inputType: TextInputType.emailAddress,
-                                hintText: 'Email Address',
+                                hintText: l10n.emailAddress,
                                 validator: (value) {
                                   if (auth.emailController.text.isEmpty) {
                                     setState(() {
-                                      emailError = "Email is required";
+                                      emailError = l10n.reqEmail;
                                     });
                                     return '';
                                   } else if (!RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(value!)) {
                                     setState(() {
-                                      emailError = "Enter a valid email address";
+                                      emailError = l10n.reqValidEmail;
                                     });
                                     return '';
                                   }
@@ -288,17 +292,14 @@ class _GetDetailsScreenState extends State<GetDetailsScreen> {
                               Align(
                                 alignment: Alignment.centerLeft,
                                 child: Text(
-                                  "Please add a fresh email address and remember it carefully. This email will be used for all communication",
+                                  l10n.emailNotice,
                                   style: context.semiBold14(color: ColorManager.disabledText),
                                 ),
                               ),
                               SizedBox(height: context.verticalSize(30)),
                               Align(
                                 alignment: Alignment.centerLeft,
-                                child: Text(
-                                  "Date of Birth",
-                                  style: context.semiBold14(color: ColorManager.blackMedium),
-                                ),
+                                child: Text(l10n.dob, style: context.semiBold14(color: ColorManager.blackMedium)),
                               ),
                               SizedBox(height: context.verticalSize(8)),
                               InkWell(
@@ -313,7 +314,9 @@ class _GetDetailsScreenState extends State<GetDetailsScreen> {
                                   alignment: Alignment.centerLeft,
                                   padding: const EdgeInsets.symmetric(horizontal: 16),
                                   child: Text(
-                                    _selectedDate != null ? '${_selectedDate!.toLocal()}'.split(' ')[0] : 'Birthdate',
+                                    _selectedDate != null
+                                        ? '${_selectedDate!.toLocal()}'.split(' ')[0]
+                                        : l10n.birthdate,
                                     style: TextStyle(color: ColorManager.blackMedium, fontSize: context.fontSize(14)),
                                   ),
                                 ),
@@ -333,7 +336,7 @@ class _GetDetailsScreenState extends State<GetDetailsScreen> {
                               Align(
                                 alignment: Alignment.centerLeft,
                                 child: Text(
-                                  "Identity Card Number",
+                                  l10n.idCardNumber,
                                   style: context.semiBold14(color: ColorManager.blackMedium),
                                 ),
                               ),
@@ -343,16 +346,16 @@ class _GetDetailsScreenState extends State<GetDetailsScreen> {
                                 height: context.verticalSize(40),
                                 controller: auth.idCardController,
                                 inputType: TextInputType.emailAddress,
-                                hintText: 'Identity Card Number',
+                                hintText: l10n.idCardNumber,
                                 validator: (value) {
                                   if (auth.idCardController.text.isEmpty) {
                                     setState(() {
-                                      idCardError = "ID number is required";
+                                      idCardError = l10n.reqId;
                                     });
                                     return '';
                                   } else if (value!.length < 5 || value.length > 20) {
                                     setState(() {
-                                      idCardError = "Enter Valid ID number";
+                                      idCardError = l10n.reqValidId;
                                     });
                                     return '';
                                   }
@@ -367,7 +370,7 @@ class _GetDetailsScreenState extends State<GetDetailsScreen> {
                               Row(
                                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [
-                                  Text("Contact Number", style: context.semiBold14(color: ColorManager.blackMedium)),
+                                  Text(l10n.contactNumber, style: context.semiBold14(color: ColorManager.blackMedium)),
                                   GestureDetector(
                                     onTap: () {
                                       setState(() {
@@ -377,7 +380,7 @@ class _GetDetailsScreenState extends State<GetDetailsScreen> {
                                     child: Row(
                                       children: [
                                         Text(
-                                          "Hide",
+                                          l10n.hide,
                                           style: context.semiBold14(
                                             color: isSelected ? ColorManager.disabledText : ColorManager.kPrimary,
                                           ),
@@ -403,16 +406,16 @@ class _GetDetailsScreenState extends State<GetDetailsScreen> {
                                 height: context.verticalSize(40),
                                 controller: auth.contactController,
                                 inputType: TextInputType.number,
-                                hintText: 'Contact Number',
+                                hintText: l10n.contactNumber,
                                 validator: (value) {
                                   if (auth.contactController.text.isEmpty) {
                                     setState(() {
-                                      contactError = "Contact number is required";
+                                      contactError = l10n.reqContact;
                                     });
                                     return '';
                                   } else if (value!.length < 5 || value.length > 20) {
                                     setState(() {
-                                      contactError = "Enter Valid Contact number";
+                                      contactError = l10n.reqValidContact;
                                     });
                                     return '';
                                   }
@@ -429,7 +432,7 @@ class _GetDetailsScreenState extends State<GetDetailsScreen> {
                                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [
                                   Text(
-                                    "WhatsApp Number (Optional)",
+                                    l10n.whatsappOptional,
                                     style: context.semiBold14(color: ColorManager.blackMedium),
                                   ),
                                   GestureDetector(
@@ -441,7 +444,7 @@ class _GetDetailsScreenState extends State<GetDetailsScreen> {
                                     child: Row(
                                       children: [
                                         Text(
-                                          "Hide",
+                                          l10n.hide,
                                           style: context.semiBold14(
                                             color:
                                                 isWhatsappSelected ? ColorManager.disabledText : ColorManager.kPrimary,
@@ -468,12 +471,12 @@ class _GetDetailsScreenState extends State<GetDetailsScreen> {
                                 height: context.verticalSize(40),
                                 controller: auth.whatsappController,
                                 inputType: TextInputType.number,
-                                hintText: 'WhatsApp Number',
+                                hintText: l10n.whatsappNumber,
                                 validator: (value) {
                                   if (value != null && value.isNotEmpty) {
                                     if (value.length < 5 || value.length > 20) {
                                       setState(() {
-                                        whatsappError = "Enter Valid WhatsApp number";
+                                        whatsappError = l10n.reqValidWhatsapp;
                                       });
                                       return '';
                                     }
@@ -490,7 +493,7 @@ class _GetDetailsScreenState extends State<GetDetailsScreen> {
                               Align(
                                 alignment: Alignment.centerLeft,
                                 child: Text(
-                                  "Select Your Job Category",
+                                  l10n.selectJobCategory,
                                   style: context.semiBold14(color: ColorManager.blackMedium),
                                 ),
                               ),
@@ -506,7 +509,7 @@ class _GetDetailsScreenState extends State<GetDetailsScreen> {
                                 child: DropdownButton<String>(
                                   value: filterDetails.job.isNotEmpty ? filterDetails.job : null,
                                   hint: Text(
-                                    "Select Job Category",
+                                    l10n.selectJobCategory,
                                     style: context.regular14(color: ColorManager.disabledText),
                                   ),
                                   items:
@@ -515,7 +518,7 @@ class _GetDetailsScreenState extends State<GetDetailsScreen> {
                                             (jobCategory) => DropdownMenuItem<String>(
                                               value: jobCategory,
                                               child: Text(
-                                                jobCategory,
+                                                TranslationService.translate(context, jobCategory), // LOCALIZED
                                                 style: context.regular14(color: ColorManager.blackMedium),
                                               ),
                                             ),
@@ -553,7 +556,10 @@ class _GetDetailsScreenState extends State<GetDetailsScreen> {
                                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [
                                   Text(
-                                    "Setup your ${(filterDetails.job == "Provincial School Teacher" || filterDetails.job == "National School Teacher") ? "Schooling" : "Office"} Details",
+                                    (filterDetails.job == "Provincial School Teacher" ||
+                                            filterDetails.job == "National School Teacher")
+                                        ? l10n.setupSchoolingDetails
+                                        : l10n.setupOfficeDetails,
                                     style: context.semiBold14(color: ColorManager.blackMedium),
                                   ),
                                   GestureDetector(
@@ -565,7 +571,7 @@ class _GetDetailsScreenState extends State<GetDetailsScreen> {
                                     child: Row(
                                       children: [
                                         Text(
-                                          "Hide",
+                                          l10n.hide,
                                           style: context.semiBold14(
                                             color: isSchoolSelected ? ColorManager.disabledText : ColorManager.kPrimary,
                                           ),
@@ -599,7 +605,7 @@ class _GetDetailsScreenState extends State<GetDetailsScreen> {
                                         ? DropdownButton<String>(
                                           value: filterDetails.province.isNotEmpty ? filterDetails.province : null,
                                           hint: Text(
-                                            "Select Province",
+                                            l10n.selectProvince,
                                             style: context.regular14(color: ColorManager.disabledText),
                                           ),
                                           items:
@@ -608,7 +614,7 @@ class _GetDetailsScreenState extends State<GetDetailsScreen> {
                                                     (province) => DropdownMenuItem(
                                                       value: province,
                                                       child: Text(
-                                                        province,
+                                                        TranslationService.translate(context, province), // LOCALIZED
                                                         style: context.regular14(color: ColorManager.blackMedium),
                                                       ),
                                                     ),
@@ -645,7 +651,7 @@ class _GetDetailsScreenState extends State<GetDetailsScreen> {
                                         : Align(
                                           alignment: Alignment.centerLeft,
                                           child: Text(
-                                            "Select Province",
+                                            l10n.selectProvince,
                                             style: context.regular14(color: ColorManager.disabledText),
                                           ),
                                         ),
@@ -665,7 +671,7 @@ class _GetDetailsScreenState extends State<GetDetailsScreen> {
                                     child: DropdownButton<String>(
                                       value: filterDetails.district.isNotEmpty ? filterDetails.district : null,
                                       hint: Text(
-                                        "Select District",
+                                        l10n.selectDistrict,
                                         style: context.regular14(color: ColorManager.disabledText),
                                       ),
                                       items:
@@ -676,7 +682,7 @@ class _GetDetailsScreenState extends State<GetDetailsScreen> {
                                                 (district) => DropdownMenuItem(
                                                   value: district,
                                                   child: Text(
-                                                    district,
+                                                    TranslationService.translate(context, district), // LOCALIZED
                                                     style: context.regular14(color: ColorManager.blackMedium),
                                                   ),
                                                 ),
@@ -758,7 +764,10 @@ class _GetDetailsScreenState extends State<GetDetailsScreen> {
                                                   : null
                                               : null,
                                       hint: Text(
-                                        "Select ${(filterDetails.job == "Provincial School Teacher" || filterDetails.job == "National School Teacher") ? "Kalapa" : "Institution Type"}",
+                                        (filterDetails.job == "Provincial School Teacher" ||
+                                                filterDetails.job == "National School Teacher")
+                                            ? l10n.selectKalapa
+                                            : l10n.selectInstitutionType,
                                         style: context.regular14(color: ColorManager.disabledText),
                                       ),
                                       items:
@@ -771,7 +780,7 @@ class _GetDetailsScreenState extends State<GetDetailsScreen> {
                                                         (kalapa) => DropdownMenuItem(
                                                           value: kalapa,
                                                           child: Text(
-                                                            kalapa,
+                                                            TranslationService.translate(context, kalapa), // LOCALIZED
                                                             style: context.regular14(color: ColorManager.blackMedium),
                                                           ),
                                                         ),
@@ -786,7 +795,10 @@ class _GetDetailsScreenState extends State<GetDetailsScreen> {
                                                         (institute) => DropdownMenuItem(
                                                           value: institute,
                                                           child: Text(
-                                                            institute,
+                                                            TranslationService.translate(
+                                                              context,
+                                                              institute,
+                                                            ), // LOCALIZED
                                                             style: context.regular14(color: ColorManager.blackMedium),
                                                           ),
                                                         ),
@@ -801,7 +813,10 @@ class _GetDetailsScreenState extends State<GetDetailsScreen> {
                                                         (institute) => DropdownMenuItem(
                                                           value: institute,
                                                           child: Text(
-                                                            institute,
+                                                            TranslationService.translate(
+                                                              context,
+                                                              institute,
+                                                            ), // LOCALIZED
                                                             style: context.regular14(color: ColorManager.blackMedium),
                                                           ),
                                                         ),
@@ -816,7 +831,10 @@ class _GetDetailsScreenState extends State<GetDetailsScreen> {
                                                         (policeDivisions) => DropdownMenuItem(
                                                           value: policeDivisions,
                                                           child: Text(
-                                                            policeDivisions,
+                                                            TranslationService.translate(
+                                                              context,
+                                                              policeDivisions,
+                                                            ), // LOCALIZED
                                                             style: context.regular14(color: ColorManager.blackMedium),
                                                           ),
                                                         ),
@@ -829,7 +847,10 @@ class _GetDetailsScreenState extends State<GetDetailsScreen> {
                                                         (dsDivisions) => DropdownMenuItem(
                                                           value: dsDivisions,
                                                           child: Text(
-                                                            dsDivisions,
+                                                            TranslationService.translate(
+                                                              context,
+                                                              dsDivisions,
+                                                            ), // LOCALIZED
                                                             style: context.regular14(color: ColorManager.blackMedium),
                                                           ),
                                                         ),
@@ -938,7 +959,10 @@ class _GetDetailsScreenState extends State<GetDetailsScreen> {
                                                   : null
                                               : null,
                                       hint: Text(
-                                        "Select ${(filterDetails.job == "Provincial School Teacher" || filterDetails.job == "National School Teacher") ? "kottasa" : "Office"}",
+                                        (filterDetails.job == "Provincial School Teacher" ||
+                                                filterDetails.job == "National School Teacher")
+                                            ? l10n.selectKottasa
+                                            : l10n.selectOffice,
                                         style: context.regular14(color: ColorManager.disabledText),
                                       ),
                                       items:
@@ -950,7 +974,7 @@ class _GetDetailsScreenState extends State<GetDetailsScreen> {
                                                         (kottasa) => DropdownMenuItem(
                                                           value: kottasa,
                                                           child: Text(
-                                                            kottasa,
+                                                            TranslationService.translate(context, kottasa), // LOCALIZED
                                                             style: context.regular14(color: ColorManager.blackMedium),
                                                           ),
                                                         ),
@@ -965,7 +989,7 @@ class _GetDetailsScreenState extends State<GetDetailsScreen> {
                                                         (kottasa) => DropdownMenuItem(
                                                           value: kottasa,
                                                           child: Text(
-                                                            kottasa,
+                                                            TranslationService.translate(context, kottasa), // LOCALIZED
                                                             style: context.regular14(color: ColorManager.blackMedium),
                                                           ),
                                                         ),
@@ -980,7 +1004,7 @@ class _GetDetailsScreenState extends State<GetDetailsScreen> {
                                                         (office) => DropdownMenuItem(
                                                           value: office,
                                                           child: Text(
-                                                            office,
+                                                            TranslationService.translate(context, office), // LOCALIZED
                                                             style: context.regular14(color: ColorManager.blackMedium),
                                                           ),
                                                         ),
@@ -995,7 +1019,7 @@ class _GetDetailsScreenState extends State<GetDetailsScreen> {
                                                         (office) => DropdownMenuItem(
                                                           value: office,
                                                           child: Text(
-                                                            office,
+                                                            TranslationService.translate(context, office), // LOCALIZED
                                                             style: context.regular14(color: ColorManager.blackMedium),
                                                           ),
                                                         ),
@@ -1010,7 +1034,7 @@ class _GetDetailsScreenState extends State<GetDetailsScreen> {
                                                         (office) => DropdownMenuItem(
                                                           value: office,
                                                           child: Text(
-                                                            office,
+                                                            TranslationService.translate(context, office), // LOCALIZED
                                                             style: context.regular14(color: ColorManager.blackMedium),
                                                           ),
                                                         ),
@@ -1024,7 +1048,7 @@ class _GetDetailsScreenState extends State<GetDetailsScreen> {
                                                         (office) => DropdownMenuItem(
                                                           value: office,
                                                           child: Text(
-                                                            office,
+                                                            TranslationService.translate(context, office), // LOCALIZED
                                                             style: context.regular14(color: ColorManager.blackMedium),
                                                           ),
                                                         ),
@@ -1091,7 +1115,7 @@ class _GetDetailsScreenState extends State<GetDetailsScreen> {
                                               ? filterDetails.nationalSchool
                                               : null,
                                       hint: Text(
-                                        "Select School",
+                                        l10n.selectSchool,
                                         style: context.regular14(color: ColorManager.disabledText),
                                       ),
                                       items:
@@ -1108,7 +1132,7 @@ class _GetDetailsScreenState extends State<GetDetailsScreen> {
                                                 (school) => DropdownMenuItem(
                                                   value: school,
                                                   child: Text(
-                                                    school,
+                                                    TranslationService.translate(context, school), // LOCALIZED
                                                     style: context.regular14(color: ColorManager.blackMedium),
                                                   ),
                                                 ),
@@ -1143,7 +1167,10 @@ class _GetDetailsScreenState extends State<GetDetailsScreen> {
                               Align(
                                 alignment: Alignment.centerLeft,
                                 child: Text(
-                                  "Setup your ${(filterDetails.job == "Provincial School Teacher" || filterDetails.job == "National School Teacher") ? "Subject" : "Grade"} Details",
+                                  (filterDetails.job == "Provincial School Teacher" ||
+                                          filterDetails.job == "National School Teacher")
+                                      ? l10n.setupSubjectDetails
+                                      : l10n.setupGradeDetails,
                                   style: context.semiBold14(color: ColorManager.blackMedium),
                                 ),
                               ),
@@ -1167,7 +1194,10 @@ class _GetDetailsScreenState extends State<GetDetailsScreen> {
                                           ? filterDetails.grade
                                           : null,
                                   hint: Text(
-                                    "Select ${(filterDetails.job == "Provincial School Teacher" || filterDetails.job == "National School Teacher") ? "Scheme" : "Grade"}",
+                                    (filterDetails.job == "Provincial School Teacher" ||
+                                            filterDetails.job == "National School Teacher")
+                                        ? l10n.selectScheme
+                                        : l10n.selectGrade,
                                     style: context.regular14(color: ColorManager.disabledText),
                                   ),
                                   items:
@@ -1179,7 +1209,7 @@ class _GetDetailsScreenState extends State<GetDetailsScreen> {
                                             (scheme) => DropdownMenuItem(
                                               value: scheme,
                                               child: Text(
-                                                scheme,
+                                                TranslationService.translate(context, scheme), // LOCALIZED
                                                 style: context.regular14(color: ColorManager.blackMedium),
                                               ),
                                             ),
@@ -1239,7 +1269,7 @@ class _GetDetailsScreenState extends State<GetDetailsScreen> {
                                     child: DropdownButton<String>(
                                       value: filterDetails.subject.isNotEmpty ? filterDetails.subject : null,
                                       hint: Text(
-                                        "Select Subject",
+                                        l10n.selectSubject,
                                         style: context.regular14(color: ColorManager.disabledText),
                                       ),
                                       items:
@@ -1250,7 +1280,7 @@ class _GetDetailsScreenState extends State<GetDetailsScreen> {
                                                 (subject) => DropdownMenuItem(
                                                   value: subject,
                                                   child: Text(
-                                                    subject,
+                                                    TranslationService.translate(context, subject), // LOCALIZED
                                                     style: context.regular14(color: ColorManager.blackMedium),
                                                   ),
                                                 ),
@@ -1325,7 +1355,7 @@ class _GetDetailsScreenState extends State<GetDetailsScreen> {
                                                   ? filterDetails.subjectMedium
                                                   : null,
                                           hint: Text(
-                                            "Select Subject Medium",
+                                            l10n.selectSubjectMedium,
                                             style: context.regular14(color: ColorManager.disabledText),
                                           ),
                                           items:
@@ -1334,7 +1364,7 @@ class _GetDetailsScreenState extends State<GetDetailsScreen> {
                                                     (medium) => DropdownMenuItem(
                                                       value: medium,
                                                       child: Text(
-                                                        medium,
+                                                        TranslationService.translate(context, medium),
                                                         style: context.regular14(color: ColorManager.blackMedium),
                                                       ),
                                                     ),
@@ -1373,7 +1403,7 @@ class _GetDetailsScreenState extends State<GetDetailsScreen> {
                               Align(
                                 alignment: Alignment.centerLeft,
                                 child: Text(
-                                  "Select your choice",
+                                  l10n.selectYourChoice,
                                   style: context.semiBold14(color: ColorManager.blackMedium),
                                 ),
                               ),
@@ -1381,7 +1411,7 @@ class _GetDetailsScreenState extends State<GetDetailsScreen> {
                               Align(
                                 alignment: Alignment.centerLeft,
                                 child: Text(
-                                  "Your Transfer first choice District",
+                                  l10n.transferChoice1,
                                   style: context.semiBold14(color: ColorManager.grayText),
                                 ),
                               ),
@@ -1397,7 +1427,7 @@ class _GetDetailsScreenState extends State<GetDetailsScreen> {
                                 child: DropdownButton<String>(
                                   value: filterDetails.choice1.isNotEmpty ? filterDetails.choice1 : null,
                                   hint: Text(
-                                    "Select 1st choice",
+                                    l10n.selectChoice1,
                                     style: context.regular14(color: ColorManager.disabledText),
                                   ),
                                   items:
@@ -1406,7 +1436,7 @@ class _GetDetailsScreenState extends State<GetDetailsScreen> {
                                             (district) => DropdownMenuItem(
                                               value: district,
                                               child: Text(
-                                                district,
+                                                TranslationService.translate(context, district),
                                                 style: context.regular14(color: ColorManager.blackMedium),
                                               ),
                                             ),
@@ -1431,7 +1461,7 @@ class _GetDetailsScreenState extends State<GetDetailsScreen> {
                                   ? Align(
                                     alignment: Alignment.centerLeft,
                                     child: Text(
-                                      "Your Transfer Second choice District",
+                                      l10n.transferChoice2,
                                       style: context.semiBold14(color: ColorManager.grayText),
                                     ),
                                   )
@@ -1450,7 +1480,7 @@ class _GetDetailsScreenState extends State<GetDetailsScreen> {
                                     child: DropdownButton<String>(
                                       value: filterDetails.choice2.isNotEmpty ? filterDetails.choice2 : null,
                                       hint: Text(
-                                        "Select 2nd choice",
+                                        l10n.selectChoice2,
                                         style: context.regular14(color: ColorManager.disabledText),
                                       ),
                                       items:
@@ -1459,7 +1489,7 @@ class _GetDetailsScreenState extends State<GetDetailsScreen> {
                                                 (district) => DropdownMenuItem(
                                                   value: district,
                                                   child: Text(
-                                                    district,
+                                                    TranslationService.translate(context, district),
                                                     style: context.regular14(color: ColorManager.blackMedium),
                                                   ),
                                                 ),
@@ -1483,7 +1513,7 @@ class _GetDetailsScreenState extends State<GetDetailsScreen> {
                                   ? Align(
                                     alignment: Alignment.centerLeft,
                                     child: Text(
-                                      "Your Transfer third choice District",
+                                      l10n.transferChoice3,
                                       style: context.semiBold14(color: ColorManager.grayText),
                                     ),
                                   )
@@ -1502,7 +1532,7 @@ class _GetDetailsScreenState extends State<GetDetailsScreen> {
                                     child: DropdownButton<String>(
                                       value: filterDetails.choice3.isNotEmpty ? filterDetails.choice3 : null,
                                       hint: Text(
-                                        "Select 3rd choice",
+                                        l10n.selectChoice3,
                                         style: context.regular14(color: ColorManager.disabledText),
                                       ),
                                       items:
@@ -1511,7 +1541,7 @@ class _GetDetailsScreenState extends State<GetDetailsScreen> {
                                                 (district) => DropdownMenuItem(
                                                   value: district,
                                                   child: Text(
-                                                    district,
+                                                    TranslationService.translate(context, district),
                                                     style: context.regular14(color: ColorManager.blackMedium),
                                                   ),
                                                 ),
@@ -1543,7 +1573,7 @@ class _GetDetailsScreenState extends State<GetDetailsScreen> {
                               Align(
                                 alignment: Alignment.centerLeft,
                                 child: Text(
-                                  "Add any Special note",
+                                  l10n.addSpecialNote,
                                   style: context.semiBold14(color: ColorManager.blackMedium),
                                 ),
                               ),
@@ -1553,14 +1583,14 @@ class _GetDetailsScreenState extends State<GetDetailsScreen> {
                                 height: context.verticalSize(40),
                                 controller: auth.noteController,
                                 inputType: TextInputType.emailAddress,
-                                hintText: 'note',
+                                hintText: l10n.note,
                                 validator: (value) {},
                               ),
                               SizedBox(height: context.verticalSize(8)),
                               SizedBox(height: context.verticalSize(30)),
                               Align(
                                 alignment: Alignment.centerLeft,
-                                child: Text("Password", style: context.semiBold14(color: ColorManager.grayText)),
+                                child: Text(l10n.password, style: context.semiBold14(color: ColorManager.grayText)),
                               ),
                               SizedBox(height: context.verticalSize(4)),
                               CustomTextField(
@@ -1572,13 +1602,12 @@ class _GetDetailsScreenState extends State<GetDetailsScreen> {
                                 validator: (value) {
                                   if (value == null || value.isEmpty) {
                                     setState(() {
-                                      passwordError = "Password is required";
+                                      passwordError = l10n.reqPassword;
                                     });
                                     return '';
                                   } else if (value.length < 8) {
                                     setState(() {
-                                      passwordError =
-                                          "Password must be 8+ characters and include a number, uppercase letter, and special character";
+                                      passwordError = l10n.reqPasswordLength;
                                     });
                                     return '';
                                   } else if (value.length > 64) {
@@ -1624,7 +1653,7 @@ class _GetDetailsScreenState extends State<GetDetailsScreen> {
                               Align(
                                 alignment: Alignment.centerLeft,
                                 child: Text(
-                                  "Re Enter Passward",
+                                  l10n.reEnterPassword,
                                   style: context.semiBold14(color: ColorManager.grayText),
                                 ),
                               ),
@@ -1638,12 +1667,12 @@ class _GetDetailsScreenState extends State<GetDetailsScreen> {
                                 validator: (value) {
                                   if (auth.confirmPasswordController.text.isEmpty) {
                                     setState(() {
-                                      confirmPasswordError = "Re-enter Password is required";
+                                      confirmPasswordError = l10n.reqPassword;
                                     });
                                     return '';
                                   } else if (value != auth.passwordController.text) {
                                     setState(() {
-                                      confirmPasswordError = "Passwords do not match!";
+                                      confirmPasswordError = l10n.reqPasswordMatch;
                                     });
                                     return '';
                                   }
@@ -1741,7 +1770,7 @@ class _GetDetailsScreenState extends State<GetDetailsScreen> {
                                     }
                                   } else if (_selectedDate == null) {
                                     setState(() {
-                                      _dobErrorText = 'Select a Date';
+                                      _dobErrorText = l10n.reqSelectDate;
                                     });
                                   }
                                   if (auth.contactController.text.isEmpty ||
@@ -1763,7 +1792,7 @@ class _GetDetailsScreenState extends State<GetDetailsScreen> {
                                       (filterDetails.job == "National School Teacher" &&
                                           filterDetails.nationalSchool == '')) {
                                     setState(() {
-                                      schoolError = 'Select your school';
+                                      schoolError = l10n.reqSelectSchool;
                                     });
                                   } else {
                                     setState(() {
@@ -1777,12 +1806,12 @@ class _GetDetailsScreenState extends State<GetDetailsScreen> {
                                       filterDetails.policeStations == '' &&
                                       filterDetails.gramaNiladhariDivision == '') {
                                     setState(() {
-                                      schoolError = 'Select your office';
+                                      schoolError = l10n.reqSelectOffice;
                                     });
                                   }
                                   if (filterDetails.scheme != "PRIMARY" && filterDetails.subject == '') {
                                     setState(() {
-                                      subjectError = 'Select your subject';
+                                      subjectError = l10n.reqSelectSubject;
                                     });
                                   } else {
                                     setState(() {
@@ -1793,7 +1822,7 @@ class _GetDetailsScreenState extends State<GetDetailsScreen> {
                                           filterDetails.job == "National School Teacher") &&
                                       filterDetails.subjectMedium == '') {
                                     setState(() {
-                                      subjectMediumError = 'Select your subject medium';
+                                      subjectMediumError = l10n.reqSelectMedium;
                                     });
                                   } else {
                                     setState(() {
@@ -1802,7 +1831,7 @@ class _GetDetailsScreenState extends State<GetDetailsScreen> {
                                   }
                                   if (filterDetails.choice1 == '') {
                                     setState(() {
-                                      choiceError = 'Select at least 1 choice';
+                                      choiceError = l10n.reqSelectChoice;
                                     });
                                   } else {
                                     setState(() {
@@ -1813,7 +1842,7 @@ class _GetDetailsScreenState extends State<GetDetailsScreen> {
                                 isGradientColor: true,
                                 gradientColors: ColorManager.gradientButtons2,
                                 isLoading: auth.isLoading,
-                                buttonText: 'Continue',
+                                buttonText: l10n.continueText,
                               ),
                             ],
                           ),
