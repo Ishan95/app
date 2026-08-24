@@ -60,7 +60,8 @@ class _PersonCardState extends State<PersonCard> {
         color: ColorManager.white,
         border: Border.all(
           color: widget.personDetails.uid != currentUserId ? ColorManager.lightGray : ColorManager.kPrimary,
-        ),
+          width: 2.0,
+        ), // Updated borders
         borderRadius: BorderRadius.circular(15.0),
         boxShadow: const [BoxShadow(color: Color(0x0A000000), blurRadius: 10, offset: Offset(0, 4))],
       ),
