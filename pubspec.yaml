@@ -41,6 +41,9 @@ dependencies:
   device_info_plus: ^12.3.0
   flutter_launcher_icons: ^0.14.4
   video_player: ^2.11.1
+  onesignal_flutter: ^5.6.8
+  http: ^1.6.0
+  flutter_dotenv: ^6.0.1
   # firebase_messaging_platform_interface: ^4.7.2
 
 dev_dependencies:
@@ -61,6 +64,7 @@ flutter:
   uses-material-design: true
   generate: true
   assets:
+    - .env
     - assets/images/
     - assets/videos/
     - assets/videos/splash_animation.mp4

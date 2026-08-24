@@ -228,8 +228,9 @@ class FirebaseService {
         }
       }
 
-      // Once APNS is confirmed (or if on Android), get the FCM token
-      return await _firebaseMessaging.getToken();
+      final token = await _firebaseMessaging.getToken();
+      debugPrint('FCM TOKEN: $token');
+      return token;
 
     } catch (e) {
       debugPrint('Error getting FCM token: $e');

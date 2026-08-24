@@ -11,6 +11,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart' as firebase_auth;
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:app/providers/service_providers/onesignal_service.dart';
 
 class AuthenticationProvider extends ChangeNotifier {
   BuildContext context = ContextHelper.navigatorKey.currentContext!;
@@ -227,74 +228,86 @@ class AuthenticationProvider extends ChangeNotifier {
   }
 
   Future<void> notifyMatches(Map<String, dynamic> newUserInfo, String currentUid) async {
-    final db = FirebaseFirestore.instance;
+    try {
+      final db = FirebaseFirestore.instance;
 
-    List<String> newUserChoices =
-        [
-          newUserInfo['choice1'],
-          newUserInfo['choice2'],
-          newUserInfo['choice3'],
-        ].where((c) => c != null && c.toString().isNotEmpty).cast<String>().toList();
-
-    if (newUserChoices.isEmpty) {
-      return;
-    }
-
-    Query query = db.collection('users');
-    final String userJob = newUserInfo['job'] ?? '';
-
-    if (userJob.isNotEmpty) {
-      query = query.where('job', isEqualTo: userJob);
-    }
-
-    final isTeacher = userJob == "Provincial School Teacher" || userJob == "National School Teacher";
-
-    if (isTeacher) {
-      query = query
-          .where('scheme', isEqualTo: newUserInfo['scheme'])
-          .where('subject', isEqualTo: newUserInfo['subject']);
-    }
-
-    query = query.where('district', whereIn: newUserChoices);
-
-    final matchesQuery = await query.get();
-    final batch = db.batch();
-
-    for (var doc in matchesQuery.docs) {
-      Map<String, dynamic> matchedUserData = doc.data() as Map<String, dynamic>;
-      if (doc.id == currentUid) continue;
-
-      String matchingChoiceTitle = "New Match Found!";
-      if (matchedUserData['choice1'] == newUserInfo['district']) {
-        matchingChoiceTitle = "Match under Choice 1";
-      } else if (matchedUserData['choice2'] == newUserInfo['district']) {
-        matchingChoiceTitle = "Match under Choice 2";
-      } else if (matchedUserData['choice3'] == newUserInfo['district']) {
-        matchingChoiceTitle = "Match under Choice 3";
-      }
-
-      List<String> matchedUserChoices =
+      List<String> newUserChoices =
           [
-            matchedUserData['choice1'],
-            matchedUserData['choice2'],
-            matchedUserData['choice3'],
-          ].where((c) => c != null).cast<String>().toList();
+            newUserInfo['choice1'],
+            newUserInfo['choice2'],
+            newUserInfo['choice3'],
+          ].where((c) => c != null && c.toString().isNotEmpty).cast<String>().toList();
 
-      if (matchedUserChoices.contains(newUserInfo['district'])) {
-        final notificationRef = db.collection('notifications').doc();
-
-        batch.set(notificationRef, {
-          'receiverId': doc.id,
-          'senderId': currentUid,
-          'title': matchingChoiceTitle,
-          'message': '${newUserInfo['name'] ?? 'A user'} wants to move to ${matchedUserData['district']}.',
-          'createdAt': FieldValue.serverTimestamp(),
-          'isRead': false,
-        });
+      if (newUserChoices.isEmpty) {
+        return;
       }
-    }
 
-    await batch.commit();
+      Query query = db.collection('users');
+      final String userJob = newUserInfo['job'] ?? '';
+
+      if (userJob.isNotEmpty) {
+        query = query.where('job', isEqualTo: userJob);
+      }
+
+      final isTeacher = userJob == "Provincial School Teacher" || userJob == "National School Teacher";
+
+      if (isTeacher) {
+        query = query
+            .where('scheme', isEqualTo: newUserInfo['scheme'])
+            .where('subject', isEqualTo: newUserInfo['subject']);
+      }
+
+      query = query.where('district', whereIn: newUserChoices);
+
+      final matchesQuery = await query.get();
+      final batch = db.batch();
+
+      for (var doc in matchesQuery.docs) {
+        Map<String, dynamic> matchedUserData = doc.data() as Map<String, dynamic>;
+        if (doc.id == currentUid) continue;
+
+        String matchingChoiceTitle = "New Match Found!";
+        if (matchedUserData['choice1'] == newUserInfo['district']) {
+          matchingChoiceTitle = "Match under Choice 1";
+        } else if (matchedUserData['choice2'] == newUserInfo['district']) {
+          matchingChoiceTitle = "Match under Choice 2";
+        } else if (matchedUserData['choice3'] == newUserInfo['district']) {
+          matchingChoiceTitle = "Match under Choice 3";
+        }
+
+        List<String> matchedUserChoices =
+            [
+              matchedUserData['choice1'],
+              matchedUserData['choice2'],
+              matchedUserData['choice3'],
+            ].where((c) => c != null).cast<String>().toList();
+
+        if (matchedUserChoices.contains(newUserInfo['district'])) {
+          final notificationMessage =
+              '${newUserInfo['name'] ?? 'A user'} wants to move to ${matchedUserData['district']}.';
+
+          await OneSignalService.sendMatchNotification(
+            receiverUid: doc.id,
+            title: matchingChoiceTitle,
+            message: notificationMessage,
+          );
+
+          final notificationRef = db.collection('notifications').doc();
+          batch.set(notificationRef, {
+            'receiverId': doc.id,
+            'senderId': currentUid,
+            'title': matchingChoiceTitle,
+            'message': notificationMessage,
+            'createdAt': FieldValue.serverTimestamp(),
+            'isRead': false,
+          });
+        }
+      }
+
+      await batch.commit();
+    } catch (e) {
+      print("Error in notifyMatches: $e");
+    }
   }
 
   String currentDeviceID = "";
@@ -311,6 +324,9 @@ class AuthenticationProvider extends ChangeNotifier {
       await updateFcmToken();
 
       final uid = _auth.currentUser!.uid;
+
+      OneSignalService.loginUser(uid);
+
       final userDoc = await _firestore.collection('users').doc(uid).get();
 
       if (!userDoc.exists) {
@@ -319,6 +335,7 @@ class AuthenticationProvider extends ChangeNotifier {
         notifyListeners();
         return false;
       }
+
       final String currentDevice = await getDeviceId();
       final String? savedDevice = userDoc.data()?['deviceId'];
 
@@ -335,6 +352,7 @@ class AuthenticationProvider extends ChangeNotifier {
         currentDeviceID = currentDevice;
         _errorMessage = "This account is already used on another device.";
         await _auth.signOut();
+        OneSignalService.logoutUser();
         _isLoading = false;
         notifyListeners();
         return false;
@@ -398,6 +416,7 @@ class AuthenticationProvider extends ChangeNotifier {
       final prefs = await SharedPreferences.getInstance();
       await prefs.clear();
       await _auth.signOut();
+      OneSignalService.logoutUser();
       _user = null;
       print("User signed out successfully.");
       Navigator.pushAndRemoveUntil(
