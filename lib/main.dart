@@ -12,6 +12,7 @@ import 'package:app/providers/auth_provider.dart';
 import 'package:app/providers/chat_provider.dart';
 import 'package:app/providers/filtter_provider.dart';
 import 'package:app/providers/locale_provider.dart';
+import 'package:app/providers/matching_provider.dart';
 import 'package:app/providers/service_providers/firebase_service.dart';
 import 'package:app/screens/home/home.dart';
 import 'package:app/screens/onboarding/splash_screen.dart';
@@ -66,6 +67,7 @@ void main() async {
           ChangeNotifierProvider(create: (_) => FiltterProvider()),
           ChangeNotifierProvider(create: (_) => ChatProvider()),
           ChangeNotifierProvider(create: (_) => LocaleProvider()),
+          ChangeNotifierProvider(create: (_) => MatchingProvider()),
         ],
         child: const MyApp(),
       ),

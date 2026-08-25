@@ -3,6 +3,7 @@ import 'package:app/app/models/person_details_model.dart';
 import 'package:app/providers/account_provider.dart';
 import 'package:app/providers/filtter_provider.dart';
 import 'package:app/screens/home/filter_screen.dart';
+import 'package:app/screens/home/matching_screen.dart';
 import 'package:app/screens/notification/widget/person_card.dart';
 import 'package:firebase_auth/firebase_auth.dart' as firebase_auth;
 import 'package:flutter/material.dart';
@@ -123,7 +124,29 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                   ],
                 ),
-                SizedBox(height: context.verticalSize(30)),
+
+                SizedBox(height: context.verticalSize(15)),
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton.icon(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: ColorManager.kPrimary.withOpacity(0.1),
+                      foregroundColor: ColorManager.kPrimary,
+                      elevation: 0,
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                    ),
+                    onPressed: () {
+                      Navigator.push(context, MaterialPageRoute(builder: (context) => const MatchingScreen()));
+                    },
+                    icon: const Icon(Icons.hub),
+                    label: Text(
+                      "Find Multi-Person Transfer Cycles",
+                      style: context.semiBold14(color: ColorManager.kPrimary),
+                    ),
+                  ),
+                ),
+                SizedBox(height: context.verticalSize(15)),
+
                 displayedUsers.isEmpty
                     ? Expanded(
                       child: Center(
