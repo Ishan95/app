@@ -669,4 +669,64 @@ class AppLocalizationsTa extends AppLocalizations {
   @override
   String get whatsappSupportMessage =>
       'வணக்கம், எனது கணக்கு தொடர்பாக எனக்கு உதவி தேவை.';
+
+  @override
+  String get transferCycles => 'பரிமாற்ற சுழற்சிகள்';
+
+  @override
+  String get firstChoiceTab => '1 வது விருப்பம்';
+
+  @override
+  String get secondChoiceTab => '2 வது விருப்பம்';
+
+  @override
+  String get thirdChoiceTab => '3 வது விருப்பம்';
+
+  @override
+  String get twoPersonTab => '2 நபர்கள்';
+
+  @override
+  String get threePersonTab => '3 நபர்கள்';
+
+  @override
+  String get fourPersonTab => '4 நபர்கள்';
+
+  @override
+  String get noMatchesFound => 'பொருத்தங்கள் எதுவும் இல்லை.';
+
+  @override
+  String get twoPersonCycle => '2 நபர் சுழற்சி';
+
+  @override
+  String get threePersonCycle => '3 நபர் சுழற்சி';
+
+  @override
+  String get fourPersonCycle => '4 நபர் சுழற்சி';
+
+  @override
+  String get viewCycleFlow => 'சுழற்சி ஓட்டத்தைக் காண்க';
+
+  @override
+  String get cycleDetails => 'சுழற்சி விவரங்கள்';
+
+  @override
+  String get matchFulfillsChoice =>
+      'இந்த பொருத்தம் உங்கள் விருப்பத்தை பூர்த்தி செய்கிறது:';
+
+  @override
+  String get cycleConfirmationNotice =>
+      'இந்தப் பரிமாற்றத்தை உறுதிப்படுத்த அனைவரும் தேவை. ஒருவர் ரத்துசெய்தால் சுழற்சி உடையும்.';
+
+  @override
+  String get currentPost => 'தற்போதைய பதவி:';
+
+  @override
+  String get transfersTo => 'பரிமாற்றம்:';
+
+  @override
+  String get cycleCompletesBackTo => 'சுழற்சி மீண்டும் நிறைவடைகிறது';
+
+  @override
+  String get findMultiPersonCycles =>
+      'பல நபர் பரிமாற்ற சுழற்சிகளைக் கண்டறியவும்';
 }

@@ -663,4 +663,62 @@ class AppLocalizationsSi extends AppLocalizations {
   @override
   String get whatsappSupportMessage =>
       'ආයුබෝවන්, මගේ ගිණුම සම්බන්ධයෙන් මට සහාය අවශ්‍යයි.';
+
+  @override
+  String get transferCycles => 'මාරුවීම් චක්‍ර';
+
+  @override
+  String get firstChoiceTab => '1 වන තේරීම';
+
+  @override
+  String get secondChoiceTab => '2 වන තේරීම';
+
+  @override
+  String get thirdChoiceTab => '3 වන තේරීම';
+
+  @override
+  String get twoPersonTab => 'පුද්ගලයන් 2';
+
+  @override
+  String get threePersonTab => 'පුද්ගලයන් 3';
+
+  @override
+  String get fourPersonTab => 'පුද්ගලයන් 4';
+
+  @override
+  String get noMatchesFound => 'ගැලපීම් හමු නොවීය.';
+
+  @override
+  String get twoPersonCycle => 'පුද්ගලයන් 2 කගේ චක්‍රයක්';
+
+  @override
+  String get threePersonCycle => 'පුද්ගලයන් 3 කගේ චක්‍රයක්';
+
+  @override
+  String get fourPersonCycle => 'පුද්ගලයන් 4 කගේ චක්‍රයක්';
+
+  @override
+  String get viewCycleFlow => 'චක්‍රයේ ගලායාම බලන්න';
+
+  @override
+  String get cycleDetails => 'චක්‍රයේ විස්තර';
+
+  @override
+  String get matchFulfillsChoice => 'මෙම ගැලපීම ඔබගේ තේරීම ඉටු කරයි:';
+
+  @override
+  String get cycleConfirmationNotice =>
+      'මෙම චක්‍රය සඳහා සියලු දෙනාම මාරුවීම තහවුරු කිරීම අවශ්‍ය වේ. එක් අයෙකු අවලංගු කළහොත් චක්‍රය බිඳ වැටේ.';
+
+  @override
+  String get currentPost => 'වත්මන් ස්ථානය:';
+
+  @override
+  String get transfersTo => 'මාරුවන ස්ථානය:';
+
+  @override
+  String get cycleCompletesBackTo => 'චක්‍රය නැවත සම්පූර්ණ වන්නේ';
+
+  @override
+  String get findMultiPersonCycles => 'බහු-පුද්ගල මාරුවීම් චක්‍ර සොයන්න';
 }

@@ -1371,6 +1371,120 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Hello, I need assistance with my account.'**
   String get whatsappSupportMessage;
+
+  /// No description provided for @transferCycles.
+  ///
+  /// In en, this message translates to:
+  /// **'Transfer Cycles'**
+  String get transferCycles;
+
+  /// No description provided for @firstChoiceTab.
+  ///
+  /// In en, this message translates to:
+  /// **'1st Choice'**
+  String get firstChoiceTab;
+
+  /// No description provided for @secondChoiceTab.
+  ///
+  /// In en, this message translates to:
+  /// **'2nd Choice'**
+  String get secondChoiceTab;
+
+  /// No description provided for @thirdChoiceTab.
+  ///
+  /// In en, this message translates to:
+  /// **'3rd Choice'**
+  String get thirdChoiceTab;
+
+  /// No description provided for @twoPersonTab.
+  ///
+  /// In en, this message translates to:
+  /// **'2-Person'**
+  String get twoPersonTab;
+
+  /// No description provided for @threePersonTab.
+  ///
+  /// In en, this message translates to:
+  /// **'3-Person'**
+  String get threePersonTab;
+
+  /// No description provided for @fourPersonTab.
+  ///
+  /// In en, this message translates to:
+  /// **'4-Person'**
+  String get fourPersonTab;
+
+  /// No description provided for @noMatchesFound.
+  ///
+  /// In en, this message translates to:
+  /// **'No matches found.'**
+  String get noMatchesFound;
+
+  /// No description provided for @twoPersonCycle.
+  ///
+  /// In en, this message translates to:
+  /// **'2-Person Cycle'**
+  String get twoPersonCycle;
+
+  /// No description provided for @threePersonCycle.
+  ///
+  /// In en, this message translates to:
+  /// **'3-Person Cycle'**
+  String get threePersonCycle;
+
+  /// No description provided for @fourPersonCycle.
+  ///
+  /// In en, this message translates to:
+  /// **'4-Person Cycle'**
+  String get fourPersonCycle;
+
+  /// No description provided for @viewCycleFlow.
+  ///
+  /// In en, this message translates to:
+  /// **'View Cycle Flow'**
+  String get viewCycleFlow;
+
+  /// No description provided for @cycleDetails.
+  ///
+  /// In en, this message translates to:
+  /// **'Cycle Details'**
+  String get cycleDetails;
+
+  /// No description provided for @matchFulfillsChoice.
+  ///
+  /// In en, this message translates to:
+  /// **'This match fulfills your choice:'**
+  String get matchFulfillsChoice;
+
+  /// No description provided for @cycleConfirmationNotice.
+  ///
+  /// In en, this message translates to:
+  /// **'This cycle requires all people to confirm the transfer. If one cancels, the cycle breaks.'**
+  String get cycleConfirmationNotice;
+
+  /// No description provided for @currentPost.
+  ///
+  /// In en, this message translates to:
+  /// **'Current Post:'**
+  String get currentPost;
+
+  /// No description provided for @transfersTo.
+  ///
+  /// In en, this message translates to:
+  /// **'Transfers to:'**
+  String get transfersTo;
+
+  /// No description provided for @cycleCompletesBackTo.
+  ///
+  /// In en, this message translates to:
+  /// **'Cycle completes back to'**
+  String get cycleCompletesBackTo;
+
+  /// No description provided for @findMultiPersonCycles.
+  ///
+  /// In en, this message translates to:
+  /// **'Find Multi-Person Transfer Cycles'**
+  String get findMultiPersonCycles;
 }
 
 class _AppLocalizationsDelegate

@@ -3,6 +3,8 @@ import 'package:app/providers/account_provider.dart';
 import 'package:app/providers/filtter_provider.dart';
 import 'package:app/providers/matching_provider.dart';
 import 'package:app/screens/home/match_details_screen.dart';
+import 'package:app/l10n/app_localizations.dart';
+import 'package:app/app/utils/translation_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:provider/provider.dart';
@@ -32,6 +34,8 @@ class _MatchingScreenState extends State<MatchingScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return DefaultTabController(
       length: 3,
       child: Scaffold(
@@ -39,7 +43,7 @@ class _MatchingScreenState extends State<MatchingScreen> {
         appBar: AppBar(
           backgroundColor: ColorManager.white,
           elevation: 0.5,
-          title: Text("Transfer Cycles", style: context.semiBold20(color: ColorManager.blackMedium)),
+          title: Text(l10n.transferCycles, style: context.semiBold20(color: ColorManager.blackMedium)),
           centerTitle: false,
           actions: [
             Padding(
@@ -63,10 +67,10 @@ class _MatchingScreenState extends State<MatchingScreen> {
                         });
                       }
                     },
-                    items: const [
-                      DropdownMenuItem(value: 1, child: Text("1st Choice")),
-                      DropdownMenuItem(value: 2, child: Text("2nd Choice")),
-                      DropdownMenuItem(value: 3, child: Text("3rd Choice")),
+                    items: [
+                      DropdownMenuItem(value: 1, child: Text(l10n.firstChoiceTab)),
+                      DropdownMenuItem(value: 2, child: Text(l10n.secondChoiceTab)),
+                      DropdownMenuItem(value: 3, child: Text(l10n.thirdChoiceTab)),
                     ],
                   ),
                 ),
@@ -81,7 +85,7 @@ class _MatchingScreenState extends State<MatchingScreen> {
             labelColor: ColorManager.kPrimary,
             unselectedLabelColor: ColorManager.grayText,
             indicatorColor: ColorManager.kPrimary,
-            tabs: const [Tab(text: "2-Person"), Tab(text: "3-Person"), Tab(text: "4-Person")],
+            tabs: [Tab(text: l10n.twoPersonTab), Tab(text: l10n.threePersonTab), Tab(text: l10n.fourPersonTab)],
           ),
         ),
         body: Consumer<MatchingProvider>(
@@ -99,18 +103,11 @@ class _MatchingScreenState extends State<MatchingScreen> {
             final threeWay = choiceFilteredMatches.where((m) => m.matchType == MatchType.threePerson).toList();
             final fourWay = choiceFilteredMatches.where((m) => m.matchType == MatchType.fourPerson).toList();
 
-            String choicePrefix =
-                _selectedChoiceFilter == 1
-                    ? "1st"
-                    : _selectedChoiceFilter == 2
-                    ? "2nd"
-                    : "3rd";
-
             return TabBarView(
               children: [
-                _buildMatchList(twoWay, "2-Person Matches ($choicePrefix Choice)"),
-                _buildMatchList(threeWay, "3-Person Matches ($choicePrefix Choice)"),
-                _buildMatchList(fourWay, "4-Person Matches ($choicePrefix Choice)"),
+                _buildMatchList(twoWay, context),
+                _buildMatchList(threeWay, context),
+                _buildMatchList(fourWay, context),
               ],
             );
           },
@@ -119,9 +116,11 @@ class _MatchingScreenState extends State<MatchingScreen> {
     );
   }
 
-  Widget _buildMatchList(List<MutualTransferMatch> matches, String emptyTitle) {
+  Widget _buildMatchList(List<MutualTransferMatch> matches, BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     if (matches.isEmpty) {
-      return Center(child: Text("No $emptyTitle found.", style: context.semiBold14(color: ColorManager.grayText)));
+      return Center(child: Text(l10n.noMatchesFound, style: context.semiBold14(color: ColorManager.grayText)));
     }
 
     return ListView.builder(
@@ -132,10 +131,10 @@ class _MatchingScreenState extends State<MatchingScreen> {
 
         String cycleTypeText =
             match.matchType == MatchType.twoPerson
-                ? "2-Person Cycle"
+                ? l10n.twoPersonCycle
                 : match.matchType == MatchType.threePerson
-                ? "3-Person Cycle"
-                : "4-Person Cycle";
+                ? l10n.threePersonCycle
+                : l10n.fourPersonCycle;
 
         return Card(
           elevation: 2,
@@ -163,7 +162,7 @@ class _MatchingScreenState extends State<MatchingScreen> {
                         const SizedBox(width: 8),
                         Expanded(
                           child: Text(
-                            "${u.firstName} (${u.district})",
+                            "${u.firstName} (${TranslationService.translate(context, u.district)})",
                             style: context.regular14(color: ColorManager.blackMedium),
                           ),
                         ),
@@ -186,7 +185,7 @@ class _MatchingScreenState extends State<MatchingScreen> {
                         MaterialPageRoute(builder: (context) => MatchDetailsScreen(match: match)),
                       );
                     },
-                    child: Text("View Cycle Flow", style: context.semiBold14(color: ColorManager.kPrimary)),
+                    child: Text(l10n.viewCycleFlow, style: context.semiBold14(color: ColorManager.kPrimary)),
                   ),
                 ),
               ],

@@ -2,6 +2,7 @@ import 'package:app/app/export.dart';
 import 'package:app/app/models/mutual_transfer_match_model.dart';
 import 'package:app/providers/filtter_provider.dart';
 import 'package:app/l10n/app_localizations.dart';
+import 'package:app/app/utils/translation_service.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -42,15 +43,15 @@ class MatchDetailsScreen extends StatelessWidget {
 
     String choicePrefix =
         match.matchedChoice == 1
-            ? "1st"
+            ? l10n.firstChoiceTab
             : match.matchedChoice == 2
-            ? "2nd"
-            : "3rd";
+            ? l10n.secondChoiceTab
+            : l10n.thirdChoiceTab;
 
     return Scaffold(
       backgroundColor: ColorManager.white,
       appBar: AppBar(
-        title: Text("Cycle Details", style: context.semiBold20(color: ColorManager.blackMedium)),
+        title: Text(l10n.cycleDetails, style: context.semiBold20(color: ColorManager.blackMedium)),
         backgroundColor: ColorManager.white,
         elevation: 0.5,
         iconTheme: IconThemeData(color: ColorManager.blackMedium),
@@ -74,7 +75,7 @@ class MatchDetailsScreen extends StatelessWidget {
                   const SizedBox(width: 8),
                   Expanded(
                     child: Text(
-                      "This match fulfills your $choicePrefix Choice!",
+                      "${l10n.matchFulfillsChoice} $choicePrefix",
                       style: context.semiBold14(color: Colors.green),
                     ),
                   ),
@@ -88,7 +89,7 @@ class MatchDetailsScreen extends StatelessWidget {
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Text(
-                "This cycle requires all ${match.cycle.length} people to confirm the transfer. If one cancels, the cycle breaks.",
+                l10n.cycleConfirmationNotice,
                 style: context.regular14(color: ColorManager.kPrimary),
                 textAlign: TextAlign.center,
               ),
@@ -108,9 +109,9 @@ class MatchDetailsScreen extends StatelessWidget {
 
                 String schoolName = "";
                 if (isProvincialTeacher) {
-                  schoolName = currentPerson.school ?? "Unknown School";
+                  schoolName = currentPerson.school ?? l10n.unknown;
                 } else if (isNationalTeacher) {
-                  schoolName = currentPerson.nationalSchool ?? "Unknown National School";
+                  schoolName = currentPerson.nationalSchool ?? l10n.unknown;
                 }
 
                 return Column(
@@ -118,32 +119,32 @@ class MatchDetailsScreen extends StatelessWidget {
                     Container(
                       padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
-                        border: Border.all(
-                          color: currentPerson.uid != currentUserId ? ColorManager.lightGray : ColorManager.kPrimary,
-                          width: 2.0,
-                        ),
+                        border: Border.all(color: ColorManager.gray),
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            currentPerson.firstName ?? "Unknown",
+                            currentPerson.firstName ?? l10n.unknown,
                             style: context.bold16(color: ColorManager.blackMedium),
                           ),
                           const SizedBox(height: 4),
                           Text(
-                            "Current Post: ${currentPerson.district}",
+                            "${l10n.currentPost} ${TranslationService.translate(context, currentPerson.district)}",
                             style: context.regular14(color: ColorManager.grayText),
                           ),
                           if (isTeacher && schoolName.isNotEmpty) ...[
                             const SizedBox(height: 4),
-                            Text("School: $schoolName", style: context.regular14(color: ColorManager.blackMedium)),
+                            Text(
+                              "${l10n.schoolLabel}: ${TranslationService.translate(context, schoolName)}",
+                              style: context.regular14(color: ColorManager.blackMedium),
+                            ),
                           ],
                           const SizedBox(height: 8),
                           Row(
                             children: [
-                              Text("Contact:", style: context.semiBold14(color: ColorManager.blackMedium)),
+                              Icon(Icons.phone, size: 16, color: ColorManager.grayText),
                               const SizedBox(width: 8),
                               Text(
                                 currentPerson.phone ?? "N/A",
@@ -156,7 +157,7 @@ class MatchDetailsScreen extends StatelessWidget {
                             Row(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text("Whatsapp:", style: context.semiBold14(color: ColorManager.blackMedium)),
+                                const Icon(Icons.chat, size: 16, color: Colors.green),
                                 const SizedBox(width: 8),
                                 Expanded(
                                   child:
@@ -186,7 +187,7 @@ class MatchDetailsScreen extends StatelessWidget {
 
                           const Divider(height: 24),
                           Text(
-                            "Transfers to: ${nextPerson.district}",
+                            "${l10n.transfersTo} ${TranslationService.translate(context, nextPerson.district)}",
                             style: context.semiBold14(color: ColorManager.kPrimary),
                           ),
                         ],
@@ -209,7 +210,7 @@ class MatchDetailsScreen extends StatelessWidget {
               ),
               child: Center(
                 child: Text(
-                  "Cycle completes back to ${match.cycle.first.firstName}",
+                  "${l10n.cycleCompletesBackTo} ${match.cycle.first.firstName}",
                   style: context.bold16(color: ColorManager.blackMedium),
                 ),
               ),

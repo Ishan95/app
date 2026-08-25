@@ -140,7 +140,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     },
                     icon: const Icon(Icons.hub),
                     label: Text(
-                      "Find Multi-Person Transfer Cycles",
+                      l10n.findMultiPersonCycles,
                       style: context.semiBold14(color: ColorManager.kPrimary),
                     ),
                   ),
