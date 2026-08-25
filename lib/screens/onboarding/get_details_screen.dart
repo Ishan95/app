@@ -167,11 +167,11 @@ class _GetDetailsScreenState extends State<GetDetailsScreen> {
                                     },
                                     icon: Icon(Icons.arrow_back, color: ColorManager.blackMedium),
                                   ),
-                                  Flexible(
-                                    child: FittedBox(
-                                      fit: BoxFit.scaleDown,
-                                      child: Align(
-                                        alignment: Alignment.center,
+                                  Expanded(
+                                    child: Align(
+                                      alignment: Alignment.center,
+                                      child: FittedBox(
+                                        fit: BoxFit.scaleDown,
                                         child: Text(
                                           l10n.addBasicInfo,
                                           style: context.boldNunito30(color: ColorManager.blackMedium),
@@ -370,7 +370,15 @@ class _GetDetailsScreenState extends State<GetDetailsScreen> {
                               Row(
                                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [
-                                  Text(l10n.contactNumber, style: context.semiBold14(color: ColorManager.blackMedium)),
+                                  Flexible(
+                                    child: FittedBox(
+                                      fit: BoxFit.scaleDown,
+                                      child: Text(
+                                        l10n.contactNumber,
+                                        style: context.semiBold14(color: ColorManager.blackMedium),
+                                      ),
+                                    ),
+                                  ),
                                   GestureDetector(
                                     onTap: () {
                                       setState(() {
@@ -379,10 +387,13 @@ class _GetDetailsScreenState extends State<GetDetailsScreen> {
                                     },
                                     child: Row(
                                       children: [
-                                        Text(
-                                          l10n.hide,
-                                          style: context.semiBold14(
-                                            color: isSelected ? ColorManager.disabledText : ColorManager.kPrimary,
+                                        FittedBox(
+                                          fit: BoxFit.scaleDown,
+                                          child: Text(
+                                            l10n.hide,
+                                            style: context.semiBold14(
+                                              color: isSelected ? ColorManager.disabledText : ColorManager.kPrimary,
+                                            ),
                                           ),
                                         ),
                                         SizedBox(width: context.horizontalSize(10)),
@@ -431,9 +442,14 @@ class _GetDetailsScreenState extends State<GetDetailsScreen> {
                               Row(
                                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [
-                                  Text(
-                                    l10n.whatsappOptional,
-                                    style: context.semiBold14(color: ColorManager.blackMedium),
+                                  Flexible(
+                                    child: FittedBox(
+                                      fit: BoxFit.scaleDown,
+                                      child: Text(
+                                        l10n.whatsappOptional,
+                                        style: context.semiBold14(color: ColorManager.blackMedium),
+                                      ),
+                                    ),
                                   ),
                                   GestureDetector(
                                     onTap: () {
@@ -443,11 +459,16 @@ class _GetDetailsScreenState extends State<GetDetailsScreen> {
                                     },
                                     child: Row(
                                       children: [
-                                        Text(
-                                          l10n.hide,
-                                          style: context.semiBold14(
-                                            color:
-                                                isWhatsappSelected ? ColorManager.disabledText : ColorManager.kPrimary,
+                                        FittedBox(
+                                          fit: BoxFit.scaleDown,
+                                          child: Text(
+                                            l10n.hide,
+                                            style: context.semiBold14(
+                                              color:
+                                                  isWhatsappSelected
+                                                      ? ColorManager.disabledText
+                                                      : ColorManager.kPrimary,
+                                            ),
                                           ),
                                         ),
                                         SizedBox(width: context.horizontalSize(10)),
@@ -492,9 +513,12 @@ class _GetDetailsScreenState extends State<GetDetailsScreen> {
                               SizedBox(height: context.verticalSize(20)),
                               Align(
                                 alignment: Alignment.centerLeft,
-                                child: Text(
-                                  l10n.selectJobCategory,
-                                  style: context.semiBold14(color: ColorManager.blackMedium),
+                                child: FittedBox(
+                                  fit: BoxFit.scaleDown,
+                                  child: Text(
+                                    l10n.selectJobCategory,
+                                    style: context.semiBold14(color: ColorManager.blackMedium),
+                                  ),
                                 ),
                               ),
                               SizedBox(height: context.verticalSize(8)),
@@ -518,7 +542,7 @@ class _GetDetailsScreenState extends State<GetDetailsScreen> {
                                             (jobCategory) => DropdownMenuItem<String>(
                                               value: jobCategory,
                                               child: Text(
-                                                TranslationService.translate(context, jobCategory), // LOCALIZED
+                                                TranslationService.translate(context, jobCategory),
                                                 style: context.regular14(color: ColorManager.blackMedium),
                                               ),
                                             ),
@@ -555,12 +579,17 @@ class _GetDetailsScreenState extends State<GetDetailsScreen> {
                               Row(
                                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [
-                                  Text(
-                                    (filterDetails.job == "Provincial School Teacher" ||
-                                            filterDetails.job == "National School Teacher")
-                                        ? l10n.setupSchoolingDetails
-                                        : l10n.setupOfficeDetails,
-                                    style: context.semiBold14(color: ColorManager.blackMedium),
+                                  Flexible(
+                                    child: FittedBox(
+                                      fit: BoxFit.scaleDown,
+                                      child: Text(
+                                        (filterDetails.job == "Provincial School Teacher" ||
+                                                filterDetails.job == "National School Teacher")
+                                            ? l10n.setupSchoolingDetails
+                                            : l10n.setupOfficeDetails,
+                                        style: context.semiBold14(color: ColorManager.blackMedium),
+                                      ),
+                                    ),
                                   ),
                                   GestureDetector(
                                     onTap: () {
@@ -570,10 +599,14 @@ class _GetDetailsScreenState extends State<GetDetailsScreen> {
                                     },
                                     child: Row(
                                       children: [
-                                        Text(
-                                          l10n.hide,
-                                          style: context.semiBold14(
-                                            color: isSchoolSelected ? ColorManager.disabledText : ColorManager.kPrimary,
+                                        FittedBox(
+                                          fit: BoxFit.scaleDown,
+                                          child: Text(
+                                            l10n.hide,
+                                            style: context.semiBold14(
+                                              color:
+                                                  isSchoolSelected ? ColorManager.disabledText : ColorManager.kPrimary,
+                                            ),
                                           ),
                                         ),
                                         SizedBox(width: context.horizontalSize(10)),
@@ -614,7 +647,7 @@ class _GetDetailsScreenState extends State<GetDetailsScreen> {
                                                     (province) => DropdownMenuItem(
                                                       value: province,
                                                       child: Text(
-                                                        TranslationService.translate(context, province), // LOCALIZED
+                                                        TranslationService.translate(context, province),
                                                         style: context.regular14(color: ColorManager.blackMedium),
                                                       ),
                                                     ),
@@ -682,7 +715,7 @@ class _GetDetailsScreenState extends State<GetDetailsScreen> {
                                                 (district) => DropdownMenuItem(
                                                   value: district,
                                                   child: Text(
-                                                    TranslationService.translate(context, district), // LOCALIZED
+                                                    TranslationService.translate(context, district),
                                                     style: context.regular14(color: ColorManager.blackMedium),
                                                   ),
                                                 ),
@@ -780,7 +813,7 @@ class _GetDetailsScreenState extends State<GetDetailsScreen> {
                                                         (kalapa) => DropdownMenuItem(
                                                           value: kalapa,
                                                           child: Text(
-                                                            TranslationService.translate(context, kalapa), // LOCALIZED
+                                                            TranslationService.translate(context, kalapa),
                                                             style: context.regular14(color: ColorManager.blackMedium),
                                                           ),
                                                         ),
@@ -795,10 +828,7 @@ class _GetDetailsScreenState extends State<GetDetailsScreen> {
                                                         (institute) => DropdownMenuItem(
                                                           value: institute,
                                                           child: Text(
-                                                            TranslationService.translate(
-                                                              context,
-                                                              institute,
-                                                            ), // LOCALIZED
+                                                            TranslationService.translate(context, institute),
                                                             style: context.regular14(color: ColorManager.blackMedium),
                                                           ),
                                                         ),
@@ -813,10 +843,7 @@ class _GetDetailsScreenState extends State<GetDetailsScreen> {
                                                         (institute) => DropdownMenuItem(
                                                           value: institute,
                                                           child: Text(
-                                                            TranslationService.translate(
-                                                              context,
-                                                              institute,
-                                                            ), // LOCALIZED
+                                                            TranslationService.translate(context, institute),
                                                             style: context.regular14(color: ColorManager.blackMedium),
                                                           ),
                                                         ),
@@ -831,10 +858,7 @@ class _GetDetailsScreenState extends State<GetDetailsScreen> {
                                                         (policeDivisions) => DropdownMenuItem(
                                                           value: policeDivisions,
                                                           child: Text(
-                                                            TranslationService.translate(
-                                                              context,
-                                                              policeDivisions,
-                                                            ), // LOCALIZED
+                                                            TranslationService.translate(context, policeDivisions),
                                                             style: context.regular14(color: ColorManager.blackMedium),
                                                           ),
                                                         ),
@@ -847,10 +871,7 @@ class _GetDetailsScreenState extends State<GetDetailsScreen> {
                                                         (dsDivisions) => DropdownMenuItem(
                                                           value: dsDivisions,
                                                           child: Text(
-                                                            TranslationService.translate(
-                                                              context,
-                                                              dsDivisions,
-                                                            ), // LOCALIZED
+                                                            TranslationService.translate(context, dsDivisions),
                                                             style: context.regular14(color: ColorManager.blackMedium),
                                                           ),
                                                         ),
@@ -974,7 +995,7 @@ class _GetDetailsScreenState extends State<GetDetailsScreen> {
                                                         (kottasa) => DropdownMenuItem(
                                                           value: kottasa,
                                                           child: Text(
-                                                            TranslationService.translate(context, kottasa), // LOCALIZED
+                                                            TranslationService.translate(context, kottasa),
                                                             style: context.regular14(color: ColorManager.blackMedium),
                                                           ),
                                                         ),
@@ -989,7 +1010,7 @@ class _GetDetailsScreenState extends State<GetDetailsScreen> {
                                                         (kottasa) => DropdownMenuItem(
                                                           value: kottasa,
                                                           child: Text(
-                                                            TranslationService.translate(context, kottasa), // LOCALIZED
+                                                            TranslationService.translate(context, kottasa),
                                                             style: context.regular14(color: ColorManager.blackMedium),
                                                           ),
                                                         ),
@@ -1004,7 +1025,7 @@ class _GetDetailsScreenState extends State<GetDetailsScreen> {
                                                         (office) => DropdownMenuItem(
                                                           value: office,
                                                           child: Text(
-                                                            TranslationService.translate(context, office), // LOCALIZED
+                                                            TranslationService.translate(context, office),
                                                             style: context.regular14(color: ColorManager.blackMedium),
                                                           ),
                                                         ),
@@ -1019,7 +1040,7 @@ class _GetDetailsScreenState extends State<GetDetailsScreen> {
                                                         (office) => DropdownMenuItem(
                                                           value: office,
                                                           child: Text(
-                                                            TranslationService.translate(context, office), // LOCALIZED
+                                                            TranslationService.translate(context, office),
                                                             style: context.regular14(color: ColorManager.blackMedium),
                                                           ),
                                                         ),
@@ -1034,7 +1055,7 @@ class _GetDetailsScreenState extends State<GetDetailsScreen> {
                                                         (office) => DropdownMenuItem(
                                                           value: office,
                                                           child: Text(
-                                                            TranslationService.translate(context, office), // LOCALIZED
+                                                            TranslationService.translate(context, office),
                                                             style: context.regular14(color: ColorManager.blackMedium),
                                                           ),
                                                         ),
@@ -1048,7 +1069,7 @@ class _GetDetailsScreenState extends State<GetDetailsScreen> {
                                                         (office) => DropdownMenuItem(
                                                           value: office,
                                                           child: Text(
-                                                            TranslationService.translate(context, office), // LOCALIZED
+                                                            TranslationService.translate(context, office),
                                                             style: context.regular14(color: ColorManager.blackMedium),
                                                           ),
                                                         ),
@@ -1132,7 +1153,7 @@ class _GetDetailsScreenState extends State<GetDetailsScreen> {
                                                 (school) => DropdownMenuItem(
                                                   value: school,
                                                   child: Text(
-                                                    TranslationService.translate(context, school), // LOCALIZED
+                                                    TranslationService.translate(context, school),
                                                     style: context.regular14(color: ColorManager.blackMedium),
                                                   ),
                                                 ),
@@ -1209,7 +1230,7 @@ class _GetDetailsScreenState extends State<GetDetailsScreen> {
                                             (scheme) => DropdownMenuItem(
                                               value: scheme,
                                               child: Text(
-                                                TranslationService.translate(context, scheme), // LOCALIZED
+                                                TranslationService.translate(context, scheme),
                                                 style: context.regular14(color: ColorManager.blackMedium),
                                               ),
                                             ),
@@ -1280,7 +1301,7 @@ class _GetDetailsScreenState extends State<GetDetailsScreen> {
                                                 (subject) => DropdownMenuItem(
                                                   value: subject,
                                                   child: Text(
-                                                    TranslationService.translate(context, subject), // LOCALIZED
+                                                    TranslationService.translate(context, subject),
                                                     style: context.regular14(color: ColorManager.blackMedium),
                                                   ),
                                                 ),

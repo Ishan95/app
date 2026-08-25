@@ -545,9 +545,14 @@ class _EditDetailsScreenState extends State<EditDetailsScreen> {
                                 Row(
                                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                   children: [
-                                    Text(
-                                      l10n.contactNumber,
-                                      style: context.semiBold14(color: ColorManager.blackMedium),
+                                    Flexible(
+                                      child: FittedBox(
+                                        fit: BoxFit.scaleDown,
+                                        child: Text(
+                                          l10n.contactNumber,
+                                          style: context.semiBold14(color: ColorManager.blackMedium),
+                                        ),
+                                      ),
                                     ),
                                     GestureDetector(
                                       onTap: () {
@@ -680,12 +685,17 @@ class _EditDetailsScreenState extends State<EditDetailsScreen> {
                                 Row(
                                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                   children: [
-                                    Text(
-                                      (filterDetails.job == "Provincial School Teacher" ||
-                                              filterDetails.job == "National School Teacher")
-                                          ? l10n.setupSchoolingDetails
-                                          : l10n.setupOfficeDetails,
-                                      style: context.semiBold14(color: ColorManager.blackMedium),
+                                    Flexible(
+                                      child: FittedBox(
+                                        fit: BoxFit.scaleDown,
+                                        child: Text(
+                                          (filterDetails.job == "Provincial School Teacher" ||
+                                                  filterDetails.job == "National School Teacher")
+                                              ? l10n.setupSchoolingDetails
+                                              : l10n.setupOfficeDetails,
+                                          style: context.semiBold14(color: ColorManager.blackMedium),
+                                        ),
+                                      ),
                                     ),
                                     GestureDetector(
                                       onTap: () {

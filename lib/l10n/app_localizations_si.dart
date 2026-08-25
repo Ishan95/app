@@ -28,7 +28,7 @@ class AppLocalizationsSi extends AppLocalizations {
   String get email => 'විද්‍යුත් තැපෑල';
 
   @override
-  String get emailAddress => 'විද්‍යුත් තැපැල් ලිපිනය';
+  String get emailAddress => 'විද්‍යුත් තැපැල් ලිපිනය ';
 
   @override
   String get emailNotice =>
@@ -41,13 +41,13 @@ class AppLocalizationsSi extends AppLocalizations {
   String get birthdate => 'උපන්දිනය';
 
   @override
-  String get idCardNumber => 'ජාතික හැඳුනුම්පත් අංකය';
+  String get idCardNumber => 'ජාතික හැඳුනුම්පත් අංකය ';
 
   @override
-  String get contactNumber => 'සම්බන්ධ කරගත හැකි අංකය';
+  String get contactNumber => 'සම්බන්ධ කරගත හැකි අංකය ';
 
   @override
-  String get whatsappOptional => 'වට්ස්ඇප් අංකය (විකල්ප)';
+  String get whatsappOptional => 'වට්ස්ඇප් අංකය (විකල්ප) ';
 
   @override
   String get whatsappNumber => 'වට්ස්ඇප් අංකය';
@@ -56,19 +56,19 @@ class AppLocalizationsSi extends AppLocalizations {
   String get hide => 'සඟවන්න';
 
   @override
-  String get selectJobCategory => 'ඔබේ රැකියා කාණ්ඩය තෝරන්න';
+  String get selectJobCategory => 'ඔබේ රැකියා කාණ්ඩය තෝරන්න ';
 
   @override
-  String get setupSchoolingDetails => 'ඔබගේ පාසල් විස්තර සකසන්න';
+  String get setupSchoolingDetails => 'ඔබගේ පාසල් විස්තර සකසන්න ';
 
   @override
-  String get setupOfficeDetails => 'ඔබගේ කාර්යාල විස්තර සකසන්න';
+  String get setupOfficeDetails => 'ඔබගේ කාර්යාල විස්තර සකසන්න ';
 
   @override
-  String get setupSubjectDetails => 'ඔබගේ විෂය විස්තර සකසන්න';
+  String get setupSubjectDetails => 'ඔබගේ විෂය විස්තර සකසන්න ';
 
   @override
-  String get setupGradeDetails => 'ඔබගේ ශ්‍රේණි විස්තර සකසන්න';
+  String get setupGradeDetails => 'ඔබගේ ශ්‍රේණි විස්තර සකසන්න ';
 
   @override
   String get selectProvince => 'පළාත තෝරන්න';
@@ -80,7 +80,7 @@ class AppLocalizationsSi extends AppLocalizations {
   String get selectKalapa => 'කලාපය තෝරන්න';
 
   @override
-  String get selectInstitutionType => 'ආයතන වර්ගය තෝරන්න';
+  String get selectInstitutionType => 'ආයතන වර්ගය තෝරන්න ';
 
   @override
   String get selectKottasa => 'කොට්ඨාසය තෝරන්න';
@@ -107,25 +107,25 @@ class AppLocalizationsSi extends AppLocalizations {
   String get selectYourChoice => 'ඔබේ තේරීම තෝරන්න';
 
   @override
-  String get transferChoice1 => 'ඔබගේ මාරුවීමේ පළමු තේරීමේ දිස්ත්‍රික්කය';
+  String get transferChoice1 => 'ඔබගේ මාරුවීමේ පළමු තේරීමේ දිස්ත්‍රික්කය ';
 
   @override
   String get selectChoice1 => '1 වන තේරීම තෝරන්න';
 
   @override
-  String get transferChoice2 => 'ඔබගේ මාරුවීමේ දෙවන තේරීමේ දිස්ත්‍රික්කය';
+  String get transferChoice2 => 'ඔබගේ මාරුවීමේ දෙවන තේරීමේ දිස්ත්‍රික්කය ';
 
   @override
   String get selectChoice2 => '2 වන තේරීම තෝරන්න';
 
   @override
-  String get transferChoice3 => 'ඔබගේ මාරුවීමේ තුන්වන තේරීමේ දිස්ත්‍රික්කය';
+  String get transferChoice3 => 'ඔබගේ මාරුවීමේ තුන්වන තේරීමේ දිස්ත්‍රික්කය ';
 
   @override
   String get selectChoice3 => '3 වන තේරීම තෝරන්න';
 
   @override
-  String get addSpecialNote => 'විශේෂ සටහනක් එක් කරන්න';
+  String get addSpecialNote => 'විශේෂ සටහනක් එක් කරන්න ';
 
   @override
   String get note => 'සටහන';
@@ -134,7 +134,7 @@ class AppLocalizationsSi extends AppLocalizations {
   String get password => 'මුරපදය';
 
   @override
-  String get reEnterPassword => 'මුරපදය නැවත ඇතුළත් කරන්න';
+  String get reEnterPassword => 'මුරපදය නැවත ඇතුළත් කරන්න ';
 
   @override
   String get cancel => 'අවලංගු කරන්න';

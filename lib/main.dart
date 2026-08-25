@@ -24,7 +24,8 @@ import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:app/l10n/app_localizations.dart';
 import 'package:app/providers/service_providers/onesignal_service.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart'; // Added import
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 RemoteMessage? _initialMessage;
 
@@ -87,10 +88,12 @@ class _MyAppState extends State<MyApp> {
     // Handle app opened from terminated notification
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (_initialMessage != null) {
-        ContextHelper.navigatorKey.currentState?.pushAndRemoveUntil(
-          MaterialPageRoute(builder: (_) => const Home(index: 1)),
-          (route) => false,
-        );
+        if (FirebaseAuth.instance.currentUser != null) {
+          ContextHelper.navigatorKey.currentState?.pushAndRemoveUntil(
+            MaterialPageRoute(builder: (_) => const Home(index: 1)),
+            (route) => false,
+          );
+        }
         _initialMessage = null;
       }
     });

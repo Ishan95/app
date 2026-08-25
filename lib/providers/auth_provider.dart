@@ -413,11 +413,19 @@ class AuthenticationProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
+      final currentUser = _auth.currentUser;
+      if (currentUser != null) {
+        await _firestore.collection('users').doc(currentUser.uid).update({'deviceId': ''});
+      }
+
       final prefs = await SharedPreferences.getInstance();
       await prefs.clear();
       await _auth.signOut();
       OneSignalService.logoutUser();
       _user = null;
+
+      clearData();
+
       print("User signed out successfully.");
       Navigator.pushAndRemoveUntil(
         context,
@@ -453,6 +461,8 @@ class AuthenticationProvider extends ChangeNotifier {
       _appUser = null;
       _user = null;
       _errorMessage = null;
+
+      clearData();
 
       Navigator.pushAndRemoveUntil(
         context,

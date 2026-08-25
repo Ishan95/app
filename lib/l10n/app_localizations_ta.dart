@@ -56,13 +56,13 @@ class AppLocalizationsTa extends AppLocalizations {
   String get hide => 'மறை';
 
   @override
-  String get selectJobCategory => 'உங்கள் வேலை வகையைத் தேர்ந்தெடுக்கவும்';
+  String get selectJobCategory => 'உங்கள் வேலை வகையைத் தேர்ந்தெடுக்கவும் ';
 
   @override
-  String get setupSchoolingDetails => 'உங்கள் பள்ளி விவரங்களை அமைக்கவும்';
+  String get setupSchoolingDetails => 'உங்கள் பள்ளி விவரங்களை அமைக்கவும் ';
 
   @override
-  String get setupOfficeDetails => 'உங்கள் அலுவலக விவரங்களை அமைக்கவும்';
+  String get setupOfficeDetails => 'உங்கள் அலுவலக விவரங்களை அமைக்கவும் ';
 
   @override
   String get setupSubjectDetails => 'உங்கள் பாட விவரங்களை அமைக்கவும்';
@@ -80,7 +80,7 @@ class AppLocalizationsTa extends AppLocalizations {
   String get selectKalapa => 'வலயத்தைத் தேர்ந்தெடுக்கவும்';
 
   @override
-  String get selectInstitutionType => 'நிறுவனத்தின் வகையைத் தேர்ந்தெடுக்கவும்';
+  String get selectInstitutionType => 'நிறுவனத்தின் வகையைத் தேர்ந்தெடுக்கவும் ';
 
   @override
   String get selectKottasa => 'கோட்டத்தைத் தேர்ந்தெடுக்கவும்';
@@ -98,28 +98,28 @@ class AppLocalizationsTa extends AppLocalizations {
   String get selectGrade => 'தரத்தைத் தேர்ந்தெடுக்கவும்';
 
   @override
-  String get selectSubjectMedium => 'பாட ஊடகத்தைத் தேர்ந்தெடுக்கவும்';
+  String get selectSubjectMedium => 'பாட ஊடகத்தைத் தேர்ந்தெடுக்கவும் ';
 
   @override
   String get selectSubject => 'பாடத்தைத் தேர்ந்தெடுக்கவும்';
 
   @override
-  String get selectYourChoice => 'உங்கள் விருப்பத்தைத் தேர்ந்தெடுக்கவும்';
+  String get selectYourChoice => 'உங்கள் விருப்பத்தைத் தேர்ந்தெடுக்கவும் ';
 
   @override
-  String get transferChoice1 => 'பரிமாற்றத்திற்கான முதல் மாவட்ட விருப்பம்';
+  String get transferChoice1 => 'பரிமாற்றத்திற்கான முதல் மாவட்ட விருப்பம் ';
 
   @override
   String get selectChoice1 => '1 வது விருப்பத்தைத் தேர்ந்தெடுக்கவும்';
 
   @override
-  String get transferChoice2 => 'பரிமாற்றத்திற்கான இரண்டாவது மாவட்ட விருப்பம்';
+  String get transferChoice2 => 'பரிமாற்றத்திற்கான இரண்டாவது மாவட்ட விருப்பம் ';
 
   @override
   String get selectChoice2 => '2 வது விருப்பத்தைத் தேர்ந்தெடுக்கவும்';
 
   @override
-  String get transferChoice3 => 'பரிமாற்றத்திற்கான மூன்றாவது மாவட்ட விருப்பம்';
+  String get transferChoice3 => 'பரிமாற்றத்திற்கான மூன்றாவது மாவட்ட விருப்பம் ';
 
   @override
   String get selectChoice3 => '3 வது விருப்பத்தைத் தேர்ந்தெடுக்கவும்';
