@@ -14,9 +14,10 @@ class MatchingProvider extends ChangeNotifier {
     notifyListeners();
 
     // Filter Pool based on core eligibility (Job, Scheme, Subject, Grade)
-    List<PersonDetailsModel> pool = allUsers.where((u) {
-      return u.uid != "UNKNOWN" && _isEligible(currentUser, u);
-    }).toList();
+    List<PersonDetailsModel> pool =
+        allUsers.where((u) {
+          return u.uid != "UNKNOWN" && _isEligible(currentUser, u);
+        }).toList();
 
     if (!pool.any((u) => u.uid == currentUser.uid)) {
       pool.add(currentUser);
@@ -25,10 +26,11 @@ class MatchingProvider extends ChangeNotifier {
     // Build Directed Graph (Adjacency List based on desired districts)
     Map<String, List<PersonDetailsModel>> adjList = {};
     for (var u in pool) {
-      adjList[u.uid] = pool.where((v) {
-        if (u.uid == v.uid) return false;
-        return _wantsLocation(u, v);
-      }).toList();
+      adjList[u.uid] =
+          pool.where((v) {
+            if (u.uid == v.uid) return false;
+            return _wantsLocation(u, v);
+          }).toList();
     }
 
     List<List<PersonDetailsModel>> foundCycles = [];
@@ -52,18 +54,41 @@ class MatchingProvider extends ChangeNotifier {
 
     dfs(currentUser, [currentUser], {currentUser.uid});
 
-    // Map to Model
-    _matches = foundCycles.map((cycle) {
-      MatchType type = MatchType.twoPerson;
-      if (cycle.length == 3) type = MatchType.threePerson;
-      if (cycle.length == 4) type = MatchType.fourPerson;
+    // Map to Model and Determine Choice Priority
+    _matches =
+        foundCycles.map((cycle) {
+          MatchType type = MatchType.twoPerson;
+          if (cycle.length == 3) type = MatchType.threePerson;
+          if (cycle.length == 4) type = MatchType.fourPerson;
 
-      return MutualTransferMatch(
-        matchId: cycle.map((u) => u.uid).join('-'),
-        matchType: type,
-        cycle: cycle,
-      );
-    }).toList();
+          // Determine which choice this match fulfills for the current user
+          int matchedChoiceIndex = 0;
+          if (cycle.length > 1) {
+            PersonDetailsModel nextPerson = cycle[1];
+            String targetDistrict = nextPerson.district?.toLowerCase() ?? '';
+
+            if (currentUser.choice1 != null &&
+                currentUser.choice1!.isNotEmpty &&
+                targetDistrict == currentUser.choice1!.toLowerCase()) {
+              matchedChoiceIndex = 1;
+            } else if (currentUser.choice2 != null &&
+                currentUser.choice2!.isNotEmpty &&
+                targetDistrict == currentUser.choice2!.toLowerCase()) {
+              matchedChoiceIndex = 2;
+            } else if (currentUser.choice3 != null &&
+                currentUser.choice3!.isNotEmpty &&
+                targetDistrict == currentUser.choice3!.toLowerCase()) {
+              matchedChoiceIndex = 3;
+            }
+          }
+
+          return MutualTransferMatch(
+            matchId: cycle.map((u) => u.uid).join('-'),
+            matchType: type,
+            cycle: cycle,
+            matchedChoice: matchedChoiceIndex,
+          );
+        }).toList();
 
     _isLoading = false;
     notifyListeners();
@@ -89,7 +114,7 @@ class MatchingProvider extends ChangeNotifier {
     List<String> choices = [
       a.choice1?.toLowerCase() ?? '',
       a.choice2?.toLowerCase() ?? '',
-      a.choice3?.toLowerCase() ?? ''
+      a.choice3?.toLowerCase() ?? '',
     ];
     return choices.contains(b.district?.toLowerCase() ?? '');
   }
