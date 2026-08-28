@@ -6,6 +6,7 @@ import 'package:app/app/utils/translation_service.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:app/screens/chat/group_chat_screen.dart';
 
 class MatchDetailsScreen extends StatelessWidget {
   final MutualTransferMatch match;
@@ -147,7 +148,7 @@ class MatchDetailsScreen extends StatelessWidget {
                               Icon(Icons.phone, size: 16, color: ColorManager.grayText),
                               const SizedBox(width: 8),
                               Text(
-                                currentPerson.phone ?? "N/A",
+                                currentPerson.phone ?? l10n.unknown,
                                 style: context.semiBold14(color: ColorManager.blackMedium),
                               ),
                             ],
@@ -213,6 +214,24 @@ class MatchDetailsScreen extends StatelessWidget {
                   "${l10n.cycleCompletesBackTo} ${match.cycle.first.firstName}",
                   style: context.bold16(color: ColorManager.blackMedium),
                 ),
+              ),
+            ),
+            const SizedBox(height: 24),
+
+            SizedBox(
+              width: double.infinity,
+              height: 50,
+              child: ElevatedButton.icon(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.green,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  elevation: 0,
+                ),
+                icon: const Icon(Icons.forum, color: Colors.white),
+                label: Text(l10n.cycleGroupChat, style: context.bold16(color: Colors.white)),
+                onPressed: () {
+                  Navigator.push(context, MaterialPageRoute(builder: (context) => GroupChatScreen(match: match)));
+                },
               ),
             ),
             const SizedBox(height: 24),

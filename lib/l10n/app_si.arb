@@ -230,5 +230,7 @@
   "currentPost": "වත්මන් ස්ථානය:",
   "transfersTo": "මාරුවන ස්ථානය:",
   "cycleCompletesBackTo": "චක්‍රය නැවත සම්පූර්ණ වන්නේ",
-  "findMultiPersonCycles": "බහු-පුද්ගල මාරුවීම් චක්‍ර සොයන්න"
+  "findMultiPersonCycles": "බහු-පුද්ගල මාරුවීම් චක්‍ර සොයන්න",
+  "cycleGroupChat": "චක්‍රයේ කණ්ඩායම් සංවාද",
+  "groupMembers": "කණ්ඩායම් සාමාජිකයන්"
 }

@@ -729,4 +729,10 @@ class AppLocalizationsTa extends AppLocalizations {
   @override
   String get findMultiPersonCycles =>
       'பல நபர் பரிமாற்ற சுழற்சிகளைக் கண்டறியவும்';
+
+  @override
+  String get cycleGroupChat => 'சைக்கிள் குழு அரட்டை';
+
+  @override
+  String get groupMembers => 'குழு உறுப்பினர்கள்';
 }

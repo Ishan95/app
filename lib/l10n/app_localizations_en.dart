@@ -719,4 +719,10 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get findMultiPersonCycles => 'Find Multi-Person Transfer Cycles';
+
+  @override
+  String get cycleGroupChat => 'Cycle Group Chat';
+
+  @override
+  String get groupMembers => 'Group Members';
 }

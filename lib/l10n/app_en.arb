@@ -230,5 +230,7 @@
   "currentPost": "Current Post:",
   "transfersTo": "Transfers to:",
   "cycleCompletesBackTo": "Cycle completes back to",
-  "findMultiPersonCycles": "Find Multi-Person Transfer Cycles"
+  "findMultiPersonCycles": "Find Multi-Person Transfer Cycles",
+  "cycleGroupChat": "Cycle Group Chat",
+  "groupMembers": "Group Members"
 }

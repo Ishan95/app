@@ -1485,6 +1485,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Find Multi-Person Transfer Cycles'**
   String get findMultiPersonCycles;
+
+  /// No description provided for @cycleGroupChat.
+  ///
+  /// In en, this message translates to:
+  /// **'Cycle Group Chat'**
+  String get cycleGroupChat;
+
+  /// No description provided for @groupMembers.
+  ///
+  /// In en, this message translates to:
+  /// **'Group Members'**
+  String get groupMembers;
 }
 
 class _AppLocalizationsDelegate

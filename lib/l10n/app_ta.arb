@@ -230,5 +230,7 @@
   "currentPost": "தற்போதைய பதவி:",
   "transfersTo": "பரிமாற்றம்:",
   "cycleCompletesBackTo": "சுழற்சி மீண்டும் நிறைவடைகிறது",
-  "findMultiPersonCycles": "பல நபர் பரிமாற்ற சுழற்சிகளைக் கண்டறியவும்"
+  "findMultiPersonCycles": "பல நபர் பரிமாற்ற சுழற்சிகளைக் கண்டறியவும்",
+  "cycleGroupChat" : "சைக்கிள் குழு அரட்டை",
+  "groupMembers": "குழு உறுப்பினர்கள்"
 }

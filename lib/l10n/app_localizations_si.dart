@@ -721,4 +721,10 @@ class AppLocalizationsSi extends AppLocalizations {
 
   @override
   String get findMultiPersonCycles => 'බහු-පුද්ගල මාරුවීම් චක්‍ර සොයන්න';
+
+  @override
+  String get cycleGroupChat => 'චක්‍රයේ කණ්ඩායම් සංවාද';
+
+  @override
+  String get groupMembers => 'කණ්ඩායම් සාමාජිකයන්';
 }

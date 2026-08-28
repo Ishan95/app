@@ -48,19 +48,28 @@ android {
     // }
 
     signingConfigs {
-    create("release") {
-        storeFile = file(keystoreProperties["storeFile"] as String)
-        storePassword = keystoreProperties["storePassword"] as String
-        keyAlias = keystoreProperties["keyAlias"] as String
-        keyPassword = keystoreProperties["keyPassword"] as String
+        create("release") {
+            val storeFilePath = keystoreProperties["storeFile"] as? String
+
+            if (storeFilePath != null) {
+                storeFile = file(storeFilePath)
+                storePassword = keystoreProperties["storePassword"] as? String
+                keyAlias = keystoreProperties["keyAlias"] as? String
+                keyPassword = keystoreProperties["keyPassword"] as? String
+            } else {
+                logger.info("Release keystore properties not found. Skipping release signing config.")
+            }
+        }
     }
-}
-    
+
     buildTypes {
-    release {
-        signingConfig = signingConfigs.getByName("release")
+        getByName("release") {
+            signingConfig = signingConfigs.getByName("release")
+        }
+        getByName("debug") {
+            signingConfig = signingConfigs.getByName("debug")
+        }
     }
-}
 }
 
 dependencies {

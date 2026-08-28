@@ -1,17 +1,11 @@
-class Contact{
+class Contact {
   String id;
   String? name;
   String? role;
   String? profileImage;
   String? status;
 
-  Contact({
-    required this.id,
-    required this.name,
-    required this.role,
-    this.profileImage,
-    this.status = 'active'
-  });
+  Contact({required this.id, required this.name, required this.role, this.profileImage, this.status = 'active'});
 
   factory Contact.fromJson(Map<String, dynamic> json) {
     return Contact(
@@ -22,13 +16,4 @@ class Contact{
       status: json['status'] as String,
     );
   }
-
-  // factory Contact.fromJson(Map<String, dynamic> json) =>
-  //     Contact(
-  //         id: json['station_owner'].toString(),
-  //         name: json['station_owner_name'],
-  //         role: json['role'],
-  //         profileImage: json['profileImage'],
-  //         status: json['status']
-  //     );
 }

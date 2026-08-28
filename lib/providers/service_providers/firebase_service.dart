@@ -147,8 +147,22 @@ class FirebaseService {
       settings,
       onDidReceiveNotificationResponse: (NotificationResponse response) {
         if (FirebaseAuth.instance.currentUser != null) {
+          int homeIndex = 1;
+
+          if (response.payload != null) {
+            try {
+              final payloadData = jsonDecode(response.payload!);
+              final type = payloadData['type'];
+              if (type == 'CHAT_MESSAGE' || type == 'GROUP_CHAT_MESSAGE') {
+                homeIndex = 2;
+              }
+            } catch (e) {
+              print("Error parsing local notification payload: $e");
+            }
+          }
+
           ContextHelper.navigatorKey.currentState?.pushAndRemoveUntil(
-            MaterialPageRoute(builder: (_) => const Home(index: 1)),
+            MaterialPageRoute(builder: (_) => Home(index: homeIndex)),
             (route) => false,
           );
         }
@@ -189,8 +203,15 @@ class FirebaseService {
     // Background / tapped notification
     FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
       if (FirebaseAuth.instance.currentUser != null) {
+        int homeIndex = 1;
+
+        final type = message.data['type'];
+        if (type == 'CHAT_MESSAGE' || type == 'GROUP_CHAT_MESSAGE') {
+          homeIndex = 2;
+        }
+
         ContextHelper.navigatorKey.currentState?.pushAndRemoveUntil(
-          MaterialPageRoute(builder: (_) => const Home(index: 1)),
+          MaterialPageRoute(builder: (_) => Home(index: homeIndex)),
           (route) => false,
         );
       }
