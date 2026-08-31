@@ -5,6 +5,7 @@ import 'package:app/providers/auth_provider.dart';
 import 'package:app/screens/edit_details/change_password_screen.dart';
 import 'package:app/screens/edit_details/edit_details_screen.dart';
 import 'package:app/screens/edit_details/edit_payment_details_screen.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
@@ -133,6 +134,45 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 Stack(
                   alignment: Alignment.center,
                   children: [
+                    Align(
+                      alignment: Alignment.centerLeft,
+                      child: Padding(
+                        padding: const EdgeInsets.only(left: 15.0),
+                        child: Consumer<AccountProvider>(
+                          builder: (context, accProvider, child) {
+                            final isActive = accProvider.appUser?.isActive ?? true;
+                            return Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Text(
+                                  isActive ? "Active" : "Inactive",
+                                  style: context.semiBold14(
+                                    color: isActive ? ColorManager.kPrimary : ColorManager.grayText,
+                                  ),
+                                ),
+                                Switch(
+                                  value: isActive,
+                                  onChanged: (val) async {
+                                    if (accProvider.appUser?.uid != null) {
+                                      try {
+                                        await FirebaseFirestore.instance
+                                            .collection('users')
+                                            .doc(accProvider.appUser!.uid)
+                                            .update({'isActive': val});
+                                        accProvider.refreshCurrentUser();
+                                      } catch (e) {
+                                        print("Error updating profile status: $e");
+                                      }
+                                    }
+                                  },
+                                  activeColor: ColorManager.kPrimary,
+                                ),
+                              ],
+                            );
+                          },
+                        ),
+                      ),
+                    ),
                     Align(
                       alignment: Alignment.center,
                       child: Text(l10n.myProfile, style: context.semiBold20(color: ColorManager.blackMedium)),

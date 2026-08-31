@@ -69,8 +69,7 @@ class FiltterProvider extends ChangeNotifier {
     }
 
     try {
-      DocumentSnapshot userProfileDoc =
-          await _firestore.collection('users').doc(uid).get();
+      DocumentSnapshot userProfileDoc = await _firestore.collection('users').doc(uid).get();
       if (userProfileDoc.exists) {
         _appUser = PersonDetailsModel.fromAuthAndFirestore(
           firebaseUser: _firebaseUser!,
@@ -87,9 +86,7 @@ class FiltterProvider extends ChangeNotifier {
           createdAtAuth: _firebaseUser!.metadata.creationTime,
           lastSignInTimeAuth: _firebaseUser!.metadata.lastSignInTime,
         );
-        print(
-          "Firestore profile not found for UID: $uid. Using only Auth data.",
-        );
+        print("Firestore profile not found for UID: $uid. Using only Auth data.");
       }
     } on FirebaseException catch (e) {
       print("Error fetching Firestore profile for UID $uid: ${e.message}");
@@ -140,27 +137,30 @@ class FiltterProvider extends ChangeNotifier {
 
       for (var doc in querySnapshot.docs) {
         if (doc.exists) {
-          // _allUsersData.add(doc.data() as Map<String, dynamic>);
-          _allUsersData.add(
-            PersonDetailsModel.fromJson(doc.data() as Map<String, dynamic>),
-          );
+          Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+
+          // Check if the user is active (default to true for backward compatibility)
+          bool isActive = data['isActive'] ?? true;
+
+          // If the user is INACTIVE and is NOT the current logged-in user, skip them
+          if (!isActive && doc.id != _auth.currentUser?.uid) {
+            continue;
+          }
+
+          _allUsersData.add(PersonDetailsModel.fromJson(data));
         }
       }
-      _filteredUsersData = List.from(
-        _allUsersData,
-      ); // Initialize filtered list with all users
+      _filteredUsersData = List.from(_allUsersData);
       _errorMessage = null;
     } on FirebaseException catch (e) {
-      print(
-        "Error fetching all user details from Firestore: ${e.code} - ${e.message}",
-      );
+      print("Error fetching all user details from Firestore: ${e.code} - ${e.message}");
       _errorMessage = "Failed to load user list: ${e.message}";
     } catch (e) {
       print("General error fetching all user details: $e");
       _errorMessage = "An unexpected error occurred while fetching user list.";
     } finally {
       _isLoading = false;
-      notifyListeners(); // Notify UI about updated data or errors
+      notifyListeners();
     }
   }
 
@@ -171,29 +171,18 @@ class FiltterProvider extends ChangeNotifier {
     } else {
       _filteredUsersData =
           _allUsersData.where((user) {
-            final name =
-                user.firstName?.toLowerCase() ??
-                ''; // Access via model properties
+            final name = user.firstName?.toLowerCase() ?? ''; // Access via model properties
             final firestoreEmail = user.firestoreEmail?.toLowerCase() ?? '';
             final province = user.province?.toLowerCase() ?? '';
             final searchLower = query.toLowerCase();
 
-            return name.contains(searchLower) ||
-                firestoreEmail.contains(searchLower) ||
-                province.contains(searchLower);
+            return name.contains(searchLower) || firestoreEmail.contains(searchLower) || province.contains(searchLower);
           }).toList();
     }
     notifyListeners();
   }
 
-  void applyFilters({
-    String? district,
-    String? school,
-    String? scheme,
-    String? subject,
-    String? grade,
-    String? job,
-  }) {
+  void applyFilters({String? district, String? school, String? scheme, String? subject, String? grade, String? job}) {
     print(grade);
     List<PersonDetailsModel> filtered = List.from(_allUsersData);
 
@@ -209,85 +198,30 @@ class FiltterProvider extends ChangeNotifier {
 
     if (school != null && school.isNotEmpty) {
       job == "Provincial School Teacher"
-          ? filtered =
-              filtered
-                  .where(
-                    (u) =>
-                        (u.school ?? '').toLowerCase() == school.toLowerCase(),
-                  )
-                  .toList()
+          ? filtered = filtered.where((u) => (u.school ?? '').toLowerCase() == school.toLowerCase()).toList()
           : job == "National School Teacher"
-          ? filtered =
-              filtered
-                  .where(
-                    (u) =>
-                        (u.nationalSchool ?? '').toLowerCase() ==
-                        school.toLowerCase(),
-                  )
-                  .toList()
+          ? filtered = filtered.where((u) => (u.nationalSchool ?? '').toLowerCase() == school.toLowerCase()).toList()
           : job == "Nurse"
-          ? filtered =
-              filtered
-                  .where(
-                    (u) =>
-                        (u.officeForNurse ?? '').toLowerCase() ==
-                        school.toLowerCase(),
-                  )
-                  .toList()
+          ? filtered = filtered.where((u) => (u.officeForNurse ?? '').toLowerCase() == school.toLowerCase()).toList()
           : job == "Management Assistant"
-          ? filtered =
-              filtered
-                  .where(
-                    (u) =>
-                        (u.officeForMA ?? '').toLowerCase() ==
-                        school.toLowerCase(),
-                  )
-                  .toList()
+          ? filtered = filtered.where((u) => (u.officeForMA ?? '').toLowerCase() == school.toLowerCase()).toList()
           : job == "Police Officer"
-          ? filtered =
-              filtered
-                  .where(
-                    (u) =>
-                        (u.policeStations ?? '').toLowerCase() ==
-                        school.toLowerCase(),
-                  )
-                  .toList()
+          ? filtered = filtered.where((u) => (u.policeStations ?? '').toLowerCase() == school.toLowerCase()).toList()
           : filtered =
-              filtered
-                  .where(
-                    (u) =>
-                        (u.gramaNiladhariDivision ?? '').toLowerCase() ==
-                        school.toLowerCase(),
-                  )
-                  .toList();
+              filtered.where((u) => (u.gramaNiladhariDivision ?? '').toLowerCase() == school.toLowerCase()).toList();
     }
 
     // ✅ 2. Apply secondary filters (scheme / subject)
     if (scheme != null && scheme.isNotEmpty) {
-      filtered =
-          filtered
-              .where(
-                (u) => (u.scheme ?? '').toLowerCase() == scheme.toLowerCase(),
-              )
-              .toList();
+      filtered = filtered.where((u) => (u.scheme ?? '').toLowerCase() == scheme.toLowerCase()).toList();
     }
 
     if (subject != null && subject.isNotEmpty) {
-      filtered =
-          filtered
-              .where(
-                (u) => (u.subject ?? '').toLowerCase() == subject.toLowerCase(),
-              )
-              .toList();
+      filtered = filtered.where((u) => (u.subject ?? '').toLowerCase() == subject.toLowerCase()).toList();
     }
 
     if (grade != null && grade.isNotEmpty) {
-      filtered =
-          filtered
-              .where(
-                (u) => (u.grade ?? '').toLowerCase() == grade.toLowerCase(),
-              )
-              .toList();
+      filtered = filtered.where((u) => (u.grade ?? '').toLowerCase() == grade.toLowerCase()).toList();
     }
 
     // ✅ Update provider list
@@ -314,8 +248,7 @@ class FiltterProvider extends ChangeNotifier {
 
     applyFilters(
       // Location filter
-      district:
-          locationFilter && savedDistrict.isNotEmpty ? savedDistrict : null,
+      district: locationFilter && savedDistrict.isNotEmpty ? savedDistrict : null,
 
       // School filter
       school:

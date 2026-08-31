@@ -13,6 +13,13 @@ class MatchingProvider extends ChangeNotifier {
     _isLoading = true;
     notifyListeners();
 
+    if (currentUser.isActive == false) {
+      _matches = [];
+      _isLoading = false;
+      notifyListeners();
+      return;
+    }
+
     // Filter Pool based on core eligibility (Job, Scheme, Subject, Grade)
     List<PersonDetailsModel> pool =
         allUsers.where((u) {

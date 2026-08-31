@@ -54,6 +54,7 @@ class PersonDetailsModel {
   String? clientName;
   String? amount;
   String? serviceProvider;
+  bool? isActive;
 
   PersonDetailsModel({
     required this.uid,
@@ -106,6 +107,7 @@ class PersonDetailsModel {
     this.clientName,
     this.amount,
     this.serviceProvider,
+    this.isActive,
   });
 
   factory PersonDetailsModel.fromAuthAndFirestore({
@@ -166,6 +168,7 @@ class PersonDetailsModel {
       clientName: firestoreData['clientName'] as String?,
       amount: firestoreData['amount'] as String?,
       serviceProvider: firestoreData['serviceProvider'] as String?,
+      isActive: (firestoreData['isActive'] as bool?) ?? true,
     );
   }
 
@@ -221,6 +224,7 @@ class PersonDetailsModel {
       clientName: json['clientName'] as String?,
       amount: json['amount'] as String?,
       serviceProvider: json['serviceProvider'] as String?,
+      isActive: json['isActive'] ?? true,
     );
   }
 
@@ -266,6 +270,7 @@ class PersonDetailsModel {
       'clientName': clientName,
       'amount': amount,
       'serviceProvider': serviceProvider,
+      'isActive': isActive,
     };
   }
 }

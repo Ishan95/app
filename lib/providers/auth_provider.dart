@@ -196,6 +196,7 @@ class AuthenticationProvider extends ChangeNotifier {
           'choice3': filterDetails.choice3,
           // 'note': noteController.text.trim(),
           'isEnable': isEnable,
+          'isActive': true,
           'createdAt': FieldValue.serverTimestamp(),
           'uid': newUser.uid,
           'fcmToken': token,
@@ -532,16 +533,6 @@ class AuthenticationProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
-      final firebase_auth.User? currentUser = _auth.currentUser;
-
-      if (currentUser != null) {
-        try {
-          await _firestore.collection('users').doc(currentUser.uid).update({'deviceId': ''});
-        } catch (e) {
-          debugPrint('Failed to clear deviceId: $e');
-        }
-      }
-
       final prefs = await SharedPreferences.getInstance();
       await prefs.clear();
       await _auth.signOut();
@@ -585,20 +576,13 @@ class AuthenticationProvider extends ChangeNotifier {
       if (currentUser == null) {
         throw Exception("No user is currently logged in to delete.");
       }
-
-      await _firestore.collection('users').doc(currentUser.uid).update({'deviceId': ''});
-
       final uidToDelete = currentUser.uid;
-
-      await currentUser.delete();
       await _firestore.collection('users').doc(uidToDelete).delete();
-
+      await currentUser.delete();
       _appUser = null;
       _user = null;
       _errorMessage = null;
-
       clearData();
-
       Navigator.pushAndRemoveUntil(
         context,
         MaterialPageRoute<void>(builder: (BuildContext context) => const LoginScreen()),

@@ -47,6 +47,9 @@ class _HomeScreenState extends State<HomeScreen> {
                 if (currentUserJob == null || currentUserJob.isEmpty) {
                   return false;
                 }
+                if (user.isActive == false) {
+                  return false;
+                }
                 return user.job == currentUserJob;
               }).toList();
 
@@ -139,10 +142,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       Navigator.push(context, MaterialPageRoute(builder: (context) => const MatchingScreen()));
                     },
                     icon: const Icon(Icons.hub),
-                    label: Text(
-                      l10n.findMultiPersonCycles,
-                      style: context.semiBold14(color: ColorManager.kPrimary),
-                    ),
+                    label: Text(l10n.findMultiPersonCycles, style: context.semiBold14(color: ColorManager.kPrimary)),
                   ),
                 ),
                 SizedBox(height: context.verticalSize(15)),
@@ -204,6 +204,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                 choice2: user.choice2 ?? '--',
                                 choice3: user.choice3 ?? '--',
                                 note: user.note ?? '--',
+                                isActive: user.isActive ?? true,
                               ),
                             ),
                           );
