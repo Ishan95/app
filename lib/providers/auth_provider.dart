@@ -10,6 +10,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart' as firebase_auth;
 import 'package:device_info_plus/device_info_plus.dart';
+import 'package:google_sign_in/google_sign_in.dart' as google_sign_in;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:app/providers/service_providers/onesignal_service.dart';
 
@@ -26,6 +27,9 @@ class AuthenticationProvider extends ChangeNotifier {
   TextEditingController confirmPasswordController = TextEditingController();
   TextEditingController noteController = TextEditingController();
 
+  final firebase_auth.FirebaseAuth _firebaseAuth = firebase_auth.FirebaseAuth.instance;
+  bool isGoogleAuth = false;
+
   void clearData() {
     firstNameController.clear();
     lastNameController.clear();
@@ -38,6 +42,7 @@ class AuthenticationProvider extends ChangeNotifier {
     noteController.clear();
     filterDetails = FilterModel();
     _errorMessage = null;
+    isGoogleAuth = false;
     notifyListeners();
   }
 
@@ -136,7 +141,7 @@ class AuthenticationProvider extends ChangeNotifier {
       final existingDeviceQuery =
           await _firestore.collection('users').where('deviceId', isEqualTo: currentDevice).limit(1).get();
 
-      if (existingDeviceQuery.docs.isNotEmpty) {
+      if (existingDeviceQuery.docs.isNotEmpty && existingDeviceQuery.docs.first.id != newUser.uid) {
         _errorMessage = "DEVICE_ALREADY_EXISTS";
         return false;
       }
@@ -198,7 +203,7 @@ class AuthenticationProvider extends ChangeNotifier {
           'deviceId': currentDevice,
         };
 
-        await _firestore.collection('users').doc(newUser.uid).set(firestoreData);
+        await _firestore.collection('users').doc(newUser.uid).set(firestoreData, SetOptions(merge: true));
         print("Additional user data saved to Firestore for UID: ${newUser.uid}");
         _errorMessage = null;
 
@@ -376,6 +381,89 @@ class AuthenticationProvider extends ChangeNotifier {
     }
   }
 
+  Future<Map<String, dynamic>> signInWithGoogle() async {
+    _isLoading = true;
+    isGoogleAuth = true;
+    notifyListeners();
+
+    try {
+      await google_sign_in.GoogleSignIn.instance.initialize();
+
+      final google_sign_in.GoogleSignInAccount googleUser =
+      await google_sign_in.GoogleSignIn.instance.authenticate();
+
+      final google_sign_in.GoogleSignInAuthentication googleAuth =
+      googleUser.authentication;
+
+      final firebase_auth.AuthCredential credential =
+      firebase_auth.GoogleAuthProvider.credential(
+        idToken: googleAuth.idToken,
+      );
+
+      await _firebaseAuth.signInWithCredential(credential);
+      final userCredential = await _auth.signInWithCredential(credential);
+      final user = userCredential.user;
+
+      if (user != null) {
+        final userDoc = await _firestore.collection('users').doc(user.uid).get();
+
+        if (userDoc.exists && userDoc.data()!.containsKey('nicNo') && userDoc.data()!['nicNo'] != '') {
+          isGoogleAuth = false;
+          await updateFcmToken();
+          OneSignalService.loginUser(user.uid);
+
+          final String currentDevice = await getDeviceId();
+          final String? savedDevice = userDoc.data()?['deviceId'];
+
+          if (savedDevice == null || savedDevice == '') {
+            await _firestore.collection('users').doc(user.uid).update({
+              'deviceId': currentDevice,
+              'lastLogin': FieldValue.serverTimestamp(),
+            });
+          } else if (savedDevice != currentDevice) {
+            currentDeviceID = currentDevice;
+            _errorMessage = "This account is already used on another device.";
+            await _auth.signOut();
+            OneSignalService.logoutUser();
+            _isLoading = false;
+            notifyListeners();
+            return {'success': false, 'error': _errorMessage};
+          } else {
+            await _firestore.collection('users').doc(user.uid).update({'lastLogin': FieldValue.serverTimestamp()});
+          }
+
+          _isLoading = false;
+          notifyListeners();
+          return {'success': true, 'isComplete': true};
+        } else {
+          isGoogleAuth = true;
+          emailController.text = user.email ?? '';
+          if (user.displayName != null) {
+            final parts = user.displayName!.split(' ');
+            firstNameController.text = parts[0];
+            if (parts.length > 1) {
+              lastNameController.text = parts.sublist(1).join(' ');
+            }
+          }
+          _isLoading = false;
+          notifyListeners();
+          return {'success': true, 'isComplete': false};
+        }
+      }
+
+      _isLoading = false;
+      isGoogleAuth = false;
+      notifyListeners();
+      return {'success': false, 'error': 'Failed to authenticate'};
+    } catch (e) {
+      _isLoading = false;
+      isGoogleAuth = false;
+      _errorMessage = e.toString();
+      notifyListeners();
+      return {'success': false, 'error': e.toString()};
+    }
+  }
+
   Future<void> updateFcmToken() async {
     try {
       final user = _auth.currentUser;
@@ -421,6 +509,14 @@ class AuthenticationProvider extends ChangeNotifier {
       final prefs = await SharedPreferences.getInstance();
       await prefs.clear();
       await _auth.signOut();
+
+      try {
+        await google_sign_in.GoogleSignIn.instance.signOut();
+        await _firebaseAuth.signOut();
+      } catch (e) {
+        print("Error sign out: $e");
+      }
+
       OneSignalService.logoutUser();
       _user = null;
 
@@ -452,6 +548,8 @@ class AuthenticationProvider extends ChangeNotifier {
       if (currentUser == null) {
         throw Exception("No user is currently logged in to delete.");
       }
+
+      await _firestore.collection('users').doc(currentUser.uid).update({'deviceId': ''});
 
       final uidToDelete = currentUser.uid;
 

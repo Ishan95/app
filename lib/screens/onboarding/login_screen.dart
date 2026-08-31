@@ -206,30 +206,64 @@ class _LoginScreenState extends State<LoginScreen> {
                         ],
                       )
                       : const SizedBox.shrink(),
-                  SizedBox(height: context.verticalSize(100)),
+                  SizedBox(height: context.verticalSize(50)),
                   CenterTextIconButton(
                     onPress: () async {
-                      final success = await auth.signIn(
-                        email: auth.emailController.text.trim(),
-                        password: auth.passwordController.text.trim(),
-                      );
-
-                      if (authProvider.user != null && success) {
-                        Navigator.pushAndRemoveUntil(
-                          context,
-                          MaterialPageRoute<void>(builder: (BuildContext context) => const Home(index: 0)),
-                          (route) => false,
+                      if (signInForm.currentState!.validate()) {
+                        final success = await auth.signIn(
+                          email: auth.emailController.text.trim(),
+                          password: auth.passwordController.text.trim(),
                         );
-                      } else {
-                        if (mounted) {
-                          toastErrorMessage(auth.errorMessage ?? l10n.loginFailed);
+
+                        if (authProvider.user != null && success) {
+                          Navigator.pushAndRemoveUntil(
+                            context,
+                            MaterialPageRoute<void>(builder: (BuildContext context) => const Home(index: 0)),
+                                (route) => false,
+                          );
+                        } else {
+                          if (mounted) {
+                            toastErrorMessage(auth.errorMessage ?? l10n.loginFailed);
+                          }
                         }
                       }
                     },
                     buttonText: l10n.logIn,
-                    isLoading: auth.isLoading,
+                    isLoading: auth.isLoading && !auth.isGoogleAuth,
                   ),
-                  SizedBox(height: context.verticalSize(50)),
+                  SizedBox(height: context.verticalSize(16)),
+                  Align(
+                    alignment: Alignment.center,
+                    child: Text(l10n.or, style: context.semiBold14(color: ColorManager.blackMedium, fontSize: 16)),
+                  ),
+                  SizedBox(height: context.verticalSize(16)),
+                  CenterTextIconButton(
+                    onPress: () async {
+                      final res = await auth.signInWithGoogle();
+                      if (res['success'] == true) {
+                        if (res['isComplete'] == true) {
+                          Navigator.pushAndRemoveUntil(
+                            context,
+                            MaterialPageRoute<void>(builder: (BuildContext context) => const Home(index: 0)),
+                                (route) => false,
+                          );
+                        } else {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute<void>(builder: (BuildContext context) => const GetDetailsScreen(isSignupEmail: false)),
+                          );
+                        }
+                      } else if (res['error'] != 'Sign in aborted') {
+                        if (mounted) {
+                          toastErrorMessage(res['error']);
+                        }
+                      }
+                    },
+                    buttonText: l10n.continueWithGoogle,
+                    isLoading: auth.isLoading && auth.isGoogleAuth,
+                  ),
+
+                  SizedBox(height: context.verticalSize(40)),
                   Center(
                     child: GestureDetector(
                       onTap: () {

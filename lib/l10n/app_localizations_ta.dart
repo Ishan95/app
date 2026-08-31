@@ -647,6 +647,9 @@ class AppLocalizationsTa extends AppLocalizations {
   String get welcome => 'வரவேற்கிறோம்';
 
   @override
+  String get or => 'அல்லது';
+
+  @override
   String get loginBelow => 'கீழே உங்கள் கணக்கில் புகுபதிகை செய்யவும்';
 
   @override
@@ -657,6 +660,9 @@ class AppLocalizationsTa extends AppLocalizations {
 
   @override
   String get logIn => 'புகுபதிகை செய்';
+
+  @override
+  String get continueWithGoogle => 'கூகிளுடன் தொடரவும்';
 
   @override
   String get cantLogInOrCreate =>

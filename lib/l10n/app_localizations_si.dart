@@ -641,6 +641,9 @@ class AppLocalizationsSi extends AppLocalizations {
   String get welcome => 'ආයුබෝවන්';
 
   @override
+  String get or => 'හෝ';
+
+  @override
   String get loginBelow => 'පහතින් ඔබගේ ගිණුමට පිවිසෙන්න';
 
   @override
@@ -651,6 +654,9 @@ class AppLocalizationsSi extends AppLocalizations {
 
   @override
   String get logIn => 'ගිණුමට පිවිසෙන්න';
+
+  @override
+  String get continueWithGoogle => 'Google මගින් පිවිසෙන්න';
 
   @override
   String get cantLogInOrCreate =>

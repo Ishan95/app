@@ -1330,6 +1330,12 @@ abstract class AppLocalizations {
   /// **'Welcome'**
   String get welcome;
 
+  /// No description provided for @or.
+  ///
+  /// In en, this message translates to:
+  /// **'Or'**
+  String get or;
+
   /// No description provided for @loginBelow.
   ///
   /// In en, this message translates to:
@@ -1353,6 +1359,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Log in'**
   String get logIn;
+
+  /// No description provided for @continueWithGoogle.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue with Google'**
+  String get continueWithGoogle;
 
   /// No description provided for @cantLogInOrCreate.
   ///

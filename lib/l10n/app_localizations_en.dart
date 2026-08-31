@@ -641,6 +641,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get welcome => 'Welcome';
 
   @override
+  String get or => 'Or';
+
+  @override
   String get loginBelow => 'Log in to your account below';
 
   @override
@@ -651,6 +654,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get logIn => 'Log in';
+
+  @override
+  String get continueWithGoogle => 'Continue with Google';
 
   @override
   String get cantLogInOrCreate => 'Can\'t Log In or Create an Account?    ';

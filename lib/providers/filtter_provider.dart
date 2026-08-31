@@ -34,15 +34,15 @@ class FiltterProvider extends ChangeNotifier {
   List<PersonDetailsModel> _filteredUsersData = []; // Change type
   List<PersonDetailsModel> get filteredUsersData => _filteredUsersData;
 
-  // //  New: Store all user data
+  // Store all user data
   // List<Map<String, dynamic>> _allUsersData = [];
   // List<Map<String, dynamic>> get allUsersData => _allUsersData;
 
-  // //  New: Store filtered user data for display
+  // Store filtered user data for display
   // List<Map<String, dynamic>> _filteredUsersData = [];
   // List<Map<String, dynamic>> get filteredUsersData => _filteredUsersData;
 
-  //  Modified: getAllUserDetails now populates the internal list
+  // getAllUserDetails now populates the internal list
 
   FiltterProvider() {
     _auth.authStateChanges().listen((firebase_auth.User? user) async {

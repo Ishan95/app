@@ -3,6 +3,7 @@ import 'package:app/app/utils/custom_toast.dart';
 import 'package:app/providers/auth_provider.dart';
 import 'package:app/providers/service_providers/firebase_service.dart';
 import 'package:app/providers/service_providers/static_data_service.dart';
+import 'package:app/screens/home/home.dart';
 import 'package:app/screens/onboarding/verify_email_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
@@ -269,6 +270,7 @@ class _GetDetailsScreenState extends State<GetDetailsScreen> {
                                 controller: auth.emailController,
                                 inputType: TextInputType.emailAddress,
                                 hintText: l10n.emailAddress,
+                                readOnly: auth.isGoogleAuth,
                                 validator: (value) {
                                   if (auth.emailController.text.isEmpty) {
                                     setState(() {
@@ -1608,113 +1610,117 @@ class _GetDetailsScreenState extends State<GetDetailsScreen> {
                                 validator: (value) {},
                               ),
                               SizedBox(height: context.verticalSize(8)),
-                              SizedBox(height: context.verticalSize(30)),
-                              Align(
-                                alignment: Alignment.centerLeft,
-                                child: Text(l10n.password, style: context.semiBold14(color: ColorManager.grayText)),
-                              ),
-                              SizedBox(height: context.verticalSize(4)),
-                              CustomTextField(
-                                radius: 30,
-                                controller: auth.passwordController,
-                                inputType: TextInputType.visiblePassword,
-                                obscure: _obscureText,
-                                hintText: '*******',
-                                validator: (value) {
-                                  if (value == null || value.isEmpty) {
+
+                              if (!auth.isGoogleAuth) ...[
+                                SizedBox(height: context.verticalSize(30)),
+                                Align(
+                                  alignment: Alignment.centerLeft,
+                                  child: Text(l10n.password, style: context.semiBold14(color: ColorManager.grayText)),
+                                ),
+                                SizedBox(height: context.verticalSize(4)),
+                                CustomTextField(
+                                  radius: 30,
+                                  controller: auth.passwordController,
+                                  inputType: TextInputType.visiblePassword,
+                                  obscure: _obscureText,
+                                  hintText: '*******',
+                                  validator: (value) {
+                                    if (value == null || value.isEmpty) {
+                                      setState(() {
+                                        passwordError = l10n.reqPassword;
+                                      });
+                                      return '';
+                                    } else if (value.length < 8) {
+                                      setState(() {
+                                        passwordError = l10n.reqPasswordLength;
+                                      });
+                                      return '';
+                                    } else if (value.length > 64) {
+                                      setState(() {
+                                        passwordError = "Password must be 8–64 characters long";
+                                      });
+                                      return '';
+                                    } else if (!RegExp(r'^(?=.*[A-Z])').hasMatch(value)) {
+                                      setState(() {
+                                        passwordError = "Must include at least one uppercase letter";
+                                      });
+                                      return '';
+                                    } else if (!RegExp(r'^(?=.*\d)').hasMatch(value)) {
+                                      setState(() {
+                                        passwordError = "Must include at least one number";
+                                      });
+                                      return '';
+                                    } else if (!RegExp(r'^(?=.*[!@#\$&*~%^()_\-+=<>?])').hasMatch(value)) {
+                                      setState(() {
+                                        passwordError = "Must include at least one special character";
+                                      });
+                                      return '';
+                                    }
                                     setState(() {
-                                      passwordError = l10n.reqPassword;
+                                      passwordError = null;
                                     });
-                                    return '';
-                                  } else if (value.length < 8) {
-                                    setState(() {
-                                      passwordError = l10n.reqPasswordLength;
-                                    });
-                                    return '';
-                                  } else if (value.length > 64) {
-                                    setState(() {
-                                      passwordError = "Password must be 8–64 characters long";
-                                    });
-                                    return '';
-                                  } else if (!RegExp(r'^(?=.*[A-Z])').hasMatch(value)) {
-                                    setState(() {
-                                      passwordError = "Must include at least one uppercase letter";
-                                    });
-                                    return '';
-                                  } else if (!RegExp(r'^(?=.*\d)').hasMatch(value)) {
-                                    setState(() {
-                                      passwordError = "Must include at least one number";
-                                    });
-                                    return '';
-                                  } else if (!RegExp(r'^(?=.*[!@#\$&*~%^()_\-+=<>?])').hasMatch(value)) {
-                                    setState(() {
-                                      passwordError = "Must include at least one special character";
-                                    });
-                                    return '';
-                                  }
-                                  setState(() {
-                                    passwordError = null;
-                                  });
-                                  return null;
-                                },
-                                errorMessage: passwordError,
-                                suffixIcon: IconButton(
-                                  icon: Icon(
-                                    _obscureText ? Icons.visibility_off : Icons.visibility,
-                                    color: Colors.grey,
-                                  ),
-                                  onPressed: () {
-                                    setState(() {
-                                      _obscureText = !_obscureText;
-                                    });
+                                    return null;
                                   },
-                                ),
-                              ),
-                              SizedBox(height: context.verticalSize(4)),
-                              Align(
-                                alignment: Alignment.centerLeft,
-                                child: Text(
-                                  l10n.reEnterPassword,
-                                  style: context.semiBold14(color: ColorManager.grayText),
-                                ),
-                              ),
-                              SizedBox(height: context.verticalSize(4)),
-                              CustomTextField(
-                                radius: 30,
-                                controller: auth.confirmPasswordController,
-                                inputType: TextInputType.visiblePassword,
-                                hintText: '*******',
-                                obscure: _obscureTextConfirmPassword,
-                                validator: (value) {
-                                  if (auth.confirmPasswordController.text.isEmpty) {
-                                    setState(() {
-                                      confirmPasswordError = l10n.reqPassword;
-                                    });
-                                    return '';
-                                  } else if (value != auth.passwordController.text) {
-                                    setState(() {
-                                      confirmPasswordError = l10n.reqPasswordMatch;
-                                    });
-                                    return '';
-                                  }
-                                  setState(() {
-                                    confirmPasswordError = null;
-                                  });
-                                  return null;
-                                },
-                                errorMessage: confirmPasswordError,
-                                suffixIcon: IconButton(
-                                  icon: Icon(
-                                    _obscureTextConfirmPassword ? Icons.visibility_off : Icons.visibility,
-                                    color: Colors.grey,
+                                  errorMessage: passwordError,
+                                  suffixIcon: IconButton(
+                                    icon: Icon(
+                                      _obscureText ? Icons.visibility_off : Icons.visibility,
+                                      color: Colors.grey,
+                                    ),
+                                    onPressed: () {
+                                      setState(() {
+                                        _obscureText = !_obscureText;
+                                      });
+                                    },
                                   ),
-                                  onPressed: () {
-                                    setState(() {
-                                      _obscureTextConfirmPassword = !_obscureTextConfirmPassword;
-                                    });
-                                  },
                                 ),
-                              ),
+                                SizedBox(height: context.verticalSize(4)),
+                                Align(
+                                  alignment: Alignment.centerLeft,
+                                  child: Text(
+                                    l10n.reEnterPassword,
+                                    style: context.semiBold14(color: ColorManager.grayText),
+                                  ),
+                                ),
+                                SizedBox(height: context.verticalSize(4)),
+                                CustomTextField(
+                                  radius: 30,
+                                  controller: auth.confirmPasswordController,
+                                  inputType: TextInputType.visiblePassword,
+                                  hintText: '*******',
+                                  obscure: _obscureTextConfirmPassword,
+                                  validator: (value) {
+                                    if (auth.confirmPasswordController.text.isEmpty) {
+                                      setState(() {
+                                        confirmPasswordError = l10n.reqPassword;
+                                      });
+                                      return '';
+                                    } else if (value != auth.passwordController.text) {
+                                      setState(() {
+                                        confirmPasswordError = l10n.reqPasswordMatch;
+                                      });
+                                      return '';
+                                    }
+                                    setState(() {
+                                      confirmPasswordError = null;
+                                    });
+                                    return null;
+                                  },
+                                  errorMessage: confirmPasswordError,
+                                  suffixIcon: IconButton(
+                                    icon: Icon(
+                                      _obscureTextConfirmPassword ? Icons.visibility_off : Icons.visibility,
+                                      color: Colors.grey,
+                                    ),
+                                    onPressed: () {
+                                      setState(() {
+                                        _obscureTextConfirmPassword = !_obscureTextConfirmPassword;
+                                      });
+                                    },
+                                  ),
+                                ),
+                              ],
+
                               SizedBox(height: context.verticalSize(36)),
                               CenterTextIconButton(
                                 onPress: () async {
@@ -1724,7 +1730,7 @@ class _GetDetailsScreenState extends State<GetDetailsScreen> {
                                     caseSensitive: false,
                                   ).hasMatch(email);
 
-                                  if (email.isNotEmpty && !isGmail) {
+                                  if (email.isNotEmpty && !isGmail && !auth.isGoogleAuth) {
                                     final shouldSave = await _saveAlertDialog(
                                       context,
                                       "Can't create your Account",
@@ -1767,27 +1773,47 @@ class _GetDetailsScreenState extends State<GetDetailsScreen> {
                                           : true) &&
                                       filterDetails.choice1 != '') {
                                     auth.filterDetails = filterDetails;
-                                    try {
-                                      final user = await auth.registerEmail(
-                                        auth.emailController.text,
-                                        auth.passwordController.text,
-                                      );
 
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder:
-                                              (_) => VerifyEmailScreen(
-                                                user: user!,
-                                                isSelected: isSelected,
-                                                isWhatsappSelected: isWhatsappSelected,
-                                                isSchoolSelected: isSchoolSelected,
-                                                isEnable: isEnable,
-                                              ),
-                                        ),
+                                    if (auth.isGoogleAuth) {
+                                      final success = await auth.createAccount(
+                                        isPhoneHide: isSelected,
+                                        isWhatsappHide: isWhatsappSelected,
+                                        isSchoolHide: isSchoolSelected,
+                                        isEnable: isEnable,
                                       );
-                                    } catch (e) {
-                                      toastErrorMessage('Email is already verified.');
+                                      if (success) {
+                                        Navigator.pushAndRemoveUntil(
+                                          context,
+                                          MaterialPageRoute(builder: (_) => const Home(index: 0)),
+                                          (route) => false,
+                                        );
+                                      } else {
+                                        toastErrorMessage(auth.errorMessage ?? 'Failed to complete setup.');
+                                      }
+                                    } else {
+                                      // Standard Email & Password registration
+                                      try {
+                                        final user = await auth.registerEmail(
+                                          auth.emailController.text,
+                                          auth.passwordController.text,
+                                        );
+
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder:
+                                                (_) => VerifyEmailScreen(
+                                                  user: user!,
+                                                  isSelected: isSelected,
+                                                  isWhatsappSelected: isWhatsappSelected,
+                                                  isSchoolSelected: isSchoolSelected,
+                                                  isEnable: isEnable,
+                                                ),
+                                          ),
+                                        );
+                                      } catch (e) {
+                                        toastErrorMessage('Email is already verified or in use.');
+                                      }
                                     }
                                   } else if (_selectedDate == null) {
                                     setState(() {
