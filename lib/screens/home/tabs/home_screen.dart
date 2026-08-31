@@ -50,23 +50,23 @@ class _HomeScreenState extends State<HomeScreen> {
                 return user.job == currentUserJob;
               }).toList();
 
-          if (acc.appUser?.isEnable == false) {
-            return Center(
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      l10n.accountDisabledMsg,
-                      style: const TextStyle(color: Colors.red),
-                      textAlign: TextAlign.center,
-                    ),
-                  ],
-                ),
-              ),
-            );
-          }
+          // if (acc.appUser?.isEnable == false) {
+          //   return Center(
+          //     child: Padding(
+          //       padding: const EdgeInsets.all(16.0),
+          //       child: Column(
+          //         mainAxisAlignment: MainAxisAlignment.center,
+          //         children: [
+          //           Text(
+          //             l10n.accountDisabledMsg,
+          //             style: const TextStyle(color: Colors.red),
+          //             textAlign: TextAlign.center,
+          //           ),
+          //         ],
+          //       ),
+          //     ),
+          //   );
+          // }
           if (filter.isLoading) {
             return SizedBox(
               width: MediaQuery.of(context).size.width,
