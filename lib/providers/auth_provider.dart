@@ -384,78 +384,109 @@ class AuthenticationProvider extends ChangeNotifier {
   Future<Map<String, dynamic>> signInWithGoogle() async {
     _isLoading = true;
     isGoogleAuth = true;
+    _errorMessage = null;
     notifyListeners();
 
     try {
-      await google_sign_in.GoogleSignIn.instance.initialize();
+      final googleSignIn = google_sign_in.GoogleSignIn.instance;
+      await googleSignIn.initialize();
+      google_sign_in.GoogleSignInAccount? googleUser;
 
-      final google_sign_in.GoogleSignInAccount googleUser =
-      await google_sign_in.GoogleSignIn.instance.authenticate();
-
-      final google_sign_in.GoogleSignInAuthentication googleAuth =
-      googleUser.authentication;
-
-      final firebase_auth.AuthCredential credential =
-      firebase_auth.GoogleAuthProvider.credential(
-        idToken: googleAuth.idToken,
-      );
-
-      await _firebaseAuth.signInWithCredential(credential);
-      final userCredential = await _auth.signInWithCredential(credential);
-      final user = userCredential.user;
-
-      if (user != null) {
-        final userDoc = await _firestore.collection('users').doc(user.uid).get();
-
-        if (userDoc.exists && userDoc.data()!.containsKey('job') && userDoc.data()!['job'] != '') {
-          isGoogleAuth = false;
-          await updateFcmToken();
-          OneSignalService.loginUser(user.uid);
-
-          final String currentDevice = await getDeviceId();
-          final String? savedDevice = userDoc.data()?['deviceId'];
-
-          if (savedDevice == null || savedDevice == '') {
-            await _firestore.collection('users').doc(user.uid).update({
-              'deviceId': currentDevice,
-              'lastLogin': FieldValue.serverTimestamp(),
-            });
-          } else if (savedDevice != currentDevice) {
-            currentDeviceID = currentDevice;
-            _errorMessage = "This account is already used on another device.";
-            await _auth.signOut();
-            OneSignalService.logoutUser();
-            _isLoading = false;
-            notifyListeners();
-            return {'success': false, 'error': _errorMessage};
-          } else {
-            await _firestore.collection('users').doc(user.uid).update({'lastLogin': FieldValue.serverTimestamp()});
-          }
-
-          _isLoading = false;
-          notifyListeners();
-          return {'success': true, 'isComplete': true};
-        } else {
-          isGoogleAuth = true;
-          emailController.text = user.email ?? '';
-          if (user.displayName != null) {
-            final parts = user.displayName!.split(' ');
-            firstNameController.text = parts[0];
-            if (parts.length > 1) {
-              lastNameController.text = parts.sublist(1).join(' ');
-            }
-          }
-          _isLoading = false;
-          notifyListeners();
-          return {'success': true, 'isComplete': false};
-        }
+      try {
+        googleUser = await googleSignIn.attemptLightweightAuthentication(reportAllExceptions: false);
+      } catch (e) {
+        debugPrint('Lightweight Google authentication failed: $e');
+        googleUser = null;
       }
 
+      if (googleUser == null) {
+        if (!googleSignIn.supportsAuthenticate()) {
+          throw Exception('Google Sign-In authentication is not supported on this platform.');
+        }
+        googleUser = await googleSignIn.authenticate();
+      }
+      final googleAuth = googleUser.authentication;
+      final idToken = googleAuth.idToken;
+      if (idToken == null || idToken.isEmpty) {
+        throw Exception('Google authentication failed because no ID token was received.');
+      }
+      final firebase_auth.AuthCredential credential = firebase_auth.GoogleAuthProvider.credential(idToken: idToken);
+      final firebase_auth.UserCredential userCredential = await _auth.signInWithCredential(credential);
+      final firebase_auth.User? user = userCredential.user;
+
+      if (user == null) {
+        _isLoading = false;
+        isGoogleAuth = false;
+        notifyListeners();
+        return {'success': false, 'error': 'Failed to authenticate with Firebase.'};
+      }
+      debugPrint('Firebase UID: ${user.uid}');
+      debugPrint('Google account: ${googleUser.email}');
+
+      final userDoc = await _firestore.collection('users').doc(user.uid).get();
+      final userData = userDoc.data();
+
+      if (userDoc.exists &&
+          userData != null &&
+          userData.containsKey('job') &&
+          userData['job'] != null &&
+          userData['job'].toString().isNotEmpty) {
+        isGoogleAuth = false;
+        await updateFcmToken();
+        OneSignalService.loginUser(user.uid);
+        final String currentDevice = await getDeviceId();
+        final String? savedDevice = userData['deviceId']?.toString();
+        if (savedDevice == null || savedDevice.isEmpty) {
+          await _firestore.collection('users').doc(user.uid).update({
+            'deviceId': currentDevice,
+            'lastLogin': FieldValue.serverTimestamp(),
+          });
+        } else if (savedDevice != currentDevice) {
+          currentDeviceID = currentDevice;
+          _errorMessage = 'This account is already used on another device.';
+          await _auth.signOut();
+          OneSignalService.logoutUser();
+          _isLoading = false;
+          notifyListeners();
+          return {'success': false, 'error': _errorMessage};
+        } else {
+          await _firestore.collection('users').doc(user.uid).update({'lastLogin': FieldValue.serverTimestamp()});
+        }
+        _isLoading = false;
+        notifyListeners();
+        return {'success': true, 'isComplete': true};
+      }
+      isGoogleAuth = true;
+      emailController.text = user.email ?? googleUser.email;
+      final String? displayName = user.displayName ?? googleUser.displayName;
+      if (displayName != null && displayName.trim().isNotEmpty) {
+        final parts = displayName.trim().split(RegExp(r'\s+'));
+        firstNameController.text = parts.first;
+        if (parts.length > 1) {
+          lastNameController.text = parts.sublist(1).join(' ');
+        } else {
+          lastNameController.clear();
+        }
+      }
+      _isLoading = false;
+      notifyListeners();
+      return {'success': true, 'isComplete': false};
+    } on google_sign_in.GoogleSignInException catch (e) {
+      debugPrint('GoogleSignInException: ${e.code} - ${e.description}');
       _isLoading = false;
       isGoogleAuth = false;
+      _errorMessage = e.description ?? 'Google authentication failed.';
       notifyListeners();
-      return {'success': false, 'error': 'Failed to authenticate'};
+      return {'success': false, 'error': _errorMessage};
+    } on firebase_auth.FirebaseAuthException catch (e) {
+      debugPrint('FirebaseAuthException: ${e.code} - ${e.message}');
+      _isLoading = false;
+      isGoogleAuth = false;
+      _errorMessage = e.message ?? 'Firebase authentication failed.';
+      notifyListeners();
+      return {'success': false, 'error': _errorMessage};
     } catch (e) {
+      debugPrint('Google authentication error: $e');
       _isLoading = false;
       isGoogleAuth = false;
       _errorMessage = e.toString();
@@ -501,9 +532,14 @@ class AuthenticationProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
-      final currentUser = _auth.currentUser;
+      final firebase_auth.User? currentUser = _auth.currentUser;
+
       if (currentUser != null) {
-        await _firestore.collection('users').doc(currentUser.uid).update({'deviceId': ''});
+        try {
+          await _firestore.collection('users').doc(currentUser.uid).update({'deviceId': ''});
+        } catch (e) {
+          debugPrint('Failed to clear deviceId: $e');
+        }
       }
 
       final prefs = await SharedPreferences.getInstance();
@@ -511,27 +547,28 @@ class AuthenticationProvider extends ChangeNotifier {
       await _auth.signOut();
 
       try {
-        await google_sign_in.GoogleSignIn.instance.signOut();
-        await _firebaseAuth.signOut();
+        if (_firebaseAuth != _auth) {
+          await _firebaseAuth.signOut();
+        }
       } catch (e) {
-        print("Error sign out: $e");
+        debugPrint('Secondary Firebase sign out error: $e');
       }
 
       OneSignalService.logoutUser();
       _user = null;
-
       clearData();
-
-      print("User signed out successfully.");
+      debugPrint('User signed out successfully.');
       Navigator.pushAndRemoveUntil(
         context,
         MaterialPageRoute<void>(builder: (BuildContext context) => const LoginScreen()),
         (route) => false,
       );
     } on firebase_auth.FirebaseAuthException catch (e) {
-      _errorMessage = "Failed to sign out: ${e.message}";
+      _errorMessage = 'Failed to sign out: ${e.message}';
+      debugPrint('Firebase sign out error: ${e.code} - ${e.message}');
     } catch (e) {
-      _errorMessage = "An unexpected error occurred during sign out.";
+      _errorMessage = 'An unexpected error occurred during sign out.';
+      debugPrint('Unexpected sign out error: $e');
     } finally {
       _isLoading = false;
       notifyListeners();
