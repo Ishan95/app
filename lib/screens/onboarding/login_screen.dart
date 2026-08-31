@@ -153,40 +153,40 @@ class _LoginScreenState extends State<LoginScreen> {
                   //   ),
                   // ),
                   // SizedBox(height: context.verticalSize(10)),
-                  GestureDetector(
-                    onTap: () {
-                      authProvider.clearData();
-                      setState(() {
-                        emailError = null;
-                        passwordError = null;
-                        _obscureText = true;
-                        _obscureDeviceID = true;
-                      });
-
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute<void>(
-                          builder: (BuildContext context) => const GetDetailsScreen(isSignupEmail: true),
-                        ),
-                      ).then((_) {
-                        authProvider.clearData();
-                        setState(() {
-                          emailError = null;
-                          passwordError = null;
-                          _obscureText = true;
-                          _obscureDeviceID = true;
-                        });
-                      });
-                    },
-                    child: RichText(
-                      text: TextSpan(
-                        children: [
-                          TextSpan(text: l10n.dontHaveAccount, style: context.regular16(color: ColorManager.grayText)),
-                          TextSpan(text: l10n.createNewAccount, style: context.bold16(color: ColorManager.kPrimary)),
-                        ],
-                      ),
-                    ),
-                  ),
+                  // GestureDetector(
+                  //   onTap: () {
+                  //     authProvider.clearData();
+                  //     setState(() {
+                  //       emailError = null;
+                  //       passwordError = null;
+                  //       _obscureText = true;
+                  //       _obscureDeviceID = true;
+                  //     });
+                  //
+                  //     Navigator.push(
+                  //       context,
+                  //       MaterialPageRoute<void>(
+                  //         builder: (BuildContext context) => const GetDetailsScreen(isSignupEmail: true),
+                  //       ),
+                  //     ).then((_) {
+                  //       authProvider.clearData();
+                  //       setState(() {
+                  //         emailError = null;
+                  //         passwordError = null;
+                  //         _obscureText = true;
+                  //         _obscureDeviceID = true;
+                  //       });
+                  //     });
+                  //   },
+                  //   child: RichText(
+                  //     text: TextSpan(
+                  //       children: [
+                  //         TextSpan(text: l10n.dontHaveAccount, style: context.regular16(color: ColorManager.grayText)),
+                  //         TextSpan(text: l10n.createNewAccount, style: context.bold16(color: ColorManager.kPrimary)),
+                  //       ],
+                  //     ),
+                  //   ),
+                  // ),
                   // SizedBox(height: context.verticalSize(10)),
                   // auth.currentDeviceID != ""
                   //     ? Row(
