@@ -598,6 +598,30 @@ abstract class AppLocalizations {
   /// **'Select your school'**
   String get reqSelectSchool;
 
+  /// No description provided for @reqProvince.
+  ///
+  /// In en, this message translates to:
+  /// **'Select your province'**
+  String get reqProvince;
+
+  /// No description provided for @reqDistrict.
+  ///
+  /// In en, this message translates to:
+  /// **'Select your district'**
+  String get reqDistrict;
+
+  /// No description provided for @reqKalapa.
+  ///
+  /// In en, this message translates to:
+  /// **'Select your kalapa/institution'**
+  String get reqKalapa;
+
+  /// No description provided for @reqKottasa.
+  ///
+  /// In en, this message translates to:
+  /// **'Select your kottasa/office/division'**
+  String get reqKottasa;
+
   /// No description provided for @reqJob.
   ///
   /// In en, this message translates to:

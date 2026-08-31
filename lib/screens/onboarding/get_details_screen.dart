@@ -39,7 +39,14 @@ class _GetDetailsScreenState extends State<GetDetailsScreen> {
   String? whatsappError;
   String? passwordError;
   String? confirmPasswordError;
+
+  String? jobError;
+  String? provinceError;
+  String? districtError;
+  String? kalapaInstitutionError;
+  String? kottasaOfficeError;
   String? schoolError;
+  String? schemeError;
   String? subjectError;
   String? subjectMediumError;
   // String? gradeError;
@@ -675,6 +682,16 @@ class _GetDetailsScreenState extends State<GetDetailsScreen> {
                                     onChanged: (value) {
                                       setState(() {
                                         filterDetails.job = value ?? '';
+                                        jobError = null;
+                                        provinceError = null;
+                                        districtError = null;
+                                        kalapaInstitutionError = null;
+                                        kottasaOfficeError = null;
+                                        schoolError = null;
+                                        schemeError = null;
+                                        subjectError = null;
+                                        subjectMediumError = null;
+
                                         filterDetails.province = '';
                                         filterDetails.district = '';
                                         filterDetails.kalapa = '';
@@ -700,6 +717,15 @@ class _GetDetailsScreenState extends State<GetDetailsScreen> {
                                     isExpanded: true,
                                   ),
                                 ),
+                                if (jobError != null)
+                                  Align(
+                                    alignment: Alignment.centerLeft,
+                                    child: Padding(
+                                      padding: const EdgeInsets.only(top: 4.0, left: 5.0),
+                                      child: Text(jobError!, style: const TextStyle(color: Colors.red, fontSize: 12.0)),
+                                    ),
+                                  ),
+
                                 SizedBox(height: context.verticalSize(20)),
                                 Row(
                                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -760,62 +786,70 @@ class _GetDetailsScreenState extends State<GetDetailsScreen> {
                                     color: ColorManager.white10,
                                     borderRadius: BorderRadius.circular(20),
                                   ),
-                                  child:
-                                      filterDetails.job != ""
-                                          ? DropdownButton<String>(
-                                            value: filterDetails.province.isNotEmpty ? filterDetails.province : null,
-                                            hint: Text(
-                                              l10n.selectProvince,
-                                              style: context.regular14(color: ColorManager.disabledText),
-                                            ),
-                                            items:
-                                                filterDetails.provinces
-                                                    .map(
-                                                      (province) => DropdownMenuItem(
-                                                        value: province,
-                                                        child: Text(
-                                                          TranslationService.translate(context, province),
-                                                          style: context.regular14(color: ColorManager.blackMedium),
-                                                        ),
-                                                      ),
-                                                    )
-                                                    .toList(),
-                                            onChanged: (value) async {
-                                              setState(() {
-                                                filterDetails.province = value ?? '';
-                                                filterDetails.district = '';
-                                                filterDetails.kalapa = '';
-                                                filterDetails.kottasa = '';
-                                                filterDetails.school = '';
-                                                filterDetails.kottasaForNationalScl = '';
-                                                filterDetails.nationalSchool = '';
-                                                filterDetails.institutionTypeForNurse = '';
-                                                filterDetails.officeForNurse = '';
-                                                filterDetails.institutionTypeForMA = '';
-                                                filterDetails.officeForMA = '';
-                                                filterDetails.divisionalSecretariat = '';
-                                                filterDetails.gramaNiladhariDivision = '';
-                                                filterDetails.policeDivisions = '';
-                                                filterDetails.policeStations = '';
-                                              });
-                                              if (value != null && value.isNotEmpty) {
-                                                await StaticDataService.fetchDistricts(filterDetails, value);
-                                                setState(() {});
-                                              }
-                                            },
-                                            dropdownColor: ColorManager.kPrimaryBlack,
-                                            underline: const SizedBox(),
-                                            icon: Icon(Icons.arrow_drop_down, color: ColorManager.disabledText),
-                                            isExpanded: true,
-                                          )
-                                          : Align(
-                                            alignment: Alignment.centerLeft,
-                                            child: Text(
-                                              l10n.selectProvince,
-                                              style: context.regular14(color: ColorManager.disabledText),
-                                            ),
-                                          ),
+                                  child: DropdownButton<String>(
+                                    value: filterDetails.province.isNotEmpty ? filterDetails.province : null,
+                                    hint: Text(
+                                      l10n.selectProvince,
+                                      style: context.regular14(color: ColorManager.disabledText),
+                                    ),
+                                    items:
+                                        filterDetails.provinces
+                                            .map(
+                                              (province) => DropdownMenuItem(
+                                                value: province,
+                                                child: Text(
+                                                  TranslationService.translate(context, province),
+                                                  style: context.regular14(color: ColorManager.blackMedium),
+                                                ),
+                                              ),
+                                            )
+                                            .toList(),
+                                    onChanged: (value) async {
+                                      setState(() {
+                                        filterDetails.province = value ?? '';
+                                        provinceError = null;
+                                        districtError = null;
+                                        kalapaInstitutionError = null;
+                                        kottasaOfficeError = null;
+                                        schoolError = null;
+
+                                        filterDetails.district = '';
+                                        filterDetails.kalapa = '';
+                                        filterDetails.kottasa = '';
+                                        filterDetails.school = '';
+                                        filterDetails.kottasaForNationalScl = '';
+                                        filterDetails.nationalSchool = '';
+                                        filterDetails.institutionTypeForNurse = '';
+                                        filterDetails.officeForNurse = '';
+                                        filterDetails.institutionTypeForMA = '';
+                                        filterDetails.officeForMA = '';
+                                        filterDetails.divisionalSecretariat = '';
+                                        filterDetails.gramaNiladhariDivision = '';
+                                        filterDetails.policeDivisions = '';
+                                        filterDetails.policeStations = '';
+                                      });
+                                      if (value != null && value.isNotEmpty) {
+                                        await StaticDataService.fetchDistricts(filterDetails, value);
+                                        setState(() {});
+                                      }
+                                    },
+                                    dropdownColor: ColorManager.kPrimaryBlack,
+                                    underline: const SizedBox(),
+                                    icon: Icon(Icons.arrow_drop_down, color: ColorManager.disabledText),
+                                    isExpanded: true,
+                                  ),
                                 ),
+                                if (provinceError != null)
+                                  Align(
+                                    alignment: Alignment.centerLeft,
+                                    child: Padding(
+                                      padding: const EdgeInsets.only(top: 4.0, left: 5.0),
+                                      child: Text(
+                                        provinceError!,
+                                        style: const TextStyle(color: Colors.red, fontSize: 12.0),
+                                      ),
+                                    ),
+                                  ),
 
                                 SizedBox(height: context.verticalSize(filterDetails.province.isNotEmpty ? 20 : 0)),
 
@@ -851,6 +885,11 @@ class _GetDetailsScreenState extends State<GetDetailsScreen> {
                                         onChanged: (value) async {
                                           setState(() {
                                             filterDetails.district = value ?? '';
+                                            districtError = null;
+                                            kalapaInstitutionError = null;
+                                            kottasaOfficeError = null;
+                                            schoolError = null;
+
                                             filterDetails.kalapa = '';
                                             filterDetails.kottasa = '';
                                             filterDetails.school = '';
@@ -888,6 +927,18 @@ class _GetDetailsScreenState extends State<GetDetailsScreen> {
                                       ),
                                     )
                                     : const SizedBox.shrink(),
+                                if (districtError != null)
+                                  Align(
+                                    alignment: Alignment.centerLeft,
+                                    child: Padding(
+                                      padding: const EdgeInsets.only(top: 4.0, left: 5.0),
+                                      child: Text(
+                                        districtError!,
+                                        style: const TextStyle(color: Colors.red, fontSize: 12.0),
+                                      ),
+                                    ),
+                                  ),
+
                                 SizedBox(height: context.verticalSize(filterDetails.district.isNotEmpty ? 20 : 0)),
 
                                 filterDetails.district.isNotEmpty
@@ -1021,6 +1072,11 @@ class _GetDetailsScreenState extends State<GetDetailsScreen> {
                                                 : filterDetails.job == "Grama Niladari"
                                                 ? filterDetails.divisionalSecretariat = value ?? ''
                                                 : '';
+
+                                            kalapaInstitutionError = null;
+                                            kottasaOfficeError = null;
+                                            schoolError = null;
+
                                             filterDetails.kottasa = '';
                                             filterDetails.school = '';
                                             filterDetails.kottasaForNationalScl = '';
@@ -1055,6 +1111,18 @@ class _GetDetailsScreenState extends State<GetDetailsScreen> {
                                       ),
                                     )
                                     : const SizedBox.shrink(),
+                                if (kalapaInstitutionError != null)
+                                  Align(
+                                    alignment: Alignment.centerLeft,
+                                    child: Padding(
+                                      padding: const EdgeInsets.only(top: 4.0, left: 5.0),
+                                      child: Text(
+                                        kalapaInstitutionError!,
+                                        style: const TextStyle(color: Colors.red, fontSize: 12.0),
+                                      ),
+                                    ),
+                                  ),
+
                                 SizedBox(
                                   height: context.verticalSize(
                                     (filterDetails.kalapa.isNotEmpty ||
@@ -1218,6 +1286,9 @@ class _GetDetailsScreenState extends State<GetDetailsScreen> {
                                                 : filterDetails.job == "Police Officer"
                                                 ? filterDetails.policeStations = value ?? ''
                                                 : filterDetails.gramaNiladhariDivision = value ?? '';
+                                            kottasaOfficeError = null;
+                                            schoolError = null;
+
                                             filterDetails.school = '';
                                             filterDetails.nationalSchool = '';
                                           });
@@ -1238,6 +1309,18 @@ class _GetDetailsScreenState extends State<GetDetailsScreen> {
                                       ),
                                     )
                                     : const SizedBox.shrink(),
+                                if (kottasaOfficeError != null)
+                                  Align(
+                                    alignment: Alignment.centerLeft,
+                                    child: Padding(
+                                      padding: const EdgeInsets.only(top: 4.0, left: 5.0),
+                                      child: Text(
+                                        kottasaOfficeError!,
+                                        style: const TextStyle(color: Colors.red, fontSize: 12.0),
+                                      ),
+                                    ),
+                                  ),
+
                                 SizedBox(
                                   height: context.verticalSize(
                                     filterDetails.kottasa.isNotEmpty || filterDetails.kottasaForNationalScl.isNotEmpty
@@ -1305,16 +1388,17 @@ class _GetDetailsScreenState extends State<GetDetailsScreen> {
                                       ),
                                     )
                                     : const SizedBox.shrink(),
-                                Align(
-                                  alignment: Alignment.centerLeft,
-                                  child: Padding(
-                                    padding: EdgeInsets.only(top: schoolError != null ? 4.0 : 4.0, left: 5.0),
-                                    child: Text(
-                                      schoolError != null ? schoolError! : '',
-                                      style: const TextStyle(color: Colors.red, fontSize: 12.0),
+                                if (schoolError != null && schoolError!.isNotEmpty)
+                                  Align(
+                                    alignment: Alignment.centerLeft,
+                                    child: Padding(
+                                      padding: const EdgeInsets.only(top: 4.0, left: 5.0),
+                                      child: Text(
+                                        schoolError!,
+                                        style: const TextStyle(color: Colors.red, fontSize: 12.0),
+                                      ),
                                     ),
                                   ),
-                                ),
 
                                 if (filterDetails.job == "Provincial School Teacher" ||
                                     filterDetails.job == "National School Teacher") ...[
@@ -1357,6 +1441,7 @@ class _GetDetailsScreenState extends State<GetDetailsScreen> {
                                         setState(() {
                                           filterDetails.scheme = value ?? '';
                                           filterDetails.subject = ''; // reset subject
+                                          schemeError = null;
                                           if (filterDetails.scheme != "PRIMARY") {
                                             subjectError = "Subject also required";
                                           } else {
@@ -1374,6 +1459,17 @@ class _GetDetailsScreenState extends State<GetDetailsScreen> {
                                       isExpanded: true,
                                     ),
                                   ),
+                                  if (schemeError != null)
+                                    Align(
+                                      alignment: Alignment.centerLeft,
+                                      child: Padding(
+                                        padding: const EdgeInsets.only(top: 4.0, left: 5.0),
+                                        child: Text(
+                                          schemeError!,
+                                          style: const TextStyle(color: Colors.red, fontSize: 12.0),
+                                        ),
+                                      ),
+                                    ),
 
                                   SizedBox(
                                     height: context.verticalSize(
@@ -1424,25 +1520,20 @@ class _GetDetailsScreenState extends State<GetDetailsScreen> {
                                       ),
                                     ),
                                   ],
-                                  Align(
-                                    alignment: Alignment.centerLeft,
-                                    child: Padding(
-                                      padding: EdgeInsets.only(top: subjectError != null ? 4.0 : 4.0, left: 5.0),
-                                      child: Text(
-                                        subjectError != null ? subjectError! : '',
-                                        style: const TextStyle(color: Colors.red, fontSize: 12.0),
+                                  if (subjectError != null && subjectError!.isNotEmpty)
+                                    Align(
+                                      alignment: Alignment.centerLeft,
+                                      child: Padding(
+                                        padding: const EdgeInsets.only(top: 4.0, left: 5.0),
+                                        child: Text(
+                                          subjectError!,
+                                          style: const TextStyle(color: Colors.red, fontSize: 12.0),
+                                        ),
                                       ),
                                     ),
-                                  ),
-                                  SizedBox(
-                                    height: context.verticalSize(
-                                      (filterDetails.scheme != "PRIMARY" && filterDetails.scheme.isNotEmpty)
-                                          ? subjectError != null
-                                              ? 12
-                                              : 2
-                                          : 0,
-                                    ),
-                                  ),
+
+                                  SizedBox(height: context.verticalSize(20)),
+
                                   Column(
                                     children: [
                                       Container(
@@ -1486,19 +1577,17 @@ class _GetDetailsScreenState extends State<GetDetailsScreen> {
                                           isExpanded: true,
                                         ),
                                       ),
-                                      Align(
-                                        alignment: Alignment.centerLeft,
-                                        child: Padding(
-                                          padding: EdgeInsets.only(
-                                            top: subjectMediumError != null ? 4.0 : 4.0,
-                                            left: 5.0,
-                                          ),
-                                          child: Text(
-                                            subjectMediumError != null ? subjectMediumError! : '',
-                                            style: const TextStyle(color: Colors.red, fontSize: 12.0),
+                                      if (subjectMediumError != null)
+                                        Align(
+                                          alignment: Alignment.centerLeft,
+                                          child: Padding(
+                                            padding: const EdgeInsets.only(top: 4.0, left: 5.0),
+                                            child: Text(
+                                              subjectMediumError!,
+                                              style: const TextStyle(color: Colors.red, fontSize: 12.0),
+                                            ),
                                           ),
                                         ),
-                                      ),
                                     ],
                                   ),
                                 ],
@@ -1666,16 +1755,17 @@ class _GetDetailsScreenState extends State<GetDetailsScreen> {
                                       ),
                                     )
                                     : const SizedBox.shrink(),
-                                Align(
-                                  alignment: Alignment.centerLeft,
-                                  child: Padding(
-                                    padding: EdgeInsets.only(top: choiceError != null ? 4.0 : 4.0, left: 5.0),
-                                    child: Text(
-                                      choiceError != null ? choiceError! : '',
-                                      style: const TextStyle(color: Colors.red, fontSize: 12.0),
+                                if (choiceError != null && choiceError!.isNotEmpty)
+                                  Align(
+                                    alignment: Alignment.centerLeft,
+                                    child: Padding(
+                                      padding: const EdgeInsets.only(top: 4.0, left: 5.0),
+                                      child: Text(
+                                        choiceError!,
+                                        style: const TextStyle(color: Colors.red, fontSize: 12.0),
+                                      ),
                                     ),
                                   ),
-                                ),
 
                                 // NOTE SECTION COMMENTED OUT
                                 // SizedBox(height: context.verticalSize(30)),
@@ -1709,9 +1799,7 @@ class _GetDetailsScreenState extends State<GetDetailsScreen> {
                                         contactError = l10n.reqContact;
                                       });
                                       isValid = false;
-                                    }
-
-                                    if (auth.contactController.text.length < 10 ||
+                                    } else if (auth.contactController.text.length < 10 ||
                                         auth.contactController.text.length > 12) {
                                       setState(() {
                                         contactError = l10n.reqValidContact;
@@ -1753,54 +1841,108 @@ class _GetDetailsScreenState extends State<GetDetailsScreen> {
                                   else if (currentStep == 1) {
                                     bool isValid = true;
 
+                                    setState(() {
+                                      jobError = null;
+                                      provinceError = null;
+                                      districtError = null;
+                                      kalapaInstitutionError = null;
+                                      kottasaOfficeError = null;
+                                      schoolError = null;
+                                      schemeError = null;
+                                      subjectError = null;
+                                      subjectMediumError = null;
+                                    });
+
                                     if (filterDetails.job.isEmpty) {
-                                      toastErrorMessage(l10n.reqJob);
+                                      setState(() => jobError = l10n.reqJob);
                                       isValid = false;
                                     } else {
-                                      if (filterDetails.job == "Provincial School Teacher" &&
-                                          filterDetails.school == '') {
-                                        setState(() => schoolError = l10n.reqSelectSchool);
+                                      if (filterDetails.province.isEmpty) {
+                                        setState(() => provinceError = l10n.reqProvince);
                                         isValid = false;
-                                      } else if (filterDetails.job == "National School Teacher" &&
-                                          filterDetails.nationalSchool == '') {
-                                        setState(() => schoolError = l10n.reqSelectSchool);
+                                      }
+                                      if (filterDetails.district.isEmpty) {
+                                        setState(() => districtError = l10n.reqDistrict);
                                         isValid = false;
-                                      } else if (filterDetails.job == "Nurse" && filterDetails.officeForNurse == '') {
-                                        setState(() => schoolError = l10n.reqSelectOffice);
-                                        isValid = false;
-                                      } else if (filterDetails.job == "Management Assistant" &&
-                                          filterDetails.officeForMA == '') {
-                                        setState(() => schoolError = l10n.reqSelectOffice);
-                                        isValid = false;
-                                      } else if (filterDetails.job == "Police Officer" &&
-                                          filterDetails.policeStations == '') {
-                                        setState(() => schoolError = l10n.reqSelectOffice);
-                                        isValid = false;
-                                      } else if (filterDetails.job == "Grama Niladari" &&
-                                          filterDetails.gramaNiladhariDivision == '') {
-                                        setState(() => schoolError = l10n.reqSelectOffice);
-                                        isValid = false;
-                                      } else {
-                                        setState(() => schoolError = '');
+                                      }
+
+                                      if (filterDetails.job == "Provincial School Teacher" ||
+                                          filterDetails.job == "National School Teacher") {
+                                        if (filterDetails.kalapa.isEmpty) {
+                                          setState(() => kalapaInstitutionError = l10n.reqKalapa);
+                                          isValid = false;
+                                        }
+
+                                        if (filterDetails.job == "Provincial School Teacher" &&
+                                            filterDetails.kottasa.isEmpty) {
+                                          setState(() => kottasaOfficeError = l10n.reqKottasa);
+                                          isValid = false;
+                                        } else if (filterDetails.job == "National School Teacher" &&
+                                            filterDetails.kottasaForNationalScl.isEmpty) {
+                                          setState(() => kottasaOfficeError = l10n.reqKottasa);
+                                          isValid = false;
+                                        }
+
+                                        if (filterDetails.job == "Provincial School Teacher" &&
+                                            filterDetails.school.isEmpty) {
+                                          setState(() => schoolError = l10n.reqSelectSchool);
+                                          isValid = false;
+                                        } else if (filterDetails.job == "National School Teacher" &&
+                                            filterDetails.nationalSchool.isEmpty) {
+                                          setState(() => schoolError = l10n.reqSelectSchool);
+                                          isValid = false;
+                                        }
+                                      } else if (filterDetails.job == "Nurse") {
+                                        if (filterDetails.institutionTypeForNurse.isEmpty) {
+                                          setState(() => kalapaInstitutionError = l10n.reqKalapa);
+                                          isValid = false;
+                                        }
+                                        if (filterDetails.officeForNurse.isEmpty) {
+                                          setState(() => kottasaOfficeError = l10n.reqSelectOffice);
+                                          isValid = false;
+                                        }
+                                      } else if (filterDetails.job == "Management Assistant") {
+                                        if (filterDetails.institutionTypeForMA.isEmpty) {
+                                          setState(() => kalapaInstitutionError = l10n.reqKalapa);
+                                          isValid = false;
+                                        }
+                                        if (filterDetails.officeForMA.isEmpty) {
+                                          setState(() => kottasaOfficeError = l10n.reqSelectOffice);
+                                          isValid = false;
+                                        }
+                                      } else if (filterDetails.job == "Police Officer") {
+                                        if (filterDetails.policeDivisions.isEmpty) {
+                                          setState(() => kalapaInstitutionError = l10n.reqKalapa);
+                                          isValid = false;
+                                        }
+                                        if (filterDetails.policeStations.isEmpty) {
+                                          setState(() => kottasaOfficeError = l10n.reqSelectOffice);
+                                          isValid = false;
+                                        }
+                                      } else if (filterDetails.job == "Grama Niladari") {
+                                        if (filterDetails.divisionalSecretariat.isEmpty) {
+                                          setState(() => kalapaInstitutionError = l10n.reqKalapa);
+                                          isValid = false;
+                                        }
+                                        if (filterDetails.gramaNiladhariDivision.isEmpty) {
+                                          setState(() => kottasaOfficeError = l10n.reqSelectOffice);
+                                          isValid = false;
+                                        }
                                       }
 
                                       if (filterDetails.job == "Provincial School Teacher" ||
                                           filterDetails.job == "National School Teacher") {
                                         if (filterDetails.scheme.isEmpty) {
-                                          setState(() => subjectError = l10n.reqScheme);
+                                          setState(() => schemeError = l10n.reqScheme);
                                           isValid = false;
-                                        } else if (filterDetails.scheme != "PRIMARY" && filterDetails.subject == '') {
+                                        } else if (filterDetails.scheme != "PRIMARY" && filterDetails.subject.isEmpty) {
                                           setState(() => subjectError = l10n.reqSelectSubject);
                                           isValid = false;
-                                        } else {
-                                          setState(() => subjectError = '');
                                         }
 
-                                        if (filterDetails.subjectMedium == '') {
+                                        if (filterDetails.subjectMedium.isEmpty) {
                                           setState(() => subjectMediumError = l10n.reqSelectMedium);
                                           isValid = false;
-                                        } else {
-                                          setState(() => subjectMediumError = null);
                                         }
                                       }
                                     }

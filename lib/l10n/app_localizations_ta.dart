@@ -265,6 +265,18 @@ class AppLocalizationsTa extends AppLocalizations {
   String get reqSelectSchool => 'பள்ளியைத் தேர்ந்தெடுக்கவும்';
 
   @override
+  String get reqProvince => 'உங்கள் மாகாணத்தைத் தேர்ந்தெடுக்கவும்';
+
+  @override
+  String get reqDistrict => 'உங்கள் மாவட்டத்தைத் தேர்ந்தெடுக்கவும்';
+
+  @override
+  String get reqKalapa => 'உங்கள் வலயம்/நிறுவனத்தின் வகையைத் தேர்ந்தெடுக்கவும்';
+
+  @override
+  String get reqKottasa => 'உங்கள் கோட்டம்/அலுவலகத்தைத் தேர்ந்தெடுக்கவும்';
+
+  @override
   String get reqJob => 'ஒரு வேலைப் பிரிவைத் தேர்ந்தெடுக்கவும்';
 
   @override

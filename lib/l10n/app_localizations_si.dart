@@ -265,6 +265,18 @@ class AppLocalizationsSi extends AppLocalizations {
   String get reqSelectSchool => 'ඔබේ පාසල තෝරන්න';
 
   @override
+  String get reqProvince => 'ඔබේ පළාත තෝරන්න';
+
+  @override
+  String get reqDistrict => 'ඔබේ දිස්ත්‍රික්කය තෝරන්න';
+
+  @override
+  String get reqKalapa => 'ඔබේ කලාපය/ආයතන වර්ගය තෝරන්න';
+
+  @override
+  String get reqKottasa => 'ඔබේ කොට්ඨාසය/කාර්යාලය තෝරන්න';
+
+  @override
   String get reqJob => 'රැකියා කාණ්ඩයක් තෝරන්න.';
 
   @override
