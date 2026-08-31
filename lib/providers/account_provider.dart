@@ -109,7 +109,7 @@ class AccountProvider extends ChangeNotifier {
         isWhatsappVisible = _appUser?.isWhatsappHide ?? false;
 
         isSchoolVisible = _appUser?.isSchoolHide ?? false;
-        noteController.text = _appUser?.note ?? '';
+        // noteController.text = _appUser?.note ?? '';
         emailAddress = _appUser?.authEmail ?? '';
       } else {
         _appUser = PersonDetailsModel(
@@ -299,9 +299,9 @@ class AccountProvider extends ChangeNotifier {
         updatedData['subjectMedium'] = editDetails.subjectMedium;
       }
 
-      if (editDetails.grade != "" && _appUser!.grade != editDetails.grade) {
-        updatedData['grade'] = editDetails.grade;
-      }
+      // if (editDetails.grade != "" && _appUser!.grade != editDetails.grade) {
+      //   updatedData['grade'] = editDetails.grade;
+      // }
 
       if (editDetails.choice1 != "" && _appUser!.choice1 != editDetails.choice1) {
         updatedData['choice1'] = editDetails.choice1;
@@ -310,9 +310,9 @@ class AccountProvider extends ChangeNotifier {
       updatedData['choice2'] = editDetails.choice2;
       updatedData['choice3'] = editDetails.choice3;
 
-      if (noteController.text.trim() != _appUser!.note) {
-        updatedData['note'] = noteController.text.trim();
-      }
+      // if (noteController.text.trim() != _appUser!.note) {
+      //   updatedData['note'] = noteController.text.trim();
+      // }
 
       updatedData['updatedAt'] = FieldValue.serverTimestamp();
 

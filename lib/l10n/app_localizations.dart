@@ -598,11 +598,23 @@ abstract class AppLocalizations {
   /// **'Select your school'**
   String get reqSelectSchool;
 
+  /// No description provided for @reqJob.
+  ///
+  /// In en, this message translates to:
+  /// **'Please select a job category'**
+  String get reqJob;
+
   /// No description provided for @reqSelectOffice.
   ///
   /// In en, this message translates to:
   /// **'Select your office'**
   String get reqSelectOffice;
+
+  /// No description provided for @reqScheme.
+  ///
+  /// In en, this message translates to:
+  /// **'Select your scheme'**
+  String get reqScheme;
 
   /// No description provided for @reqSelectSubject.
   ///

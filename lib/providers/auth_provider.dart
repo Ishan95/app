@@ -162,10 +162,10 @@ class AuthenticationProvider extends ChangeNotifier {
         }
 
         Map<String, dynamic> firestoreData = {
-          'nicNo': idCardController.text.trim(),
+          // 'nicNo': idCardController.text.trim(),
           'name': '${firstNameController.text.trim()} ${lastNameController.text.trim()}',
           'email': emailController.text.trim(),
-          'age': age,
+          // 'age': age,
           'phone': contactController.text.trim(),
           'whatsapp': whatsappController.text.trim(),
           'isPhoneHide': isPhoneHide,
@@ -190,11 +190,11 @@ class AuthenticationProvider extends ChangeNotifier {
           'scheme': filterDetails.scheme,
           'subject': filterDetails.subject,
           'subjectMedium': filterDetails.subjectMedium,
-          'grade': filterDetails.grade,
+          // 'grade': filterDetails.grade,
           'choice1': filterDetails.choice1,
           'choice2': filterDetails.choice2,
           'choice3': filterDetails.choice3,
-          'note': noteController.text.trim(),
+          // 'note': noteController.text.trim(),
           'isEnable': isEnable,
           'createdAt': FieldValue.serverTimestamp(),
           'uid': newUser.uid,
@@ -407,7 +407,7 @@ class AuthenticationProvider extends ChangeNotifier {
       if (user != null) {
         final userDoc = await _firestore.collection('users').doc(user.uid).get();
 
-        if (userDoc.exists && userDoc.data()!.containsKey('nicNo') && userDoc.data()!['nicNo'] != '') {
+        if (userDoc.exists && userDoc.data()!.containsKey('job') && userDoc.data()!['job'] != '') {
           isGoogleAuth = false;
           await updateFcmToken();
           OneSignalService.loginUser(user.uid);

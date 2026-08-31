@@ -264,7 +264,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get reqSelectSchool => 'Select your school';
 
   @override
+  String get reqJob => 'Please select a job category';
+
+  @override
   String get reqSelectOffice => 'Select your office';
+
+  @override
+  String get reqScheme => 'Select your scheme';
 
   @override
   String get reqSelectSubject => 'Select your subject';

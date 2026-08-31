@@ -71,7 +71,7 @@ class _LoginScreenState extends State<LoginScreen> {
         actions: const [LanguageSelector(), SizedBox(width: 16)],
       ),
       body: Padding(
-        padding: context.padding(horizontal: 24, bottom: 44),
+        padding: context.padding(horizontal: 24, bottom: 24),
         child: Consumer<AuthenticationProvider>(
           builder: (context, auth, child) {
             return Form(
@@ -87,72 +87,72 @@ class _LoginScreenState extends State<LoginScreen> {
                   SizedBox(height: context.verticalSize(6)),
                   Align(
                     alignment: Alignment.center,
-                    child: Text(l10n.loginBelow, style: context.regular14(color: ColorManager.grayText)),
+                    child: Text(l10n.loginBelow, style: context.regularMulish18(color: ColorManager.grayText)),
                   ),
-                  SizedBox(height: context.verticalSize(90)),
-                  Text(l10n.email, textAlign: TextAlign.left, style: context.semiBold14(color: ColorManager.grayText)),
-                  SizedBox(height: context.verticalSize(6)),
-                  CustomTextField(
-                    radius: 30,
-                    height: 40,
-                    controller: auth.emailController,
-                    inputType: TextInputType.emailAddress,
-                    hintText: l10n.emailAddress,
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        setState(() {
-                          emailError = l10n.reqEmail;
-                        });
-                        return '';
-                      } else if (!RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(value!)) {
-                        setState(() {
-                          emailError = l10n.reqValidEmail;
-                        });
-                        return '';
-                      }
-                      setState(() {
-                        emailError = null;
-                      });
-                      return null;
-                    },
-                    errorMessage: emailError,
-                  ),
-                  SizedBox(height: context.verticalSize(2)),
-                  Text(
-                    l10n.password,
-                    textAlign: TextAlign.left,
-                    style: context.semiBold14(color: ColorManager.grayText),
-                  ),
-                  SizedBox(height: context.verticalSize(6)),
-                  CustomTextField(
-                    radius: 30,
-                    height: 40,
-                    controller: auth.passwordController,
-                    obscure: _obscureText,
-                    hintText: '*******',
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        setState(() {
-                          passwordError = l10n.reqPassword;
-                        });
-                        return '';
-                      }
-                      setState(() {
-                        passwordError = null;
-                      });
-                      return null;
-                    },
-                    errorMessage: passwordError,
-                    suffixIcon: IconButton(
-                      icon: Icon(_obscureText ? Icons.visibility_off : Icons.visibility, color: Colors.grey),
-                      onPressed: () {
-                        setState(() {
-                          _obscureText = !_obscureText;
-                        });
-                      },
-                    ),
-                  ),
-                  SizedBox(height: context.verticalSize(10)),
+                  SizedBox(height: context.verticalSize(50)),
+                  // Text(l10n.email, textAlign: TextAlign.left, style: context.semiBold14(color: ColorManager.grayText)),
+                  // SizedBox(height: context.verticalSize(6)),
+                  // CustomTextField(
+                  //   radius: 30,
+                  //   height: 40,
+                  //   controller: auth.emailController,
+                  //   inputType: TextInputType.emailAddress,
+                  //   hintText: l10n.emailAddress,
+                  //   validator: (value) {
+                  //     if (value == null || value.isEmpty) {
+                  //       setState(() {
+                  //         emailError = l10n.reqEmail;
+                  //       });
+                  //       return '';
+                  //     } else if (!RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(value!)) {
+                  //       setState(() {
+                  //         emailError = l10n.reqValidEmail;
+                  //       });
+                  //       return '';
+                  //     }
+                  //     setState(() {
+                  //       emailError = null;
+                  //     });
+                  //     return null;
+                  //   },
+                  //   errorMessage: emailError,
+                  // ),
+                  // SizedBox(height: context.verticalSize(2)),
+                  // Text(
+                  //   l10n.password,
+                  //   textAlign: TextAlign.left,
+                  //   style: context.semiBold14(color: ColorManager.grayText),
+                  // ),
+                  // SizedBox(height: context.verticalSize(6)),
+                  // CustomTextField(
+                  //   radius: 30,
+                  //   height: 40,
+                  //   controller: auth.passwordController,
+                  //   obscure: _obscureText,
+                  //   hintText: '*******',
+                  //   validator: (value) {
+                  //     if (value == null || value.isEmpty) {
+                  //       setState(() {
+                  //         passwordError = l10n.reqPassword;
+                  //       });
+                  //       return '';
+                  //     }
+                  //     setState(() {
+                  //       passwordError = null;
+                  //     });
+                  //     return null;
+                  //   },
+                  //   errorMessage: passwordError,
+                  //   suffixIcon: IconButton(
+                  //     icon: Icon(_obscureText ? Icons.visibility_off : Icons.visibility, color: Colors.grey),
+                  //     onPressed: () {
+                  //       setState(() {
+                  //         _obscureText = !_obscureText;
+                  //       });
+                  //     },
+                  //   ),
+                  // ),
+                  // SizedBox(height: context.verticalSize(10)),
                   GestureDetector(
                     onTap: () {
                       authProvider.clearData();
@@ -181,61 +181,61 @@ class _LoginScreenState extends State<LoginScreen> {
                     child: RichText(
                       text: TextSpan(
                         children: [
-                          TextSpan(text: l10n.dontHaveAccount, style: context.regular12(color: ColorManager.grayText)),
-                          TextSpan(text: l10n.createNewAccount, style: context.bold12(color: ColorManager.kPrimary)),
+                          TextSpan(text: l10n.dontHaveAccount, style: context.regular16(color: ColorManager.grayText)),
+                          TextSpan(text: l10n.createNewAccount, style: context.bold16(color: ColorManager.kPrimary)),
                         ],
                       ),
                     ),
                   ),
-                  SizedBox(height: context.verticalSize(10)),
-                  auth.currentDeviceID != ""
-                      ? Row(
-                        children: [
-                          GestureDetector(
-                            child: Icon(_obscureDeviceID ? Icons.visibility_off : Icons.visibility, color: Colors.grey),
-                            onTap: () {
-                              setState(() {
-                                _obscureDeviceID = !_obscureDeviceID;
-                              });
-                            },
-                          ),
-                          SizedBox(width: context.horizontalSize(10)),
-                          !_obscureDeviceID
-                              ? Text(auth.currentDeviceID, style: context.regular14(color: ColorManager.blackMedium))
-                              : const SizedBox.shrink(),
-                        ],
-                      )
-                      : const SizedBox.shrink(),
-                  SizedBox(height: context.verticalSize(50)),
-                  CenterTextIconButton(
-                    onPress: () async {
-                      if (signInForm.currentState!.validate()) {
-                        final success = await auth.signIn(
-                          email: auth.emailController.text.trim(),
-                          password: auth.passwordController.text.trim(),
-                        );
-
-                        if (authProvider.user != null && success) {
-                          Navigator.pushAndRemoveUntil(
-                            context,
-                            MaterialPageRoute<void>(builder: (BuildContext context) => const Home(index: 0)),
-                                (route) => false,
-                          );
-                        } else {
-                          if (mounted) {
-                            toastErrorMessage(auth.errorMessage ?? l10n.loginFailed);
-                          }
-                        }
-                      }
-                    },
-                    buttonText: l10n.logIn,
-                    isLoading: auth.isLoading && !auth.isGoogleAuth,
-                  ),
-                  SizedBox(height: context.verticalSize(16)),
-                  Align(
-                    alignment: Alignment.center,
-                    child: Text(l10n.or, style: context.semiBold14(color: ColorManager.blackMedium, fontSize: 16)),
-                  ),
+                  // SizedBox(height: context.verticalSize(10)),
+                  // auth.currentDeviceID != ""
+                  //     ? Row(
+                  //       children: [
+                  //         GestureDetector(
+                  //           child: Icon(_obscureDeviceID ? Icons.visibility_off : Icons.visibility, color: Colors.grey),
+                  //           onTap: () {
+                  //             setState(() {
+                  //               _obscureDeviceID = !_obscureDeviceID;
+                  //             });
+                  //           },
+                  //         ),
+                  //         SizedBox(width: context.horizontalSize(10)),
+                  //         !_obscureDeviceID
+                  //             ? Text(auth.currentDeviceID, style: context.regular14(color: ColorManager.blackMedium))
+                  //             : const SizedBox.shrink(),
+                  //       ],
+                  //     )
+                  //     : const SizedBox.shrink(),
+                  // SizedBox(height: context.verticalSize(50)),
+                  // CenterTextIconButton(
+                  //   onPress: () async {
+                  //     if (signInForm.currentState!.validate()) {
+                  //       final success = await auth.signIn(
+                  //         email: auth.emailController.text.trim(),
+                  //         password: auth.passwordController.text.trim(),
+                  //       );
+                  //
+                  //       if (authProvider.user != null && success) {
+                  //         Navigator.pushAndRemoveUntil(
+                  //           context,
+                  //           MaterialPageRoute<void>(builder: (BuildContext context) => const Home(index: 0)),
+                  //               (route) => false,
+                  //         );
+                  //       } else {
+                  //         if (mounted) {
+                  //           toastErrorMessage(auth.errorMessage ?? l10n.loginFailed);
+                  //         }
+                  //       }
+                  //     }
+                  //   },
+                  //   buttonText: l10n.logIn,
+                  //   isLoading: auth.isLoading && !auth.isGoogleAuth,
+                  // ),
+                  // SizedBox(height: context.verticalSize(16)),
+                  // Align(
+                  //   alignment: Alignment.center,
+                  //   child: Text(l10n.or, style: context.semiBold14(color: ColorManager.blackMedium, fontSize: 16)),
+                  // ),
                   SizedBox(height: context.verticalSize(16)),
                   CenterTextIconButton(
                     onPress: () async {
@@ -264,24 +264,36 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
 
                   SizedBox(height: context.verticalSize(40)),
-                  Center(
-                    child: GestureDetector(
+                  GestureDetector(
                       onTap: () {
                         contactWhatsApp("94713905383", l10n.whatsappSupportMessage);
                       },
-                      child: RichText(
-                        text: TextSpan(
-                          children: [
-                            TextSpan(
-                              text: l10n.cantLogInOrCreate,
-                              style: context.regular12(color: ColorManager.grayText),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          FittedBox(
+                            fit: BoxFit.scaleDown,
+                            child: RichText(
+                              text: TextSpan(
+                                children: [
+                                  TextSpan(
+                                    text: l10n.cantLogInOrCreate,
+                                    style: context.regular16(color: ColorManager.grayText),
+                                  ),
+                                ],
+                              ),
                             ),
-                            TextSpan(text: l10n.needHelp, style: context.bold12(color: ColorManager.kPrimary)),
-                          ],
-                        ),
+                          ),
+                          RichText(
+                            text: TextSpan(
+                              children: [
+                                TextSpan(text: l10n.needHelp, style: context.bold16(color: ColorManager.kPrimary)),
+                              ],
+                            ),
+                          ),
+                        ],
                       ),
                     ),
-                  ),
                   SizedBox(height: context.verticalSize(50)),
                 ],
               ),
