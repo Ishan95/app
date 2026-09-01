@@ -211,7 +211,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         },
                       ),
                     ),
-                SizedBox(height: context.verticalSize(100)),
+                // SizedBox(height: context.verticalSize(100)),
               ],
             );
           }

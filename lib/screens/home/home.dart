@@ -27,10 +27,7 @@ class _HomeState extends State<Home> {
     _selectedIndex = widget.index;
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      Provider.of<AccountProvider>(
-        ContextHelper.navigatorKey.currentContext!,
-        listen: false,
-      );
+      Provider.of<AccountProvider>(ContextHelper.navigatorKey.currentContext!, listen: false);
     });
   }
 
@@ -51,22 +48,10 @@ class _HomeState extends State<Home> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: ColorManager.white,
-      body: Stack(
-        children: [
-          Column(
-            children: [
-              const CustomHeightBox(height: 30),
-              Expanded(child: _widgetOptions.elementAt(_selectedIndex)),
-            ],
-          ),
-          Positioned(
-            bottom: 0,
-            left: 0,
-            right: 0,
-            child: BottomNavBar(onPress: _onItemTapped),
-          ),
-        ],
+      body: Column(
+        children: [const CustomHeightBox(height: 30), Expanded(child: _widgetOptions.elementAt(_selectedIndex))],
       ),
+      bottomNavigationBar: BottomNavBar(onPress: _onItemTapped),
     );
   }
 }

@@ -23,96 +23,105 @@ class BottomNavBar extends StatelessWidget {
         borderRadius: const BorderRadius.only(topLeft: Radius.circular(20), topRight: Radius.circular(20)),
         boxShadow: const [BoxShadow(color: Color(0x0A05241A), offset: Offset(3, 3), blurRadius: 10, spreadRadius: 4)],
       ),
-      padding: const EdgeInsets.all(12),
-      child: Consumer<AuthenticationProvider>(
-        builder: (context, auth, child) {
-          final String? currentUserId = FirebaseAuth.instance.currentUser?.uid;
+      child: SafeArea(
+        top: false,
+        child: Padding(
+          padding: const EdgeInsets.all(12),
+          child: Consumer<AuthenticationProvider>(
+            builder: (context, auth, child) {
+              final String? currentUserId = FirebaseAuth.instance.currentUser?.uid;
 
-          return Stack(
-            clipBehavior: Clip.none,
-            alignment: Alignment.center,
-            children: [
-              Row(
+              return Stack(
+                clipBehavior: Clip.none,
+                alignment: Alignment.center,
                 children: [
-                  Expanded(
-                    flex: 2,
-                    child: GestureDetector(
-                      onTap: () => onPress(0),
-                      behavior: HitTestBehavior.translucent,
-                      child: Column(
-                        children: [
-                          Icon(Icons.home, color: ColorManager.grayText),
-                          SizedBox(height: context.verticalSize(4)),
-                          Text(l10n.homeNav, style: context.regular12(color: ColorManager.grayText)),
-                          SizedBox(height: context.verticalSize(4)),
-                        ],
-                      ),
-                    ),
-                  ),
-                  Expanded(
-                    flex: 2,
-                    child: GestureDetector(
-                      onTap: () => onPress(1),
-                      behavior: HitTestBehavior.translucent,
-                      child: Column(
-                        children: [
-                          Icon(Icons.notifications, color: ColorManager.grayText),
-                          SizedBox(height: context.verticalSize(4)),
-                          Text(l10n.notificationsNav, style: context.regular12(color: ColorManager.grayText)),
-                          SizedBox(height: context.verticalSize(4)),
-                        ],
-                      ),
-                    ),
-                  ),
-                  Expanded(
-                    flex: 2,
-                    child: GestureDetector(
-                      onTap: () => onPress(2),
-                      behavior: HitTestBehavior.translucent,
-                      child: Column(
-                        children: [
-                          StreamBuilder<List<ChatModel>>(
-                            stream: chatProvider.getChats(currentUserId),
-                            builder: (context, snapshot) {
-                              int totalUnread = 0;
-                              if (snapshot.hasData) {
-                                totalUnread = snapshot.data!.fold(0, (sum, chat) => sum + chat.unreadCount);
-                              }
-                              return Badge(
-                                isLabelVisible: totalUnread > 0,
-                                label: Text(totalUnread > 99 ? '99+' : totalUnread.toString()),
-                                backgroundColor: Colors.red,
-                                child: Icon(Icons.chat, color: ColorManager.grayText),
-                              );
-                            },
+                  Row(
+                    children: [
+                      Expanded(
+                        flex: 2,
+                        child: GestureDetector(
+                          onTap: () => onPress(0),
+                          behavior: HitTestBehavior.translucent,
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(Icons.home, color: ColorManager.grayText),
+                              SizedBox(height: context.verticalSize(4)),
+                              Text(l10n.homeNav, style: context.regular12(color: ColorManager.grayText)),
+                              SizedBox(height: context.verticalSize(4)),
+                            ],
                           ),
-                          SizedBox(height: context.verticalSize(4)),
-                          Text(l10n.chatNav, style: context.regular12(color: ColorManager.grayText)),
-                          SizedBox(height: context.verticalSize(4)),
-                        ],
+                        ),
                       ),
-                    ),
-                  ),
-                  Expanded(
-                    flex: 2,
-                    child: GestureDetector(
-                      onTap: () => onPress(3),
-                      behavior: HitTestBehavior.translucent,
-                      child: Column(
-                        children: [
-                          Icon(Icons.person, color: ColorManager.grayText),
-                          SizedBox(height: context.verticalSize(4)),
-                          Text(l10n.accountNav, style: context.regular12(color: ColorManager.grayText)),
-                          SizedBox(height: context.verticalSize(4)),
-                        ],
+                      Expanded(
+                        flex: 2,
+                        child: GestureDetector(
+                          onTap: () => onPress(1),
+                          behavior: HitTestBehavior.translucent,
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(Icons.notifications, color: ColorManager.grayText),
+                              SizedBox(height: context.verticalSize(4)),
+                              Text(l10n.notificationsNav, style: context.regular12(color: ColorManager.grayText)),
+                              SizedBox(height: context.verticalSize(4)),
+                            ],
+                          ),
+                        ),
                       ),
-                    ),
+                      Expanded(
+                        flex: 2,
+                        child: GestureDetector(
+                          onTap: () => onPress(2),
+                          behavior: HitTestBehavior.translucent,
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              StreamBuilder<List<ChatModel>>(
+                                stream: chatProvider.getChats(currentUserId),
+                                builder: (context, snapshot) {
+                                  int totalUnread = 0;
+                                  if (snapshot.hasData) {
+                                    totalUnread = snapshot.data!.fold(0, (sum, chat) => sum + chat.unreadCount);
+                                  }
+                                  return Badge(
+                                    isLabelVisible: totalUnread > 0,
+                                    label: Text(totalUnread > 99 ? '99+' : totalUnread.toString()),
+                                    backgroundColor: Colors.red,
+                                    child: Icon(Icons.chat, color: ColorManager.grayText),
+                                  );
+                                },
+                              ),
+                              SizedBox(height: context.verticalSize(4)),
+                              Text(l10n.chatNav, style: context.regular12(color: ColorManager.grayText)),
+                              SizedBox(height: context.verticalSize(4)),
+                            ],
+                          ),
+                        ),
+                      ),
+                      Expanded(
+                        flex: 2,
+                        child: GestureDetector(
+                          onTap: () => onPress(3),
+                          behavior: HitTestBehavior.translucent,
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(Icons.person, color: ColorManager.grayText),
+                              SizedBox(height: context.verticalSize(4)),
+                              Text(l10n.accountNav, style: context.regular12(color: ColorManager.grayText)),
+                              SizedBox(height: context.verticalSize(4)),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ],
-              ),
-            ],
-          );
-        },
+              );
+            },
+          ),
+        ),
       ),
     );
   }
