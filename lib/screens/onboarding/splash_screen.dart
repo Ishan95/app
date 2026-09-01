@@ -1,21 +1,22 @@
 import 'dart:async';
+import 'dart:io' show Platform;
 
+import 'package:app/app/export.dart';
 import 'package:app/app/utils/context_helper.dart';
+import 'package:app/l10n/app_localizations.dart';
 import 'package:app/providers/auth_provider.dart';
 import 'package:app/screens/home/home.dart';
 import 'package:app/screens/onboarding/login_screen.dart';
+import 'package:cloud_firestore/cloud_firestore.dart'; // Added Firestore import
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_remote_config/firebase_remote_config.dart';
 import 'package:flutter/material.dart';
+import 'package:lottie/lottie.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:app/app/export.dart';
-import 'package:lottie/lottie.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'dart:io' show Platform;
 import 'package:video_player/video_player.dart';
-import 'package:app/l10n/app_localizations.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -93,42 +94,50 @@ class _SplashScreenState extends State<SplashScreen> {
 
       String minimumRequiredVersion = _remoteConfig.getString('minimum_required_app_version');
       print("Fetched minimum required version: $minimumRequiredVersion   $_currentAppVersion");
+
       if (_isUpdateRequired(_currentAppVersion, minimumRequiredVersion)) {
         _showForceUpdateDialog();
       } else {
-        if (authProvider.user != null) {
-          // return const LoginScreen();
+        await _navigateBasedOnAuthState();
+      }
+    } catch (e) {
+      print("Error fetching remote config: $e");
+      await _navigateBasedOnAuthState();
+    }
+  }
+
+  Future<void> _navigateBasedOnAuthState() async {
+    final currentUser = authProvider.user;
+
+    if (currentUser != null) {
+      try {
+        final userDoc = await FirebaseFirestore.instance.collection('users').doc(currentUser.uid).get();
+        final userData = userDoc.data();
+
+        bool hasJob =
+            userData != null &&
+            userData.containsKey('job') &&
+            userData['job'] != null &&
+            userData['job'].toString().trim().isNotEmpty;
+
+        if (hasJob) {
           await authProvider.updateFcmToken();
           Navigator.pushAndRemoveUntil(
             context,
             MaterialPageRoute<void>(builder: (BuildContext context) => const Home(index: 0)),
             (route) => false,
           );
-        } else {
-          Navigator.pushAndRemoveUntil(
-            context,
-            MaterialPageRoute<void>(builder: (BuildContext context) => const LoginScreen()),
-            (route) => false,
-          );
-          // return const UserListScreen(); // Or your main app screen after login
+          return;
         }
-      }
-    } catch (e) {
-      print("Error fetching remote config: $e");
-      if (authProvider.user != null) {
-        Navigator.pushAndRemoveUntil(
-          context,
-          MaterialPageRoute<void>(builder: (BuildContext context) => const Home(index: 0)),
-          (route) => false,
-        );
-      } else {
-        Navigator.pushAndRemoveUntil(
-          context,
-          MaterialPageRoute<void>(builder: (BuildContext context) => const LoginScreen()),
-          (route) => false,
-        );
+      } catch (e) {
+        print("Error fetching user data in splash: $e");
       }
     }
+    Navigator.pushAndRemoveUntil(
+      context,
+      MaterialPageRoute<void>(builder: (BuildContext context) => const LoginScreen()),
+      (route) => false,
+    );
   }
 
   bool _isUpdateRequired(String currentVersion, String minimumRequiredVersion) {

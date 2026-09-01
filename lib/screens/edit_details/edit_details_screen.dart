@@ -95,9 +95,13 @@ class _EditDetailsScreenState extends State<EditDetailsScreen> {
     if (filterDetails.district.isNotEmpty) {
       if (filterDetails.job == "Provincial School Teacher" || filterDetails.job == "National School Teacher") {
         await StaticDataService.fetchKalapas(filterDetails, filterDetails.district);
-      } else if (filterDetails.job == "Nurse") {
+      } else if (filterDetails.job == "Nurse" || filterDetails.job == "Hospital Attendant") {
         await StaticDataService.fetchNurseInstitutions(filterDetails, filterDetails.district);
-      } else if (filterDetails.job == "Management Assistant") {
+      } else if (filterDetails.job == "Public Health Inspector" || filterDetails.job == "Public Health Midwife") {
+        await StaticDataService.fetchNurseOffices(filterDetails, "MOH Office ${filterDetails.district}");
+      } else if (filterDetails.job == "Management Assistant" ||
+          filterDetails.job == "Development Officer" ||
+          filterDetails.job == "Administrative Officer") {
         await StaticDataService.fetchMAInstitutions(filterDetails, filterDetails.district);
       } else if (filterDetails.job == "Police Officer") {
         await StaticDataService.fetchPoliceDivisions(filterDetails, filterDetails.district);
@@ -751,7 +755,7 @@ class _EditDetailsScreenState extends State<EditDetailsScreen> {
                                               (province) => DropdownMenuItem(
                                                 value: province,
                                                 child: Text(
-                                                  TranslationService.translate(context, province), 
+                                                  TranslationService.translate(context, province),
                                                   style: context.regular14(color: ColorManager.disabledText),
                                                 ),
                                               ),
@@ -812,7 +816,7 @@ class _EditDetailsScreenState extends State<EditDetailsScreen> {
                                                   (district) => DropdownMenuItem(
                                                     value: district,
                                                     child: Text(
-                                                      TranslationService.translate(context, district), 
+                                                      TranslationService.translate(context, district),
                                                       style: context.regular14(color: ColorManager.blackMedium),
                                                     ),
                                                   ),
@@ -839,9 +843,19 @@ class _EditDetailsScreenState extends State<EditDetailsScreen> {
                                             if (filterDetails.job == "Provincial School Teacher" ||
                                                 filterDetails.job == "National School Teacher") {
                                               await StaticDataService.fetchKalapas(filterDetails, value);
-                                            } else if (filterDetails.job == "Nurse") {
+                                            } else if (filterDetails.job == "Nurse" ||
+                                                filterDetails.job == "Hospital Attendant") {
                                               await StaticDataService.fetchNurseInstitutions(filterDetails, value);
-                                            } else if (filterDetails.job == "Management Assistant") {
+                                            } else if (filterDetails.job == "Public Health Inspector" ||
+                                                filterDetails.job == "Public Health Midwife") {
+                                              filterDetails.institutionTypeForNurse = "MOH Office $value";
+                                              await StaticDataService.fetchNurseOffices(
+                                                filterDetails,
+                                                "MOH Office $value",
+                                              );
+                                            } else if (filterDetails.job == "Management Assistant" ||
+                                                filterDetails.job == "Development Officer" ||
+                                                filterDetails.job == "Administrative Officer") {
                                               await StaticDataService.fetchMAInstitutions(filterDetails, value);
                                             } else if (filterDetails.job == "Police Officer") {
                                               await StaticDataService.fetchPoliceDivisions(filterDetails, value);
@@ -860,7 +874,9 @@ class _EditDetailsScreenState extends State<EditDetailsScreen> {
                                     : SizedBox.shrink(),
                                 SizedBox(height: context.verticalSize(filterDetails.district.isNotEmpty ? 20 : 0)),
 
-                                filterDetails.district.isNotEmpty
+                                (filterDetails.district.isNotEmpty &&
+                                        filterDetails.job != "Public Health Inspector" &&
+                                        filterDetails.job != "Public Health Midwife")
                                     ? Container(
                                       height: context.verticalSize(40),
                                       width: double.infinity,
@@ -876,11 +892,14 @@ class _EditDetailsScreenState extends State<EditDetailsScreen> {
                                                 ? filterDetails.kalapa.isNotEmpty
                                                     ? filterDetails.kalapa
                                                     : null
-                                                : filterDetails.job == "Nurse"
+                                                : (filterDetails.job == "Nurse" ||
+                                                    filterDetails.job == "Hospital Attendant")
                                                 ? filterDetails.institutionTypeForNurse.isNotEmpty
                                                     ? filterDetails.institutionTypeForNurse
                                                     : null
-                                                : filterDetails.job == "Management Assistant"
+                                                : (filterDetails.job == "Management Assistant" ||
+                                                    filterDetails.job == "Development Officer" ||
+                                                    filterDetails.job == "Administrative Officer")
                                                 ? filterDetails.institutionTypeForMA.isNotEmpty
                                                     ? filterDetails.institutionTypeForMA
                                                     : null
@@ -911,17 +930,15 @@ class _EditDetailsScreenState extends State<EditDetailsScreen> {
                                                           (kalapa) => DropdownMenuItem(
                                                             value: kalapa,
                                                             child: Text(
-                                                              TranslationService.translate(
-                                                                context,
-                                                                kalapa,
-                                                              ), 
+                                                              TranslationService.translate(context, kalapa),
                                                               style: context.regular14(
                                                                 color: ColorManager.disabledText,
                                                               ),
                                                             ),
                                                           ),
                                                         )
-                                                    : filterDetails.job == "Nurse"
+                                                    : (filterDetails.job == "Nurse" ||
+                                                        filterDetails.job == "Hospital Attendant")
                                                     ? (filterDetails.district.isNotEmpty
                                                             ? filterDetails
                                                                     .districtInstitutionTypeForNurse[filterDetails
@@ -932,17 +949,16 @@ class _EditDetailsScreenState extends State<EditDetailsScreen> {
                                                           (institute) => DropdownMenuItem(
                                                             value: institute,
                                                             child: Text(
-                                                              TranslationService.translate(
-                                                                context,
-                                                                institute,
-                                                              ), 
+                                                              TranslationService.translate(context, institute),
                                                               style: context.regular14(
                                                                 color: ColorManager.disabledText,
                                                               ),
                                                             ),
                                                           ),
                                                         )
-                                                    : filterDetails.job == "Management Assistant"
+                                                    : (filterDetails.job == "Management Assistant" ||
+                                                        filterDetails.job == "Development Officer" ||
+                                                        filterDetails.job == "Administrative Officer")
                                                     ? (filterDetails.district.isNotEmpty
                                                             ? filterDetails.districtInstitutionTypeForMA[filterDetails
                                                                     .district] ??
@@ -952,10 +968,7 @@ class _EditDetailsScreenState extends State<EditDetailsScreen> {
                                                           (institute) => DropdownMenuItem(
                                                             value: institute,
                                                             child: Text(
-                                                              TranslationService.translate(
-                                                                context,
-                                                                institute,
-                                                              ), 
+                                                              TranslationService.translate(context, institute),
                                                               style: context.regular14(
                                                                 color: ColorManager.disabledText,
                                                               ),
@@ -972,10 +985,7 @@ class _EditDetailsScreenState extends State<EditDetailsScreen> {
                                                           (policeDivisions) => DropdownMenuItem(
                                                             value: policeDivisions,
                                                             child: Text(
-                                                              TranslationService.translate(
-                                                                context,
-                                                                policeDivisions,
-                                                              ), 
+                                                              TranslationService.translate(context, policeDivisions),
                                                               style: context.regular14(
                                                                 color: ColorManager.disabledText,
                                                               ),
@@ -991,10 +1001,7 @@ class _EditDetailsScreenState extends State<EditDetailsScreen> {
                                                           (dsDivisions) => DropdownMenuItem(
                                                             value: dsDivisions,
                                                             child: Text(
-                                                              TranslationService.translate(
-                                                                context,
-                                                                dsDivisions,
-                                                              ), 
+                                                              TranslationService.translate(context, dsDivisions),
                                                               style: context.regular14(
                                                                 color: ColorManager.disabledText,
                                                               ),
@@ -1007,9 +1014,12 @@ class _EditDetailsScreenState extends State<EditDetailsScreen> {
                                             (filterDetails.job == "Provincial School Teacher" ||
                                                     filterDetails.job == "National School Teacher")
                                                 ? filterDetails.kalapa = value ?? ''
-                                                : filterDetails.job == "Nurse"
+                                                : (filterDetails.job == "Nurse" ||
+                                                    filterDetails.job == "Hospital Attendant")
                                                 ? filterDetails.institutionTypeForNurse = value ?? ''
-                                                : filterDetails.job == "Management Assistant"
+                                                : (filterDetails.job == "Management Assistant" ||
+                                                    filterDetails.job == "Development Officer" ||
+                                                    filterDetails.job == "Administrative Officer")
                                                 ? filterDetails.institutionTypeForMA = value ?? ''
                                                 : filterDetails.job == "Police Officer"
                                                 ? filterDetails.policeDivisions = value ?? ''
@@ -1030,9 +1040,12 @@ class _EditDetailsScreenState extends State<EditDetailsScreen> {
                                               await StaticDataService.fetchKottasas(filterDetails, value);
                                             } else if (filterDetails.job == "National School Teacher") {
                                               await StaticDataService.fetchKottasasNational(filterDetails, value);
-                                            } else if (filterDetails.job == "Nurse") {
+                                            } else if (filterDetails.job == "Nurse" ||
+                                                filterDetails.job == "Hospital Attendant") {
                                               await StaticDataService.fetchNurseOffices(filterDetails, value);
-                                            } else if (filterDetails.job == "Management Assistant") {
+                                            } else if (filterDetails.job == "Management Assistant" ||
+                                                filterDetails.job == "Development Officer" ||
+                                                filterDetails.job == "Administrative Officer") {
                                               await StaticDataService.fetchMAOffices(filterDetails, value);
                                             } else if (filterDetails.job == "Police Officer") {
                                               await StaticDataService.fetchPoliceStations(filterDetails, value);
@@ -1055,7 +1068,10 @@ class _EditDetailsScreenState extends State<EditDetailsScreen> {
                                             filterDetails.institutionTypeForNurse.isNotEmpty ||
                                             filterDetails.institutionTypeForMA.isNotEmpty ||
                                             filterDetails.policeDivisions.isNotEmpty ||
-                                            filterDetails.divisionalSecretariat.isNotEmpty)
+                                            filterDetails.divisionalSecretariat.isNotEmpty ||
+                                            ((filterDetails.job == "Public Health Inspector" ||
+                                                    filterDetails.job == "Public Health Midwife") &&
+                                                filterDetails.district.isNotEmpty))
                                         ? 20
                                         : 0,
                                   ),
@@ -1067,7 +1083,10 @@ class _EditDetailsScreenState extends State<EditDetailsScreen> {
                                         filterDetails.institutionTypeForNurse.isNotEmpty ||
                                         filterDetails.institutionTypeForMA.isNotEmpty ||
                                         filterDetails.policeDivisions.isNotEmpty ||
-                                        filterDetails.divisionalSecretariat.isNotEmpty)
+                                        filterDetails.divisionalSecretariat.isNotEmpty ||
+                                        ((filterDetails.job == "Public Health Inspector" ||
+                                                filterDetails.job == "Public Health Midwife") &&
+                                            filterDetails.district.isNotEmpty))
                                     ? Container(
                                       height: context.verticalSize(40),
                                       width: double.infinity,
@@ -1086,11 +1105,16 @@ class _EditDetailsScreenState extends State<EditDetailsScreen> {
                                                 ? filterDetails.kottasaForNationalScl.isNotEmpty
                                                     ? filterDetails.kottasaForNationalScl
                                                     : null
-                                                : filterDetails.job == "Nurse"
+                                                : (filterDetails.job == "Nurse" ||
+                                                    filterDetails.job == "Hospital Attendant" ||
+                                                    filterDetails.job == "Public Health Inspector" ||
+                                                    filterDetails.job == "Public Health Midwife")
                                                 ? filterDetails.officeForNurse.isNotEmpty
                                                     ? filterDetails.officeForNurse
                                                     : null
-                                                : filterDetails.job == "Management Assistant"
+                                                : (filterDetails.job == "Management Assistant" ||
+                                                    filterDetails.job == "Development Officer" ||
+                                                    filterDetails.job == "Administrative Officer")
                                                 ? filterDetails.officeForMA.isNotEmpty
                                                     ? filterDetails.officeForMA
                                                     : null
@@ -1119,10 +1143,7 @@ class _EditDetailsScreenState extends State<EditDetailsScreen> {
                                                           (kottasa) => DropdownMenuItem(
                                                             value: kottasa,
                                                             child: Text(
-                                                              TranslationService.translate(
-                                                                context,
-                                                                kottasa,
-                                                              ), 
+                                                              TranslationService.translate(context, kottasa),
                                                               style: context.regular14(color: ColorManager.blackMedium),
                                                             ),
                                                           ),
@@ -1137,15 +1158,15 @@ class _EditDetailsScreenState extends State<EditDetailsScreen> {
                                                           (kottasa) => DropdownMenuItem(
                                                             value: kottasa,
                                                             child: Text(
-                                                              TranslationService.translate(
-                                                                context,
-                                                                kottasa,
-                                                              ), 
+                                                              TranslationService.translate(context, kottasa),
                                                               style: context.regular14(color: ColorManager.blackMedium),
                                                             ),
                                                           ),
                                                         )
-                                                    : filterDetails.job == "Nurse"
+                                                    : (filterDetails.job == "Nurse" ||
+                                                        filterDetails.job == "Hospital Attendant" ||
+                                                        filterDetails.job == "Public Health Inspector" ||
+                                                        filterDetails.job == "Public Health Midwife")
                                                     ? (filterDetails.institutionTypeForNurse.isNotEmpty
                                                             ? filterDetails.institutionTypeOfficesForNurse[filterDetails
                                                                     .institutionTypeForNurse] ??
@@ -1155,15 +1176,14 @@ class _EditDetailsScreenState extends State<EditDetailsScreen> {
                                                           (office) => DropdownMenuItem(
                                                             value: office,
                                                             child: Text(
-                                                              TranslationService.translate(
-                                                                context,
-                                                                office,
-                                                              ), 
+                                                              TranslationService.translate(context, office),
                                                               style: context.regular14(color: ColorManager.blackMedium),
                                                             ),
                                                           ),
                                                         )
-                                                    : filterDetails.job == "Management Assistant"
+                                                    : (filterDetails.job == "Management Assistant" ||
+                                                        filterDetails.job == "Development Officer" ||
+                                                        filterDetails.job == "Administrative Officer")
                                                     ? (filterDetails.institutionTypeForMA.isNotEmpty
                                                             ? filterDetails.institutionTypeOfficesForMA[filterDetails
                                                                     .institutionTypeForMA] ??
@@ -1173,10 +1193,7 @@ class _EditDetailsScreenState extends State<EditDetailsScreen> {
                                                           (office) => DropdownMenuItem(
                                                             value: office,
                                                             child: Text(
-                                                              TranslationService.translate(
-                                                                context,
-                                                                office,
-                                                              ), 
+                                                              TranslationService.translate(context, office),
                                                               style: context.regular14(color: ColorManager.blackMedium),
                                                             ),
                                                           ),
@@ -1191,10 +1208,7 @@ class _EditDetailsScreenState extends State<EditDetailsScreen> {
                                                           (office) => DropdownMenuItem(
                                                             value: office,
                                                             child: Text(
-                                                              TranslationService.translate(
-                                                                context,
-                                                                office,
-                                                              ), 
+                                                              TranslationService.translate(context, office),
                                                               style: context.regular14(color: ColorManager.blackMedium),
                                                             ),
                                                           ),
@@ -1208,10 +1222,7 @@ class _EditDetailsScreenState extends State<EditDetailsScreen> {
                                                           (office) => DropdownMenuItem(
                                                             value: office,
                                                             child: Text(
-                                                              TranslationService.translate(
-                                                                context,
-                                                                office,
-                                                              ), 
+                                                              TranslationService.translate(context, office),
                                                               style: context.regular14(color: ColorManager.blackMedium),
                                                             ),
                                                           ),
@@ -1223,13 +1234,20 @@ class _EditDetailsScreenState extends State<EditDetailsScreen> {
                                                 ? filterDetails.kottasa = value ?? ''
                                                 : filterDetails.job == "National School Teacher"
                                                 ? filterDetails.kottasaForNationalScl = value ?? ''
-                                                : filterDetails.job == "Nurse"
+                                                : (filterDetails.job == "Nurse" ||
+                                                    filterDetails.job == "Hospital Attendant" ||
+                                                    filterDetails.job == "Public Health Inspector" ||
+                                                    filterDetails.job == "Public Health Midwife")
                                                 ? filterDetails.officeForNurse = value ?? ''
-                                                : filterDetails.job == "Management Assistant"
+                                                : (filterDetails.job == "Management Assistant" ||
+                                                    filterDetails.job == "Development Officer" ||
+                                                    filterDetails.job == "Administrative Officer")
                                                 ? filterDetails.officeForMA = value ?? ''
                                                 : filterDetails.job == "Police Officer"
                                                 ? filterDetails.policeStations = value ?? ''
-                                                : filterDetails.gramaNiladhariDivision = value ?? '';
+                                                : filterDetails.job == "Grama Niladari"
+                                                ? filterDetails.gramaNiladhariDivision = value ?? ''
+                                                : '';
                                             filterDetails.school = '';
                                             filterDetails.nationalSchool = '';
                                           });
@@ -1295,7 +1313,7 @@ class _EditDetailsScreenState extends State<EditDetailsScreen> {
                                                   (school) => DropdownMenuItem(
                                                     value: school,
                                                     child: Text(
-                                                      TranslationService.translate(context, school), 
+                                                      TranslationService.translate(context, school),
                                                       style: context.regular14(color: ColorManager.blackMedium),
                                                     ),
                                                   ),
@@ -1372,7 +1390,7 @@ class _EditDetailsScreenState extends State<EditDetailsScreen> {
                                               (value) => DropdownMenuItem(
                                                 value: value,
                                                 child: Text(
-                                                  TranslationService.translate(context, value), 
+                                                  TranslationService.translate(context, value),
                                                   style: context.regular14(color: ColorManager.disabledText),
                                                 ),
                                               ),
@@ -1442,7 +1460,7 @@ class _EditDetailsScreenState extends State<EditDetailsScreen> {
                                                   (subject) => DropdownMenuItem(
                                                     value: subject,
                                                     child: Text(
-                                                      TranslationService.translate(context, subject), 
+                                                      TranslationService.translate(context, subject),
                                                       style: context.regular14(color: ColorManager.blackMedium),
                                                     ),
                                                   ),
@@ -1598,7 +1616,7 @@ class _EditDetailsScreenState extends State<EditDetailsScreen> {
                                               (district) => DropdownMenuItem(
                                                 value: district,
                                                 child: Text(
-                                                  TranslationService.translate(context, district), 
+                                                  TranslationService.translate(context, district),
                                                   style: context.regular14(color: ColorManager.blackMedium),
                                                 ),
                                               ),
@@ -1651,7 +1669,7 @@ class _EditDetailsScreenState extends State<EditDetailsScreen> {
                                                   (district) => DropdownMenuItem(
                                                     value: district,
                                                     child: Text(
-                                                      TranslationService.translate(context, district), 
+                                                      TranslationService.translate(context, district),
                                                       style: context.regular14(color: ColorManager.blackMedium),
                                                     ),
                                                   ),
@@ -1703,7 +1721,7 @@ class _EditDetailsScreenState extends State<EditDetailsScreen> {
                                                   (district) => DropdownMenuItem(
                                                     value: district,
                                                     child: Text(
-                                                      TranslationService.translate(context, district), 
+                                                      TranslationService.translate(context, district),
                                                       style: context.regular14(color: ColorManager.blackMedium),
                                                     ),
                                                   ),
@@ -1732,23 +1750,6 @@ class _EditDetailsScreenState extends State<EditDetailsScreen> {
                                   ),
                                 ),
                                 SizedBox(height: context.verticalSize(30)),
-                                Align(
-                                  alignment: Alignment.centerLeft,
-                                  child: Text(
-                                    l10n.addSpecialNote,
-                                    style: context.semiBold14(color: ColorManager.blackMedium),
-                                  ),
-                                ),
-                                SizedBox(height: context.verticalSize(8)),
-                                CustomTextField(
-                                  radius: 30,
-                                  height: context.verticalSize(40),
-                                  controller: acc.noteController,
-                                  inputType: TextInputType.emailAddress,
-                                  hintText: l10n.note,
-                                  validator: (value) {},
-                                ),
-                                SizedBox(height: context.verticalSize(30)),
                                 CenterTextIconButton(
                                   onPress: () async {
                                     if (informationFormKey.currentState!.validate() &&
@@ -1759,9 +1760,14 @@ class _EditDetailsScreenState extends State<EditDetailsScreen> {
                                             ? filterDetails.school != ''
                                             : filterDetails.job == "National School Teacher"
                                             ? filterDetails.nationalSchool != ''
-                                            : filterDetails.job == "Nurse"
+                                            : (filterDetails.job == "Nurse" ||
+                                                filterDetails.job == "Hospital Attendant" ||
+                                                filterDetails.job == "Public Health Inspector" ||
+                                                filterDetails.job == "Public Health Midwife")
                                             ? filterDetails.officeForNurse != ''
-                                            : filterDetails.job == "Management Assistant"
+                                            : (filterDetails.job == "Management Assistant" ||
+                                                filterDetails.job == "Development Officer" ||
+                                                filterDetails.job == "Administrative Officer")
                                             ? filterDetails.officeForMA != ''
                                             : filterDetails.job == "Police Officer"
                                             ? filterDetails.policeStations != ''

@@ -276,9 +276,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             Text(
                               (user.job == "Provincial School Teacher" || user.job == "National School Teacher")
                                   ? user.kalapa ?? "--"
-                                  : user.job == "Nurse"
+                                  : (user.job == "Nurse" ||
+                                      user.job == "Hospital Attendant" ||
+                                      user.job == "Public Health Inspector" ||
+                                      user.job == "Public Health Midwife")
                                   ? user.institutionTypeForNurse ?? "--"
-                                  : user.job == "Management Assistant"
+                                  : (user.job == "Management Assistant" ||
+                                      user.job == "Development Officer" ||
+                                      user.job == "Administrative Officer")
                                   ? user.institutionTypeForMA ?? "--"
                                   : user.job == "Police Officer"
                                   ? user.policeDivisions ?? "--"
@@ -302,9 +307,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                         ? user.school ?? '--'
                                         : user.job == "National School Teacher"
                                         ? user.nationalSchool ?? '--'
-                                        : user.job == "Nurse"
+                                        : (user.job == "Nurse" ||
+                                            user.job == "Hospital Attendant" ||
+                                            user.job == "Public Health Inspector" ||
+                                            user.job == "Public Health Midwife")
                                         ? user.officeForNurse ?? '--'
-                                        : user.job == "Management Assistant"
+                                        : (user.job == "Management Assistant" ||
+                                            user.job == "Development Officer" ||
+                                            user.job == "Administrative Officer")
                                         ? user.officeForMA ?? '--'
                                         : user.job == "Police Officer"
                                         ? user.policeStations ?? "--"

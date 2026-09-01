@@ -908,9 +908,19 @@ class _GetDetailsScreenState extends State<GetDetailsScreen> {
                                             if (filterDetails.job == "Provincial School Teacher" ||
                                                 filterDetails.job == "National School Teacher") {
                                               await StaticDataService.fetchKalapas(filterDetails, value);
-                                            } else if (filterDetails.job == "Nurse") {
+                                            } else if (filterDetails.job == "Nurse" ||
+                                                filterDetails.job == "Hospital Attendant") {
                                               await StaticDataService.fetchNurseInstitutions(filterDetails, value);
-                                            } else if (filterDetails.job == "Management Assistant") {
+                                            } else if (filterDetails.job == "Public Health Inspector" ||
+                                                filterDetails.job == "Public Health Midwife") {
+                                              filterDetails.institutionTypeForNurse = "MOH Office $value";
+                                              await StaticDataService.fetchNurseOffices(
+                                                filterDetails,
+                                                "MOH Office $value",
+                                              );
+                                            } else if (filterDetails.job == "Management Assistant" ||
+                                                filterDetails.job == "Development Officer" ||
+                                                filterDetails.job == "Administrative Officer") {
                                               await StaticDataService.fetchMAInstitutions(filterDetails, value);
                                             } else if (filterDetails.job == "Police Officer") {
                                               await StaticDataService.fetchPoliceDivisions(filterDetails, value);
@@ -941,7 +951,9 @@ class _GetDetailsScreenState extends State<GetDetailsScreen> {
 
                                 SizedBox(height: context.verticalSize(filterDetails.district.isNotEmpty ? 20 : 0)),
 
-                                filterDetails.district.isNotEmpty
+                                (filterDetails.district.isNotEmpty &&
+                                        filterDetails.job != "Public Health Inspector" &&
+                                        filterDetails.job != "Public Health Midwife")
                                     ? Container(
                                       height: context.verticalSize(40),
                                       width: double.infinity,
@@ -957,11 +969,14 @@ class _GetDetailsScreenState extends State<GetDetailsScreen> {
                                                 ? filterDetails.kalapa.isNotEmpty
                                                     ? filterDetails.kalapa
                                                     : null
-                                                : filterDetails.job == "Nurse"
+                                                : (filterDetails.job == "Nurse" ||
+                                                    filterDetails.job == "Hospital Attendant")
                                                 ? filterDetails.institutionTypeForNurse.isNotEmpty
                                                     ? filterDetails.institutionTypeForNurse
                                                     : null
-                                                : filterDetails.job == "Management Assistant"
+                                                : (filterDetails.job == "Management Assistant" ||
+                                                    filterDetails.job == "Development Officer" ||
+                                                    filterDetails.job == "Administrative Officer")
                                                 ? filterDetails.institutionTypeForMA.isNotEmpty
                                                     ? filterDetails.institutionTypeForMA
                                                     : null
@@ -997,7 +1012,8 @@ class _GetDetailsScreenState extends State<GetDetailsScreen> {
                                                             ),
                                                           ),
                                                         )
-                                                    : filterDetails.job == "Nurse"
+                                                    : (filterDetails.job == "Nurse" ||
+                                                        filterDetails.job == "Hospital Attendant")
                                                     ? (filterDetails.district.isNotEmpty
                                                             ? filterDetails
                                                                     .districtInstitutionTypeForNurse[filterDetails
@@ -1013,7 +1029,9 @@ class _GetDetailsScreenState extends State<GetDetailsScreen> {
                                                             ),
                                                           ),
                                                         )
-                                                    : filterDetails.job == "Management Assistant"
+                                                    : (filterDetails.job == "Management Assistant" ||
+                                                        filterDetails.job == "Development Officer" ||
+                                                        filterDetails.job == "Administrative Officer")
                                                     ? (filterDetails.district.isNotEmpty
                                                             ? filterDetails.districtInstitutionTypeForMA[filterDetails
                                                                     .district] ??
@@ -1063,9 +1081,12 @@ class _GetDetailsScreenState extends State<GetDetailsScreen> {
                                             (filterDetails.job == "Provincial School Teacher" ||
                                                     filterDetails.job == "National School Teacher")
                                                 ? filterDetails.kalapa = value ?? ''
-                                                : filterDetails.job == "Nurse"
+                                                : (filterDetails.job == "Nurse" ||
+                                                    filterDetails.job == "Hospital Attendant")
                                                 ? filterDetails.institutionTypeForNurse = value ?? ''
-                                                : filterDetails.job == "Management Assistant"
+                                                : (filterDetails.job == "Management Assistant" ||
+                                                    filterDetails.job == "Development Officer" ||
+                                                    filterDetails.job == "Administrative Officer")
                                                 ? filterDetails.institutionTypeForMA = value ?? ''
                                                 : filterDetails.job == "Police Officer"
                                                 ? filterDetails.policeDivisions = value ?? ''
@@ -1092,9 +1113,12 @@ class _GetDetailsScreenState extends State<GetDetailsScreen> {
                                               await StaticDataService.fetchKottasas(filterDetails, value);
                                             } else if (filterDetails.job == "National School Teacher") {
                                               await StaticDataService.fetchKottasasNational(filterDetails, value);
-                                            } else if (filterDetails.job == "Nurse") {
+                                            } else if (filterDetails.job == "Nurse" ||
+                                                filterDetails.job == "Hospital Attendant") {
                                               await StaticDataService.fetchNurseOffices(filterDetails, value);
-                                            } else if (filterDetails.job == "Management Assistant") {
+                                            } else if (filterDetails.job == "Management Assistant" ||
+                                                filterDetails.job == "Development Officer" ||
+                                                filterDetails.job == "Administrative Officer") {
                                               await StaticDataService.fetchMAOffices(filterDetails, value);
                                             } else if (filterDetails.job == "Police Officer") {
                                               await StaticDataService.fetchPoliceStations(filterDetails, value);
@@ -1129,7 +1153,10 @@ class _GetDetailsScreenState extends State<GetDetailsScreen> {
                                             filterDetails.institutionTypeForNurse.isNotEmpty ||
                                             filterDetails.institutionTypeForMA.isNotEmpty ||
                                             filterDetails.policeDivisions.isNotEmpty ||
-                                            filterDetails.divisionalSecretariat.isNotEmpty)
+                                            filterDetails.divisionalSecretariat.isNotEmpty ||
+                                            ((filterDetails.job == "Public Health Inspector" ||
+                                                    filterDetails.job == "Public Health Midwife") &&
+                                                filterDetails.district.isNotEmpty))
                                         ? 20
                                         : 0,
                                   ),
@@ -1141,7 +1168,10 @@ class _GetDetailsScreenState extends State<GetDetailsScreen> {
                                         filterDetails.institutionTypeForNurse.isNotEmpty ||
                                         filterDetails.institutionTypeForMA.isNotEmpty ||
                                         filterDetails.policeDivisions.isNotEmpty ||
-                                        filterDetails.divisionalSecretariat.isNotEmpty)
+                                        filterDetails.divisionalSecretariat.isNotEmpty ||
+                                        ((filterDetails.job == "Public Health Inspector" ||
+                                                filterDetails.job == "Public Health Midwife") &&
+                                            filterDetails.district.isNotEmpty))
                                     ? Container(
                                       height: context.verticalSize(40),
                                       width: double.infinity,
@@ -1160,11 +1190,16 @@ class _GetDetailsScreenState extends State<GetDetailsScreen> {
                                                 ? filterDetails.kottasaForNationalScl.isNotEmpty
                                                     ? filterDetails.kottasaForNationalScl
                                                     : null
-                                                : filterDetails.job == "Nurse"
+                                                : (filterDetails.job == "Nurse" ||
+                                                    filterDetails.job == "Hospital Attendant" ||
+                                                    filterDetails.job == "Public Health Inspector" ||
+                                                    filterDetails.job == "Public Health Midwife")
                                                 ? filterDetails.officeForNurse.isNotEmpty
                                                     ? filterDetails.officeForNurse
                                                     : null
-                                                : filterDetails.job == "Management Assistant"
+                                                : (filterDetails.job == "Management Assistant" ||
+                                                    filterDetails.job == "Development Officer" ||
+                                                    filterDetails.job == "Administrative Officer")
                                                 ? filterDetails.officeForMA.isNotEmpty
                                                     ? filterDetails.officeForMA
                                                     : null
@@ -1213,7 +1248,10 @@ class _GetDetailsScreenState extends State<GetDetailsScreen> {
                                                             ),
                                                           ),
                                                         )
-                                                    : filterDetails.job == "Nurse"
+                                                    : (filterDetails.job == "Nurse" ||
+                                                        filterDetails.job == "Hospital Attendant" ||
+                                                        filterDetails.job == "Public Health Inspector" ||
+                                                        filterDetails.job == "Public Health Midwife")
                                                     ? (filterDetails.institutionTypeForNurse.isNotEmpty
                                                             ? filterDetails.institutionTypeOfficesForNurse[filterDetails
                                                                     .institutionTypeForNurse] ??
@@ -1228,7 +1266,9 @@ class _GetDetailsScreenState extends State<GetDetailsScreen> {
                                                             ),
                                                           ),
                                                         )
-                                                    : filterDetails.job == "Management Assistant"
+                                                    : (filterDetails.job == "Management Assistant" ||
+                                                        filterDetails.job == "Development Officer" ||
+                                                        filterDetails.job == "Administrative Officer")
                                                     ? (filterDetails.institutionTypeForMA.isNotEmpty
                                                             ? filterDetails.institutionTypeOfficesForMA[filterDetails
                                                                     .institutionTypeForMA] ??
@@ -1279,13 +1319,21 @@ class _GetDetailsScreenState extends State<GetDetailsScreen> {
                                                 ? filterDetails.kottasa = value ?? ''
                                                 : filterDetails.job == "National School Teacher"
                                                 ? filterDetails.kottasaForNationalScl = value ?? ''
-                                                : filterDetails.job == "Nurse"
+                                                : (filterDetails.job == "Nurse" ||
+                                                    filterDetails.job == "Hospital Attendant" ||
+                                                    filterDetails.job == "Public Health Inspector" ||
+                                                    filterDetails.job == "Public Health Midwife")
                                                 ? filterDetails.officeForNurse = value ?? ''
-                                                : filterDetails.job == "Management Assistant"
+                                                : (filterDetails.job == "Management Assistant" ||
+                                                    filterDetails.job == "Development Officer" ||
+                                                    filterDetails.job == "Administrative Officer")
                                                 ? filterDetails.officeForMA = value ?? ''
                                                 : filterDetails.job == "Police Officer"
                                                 ? filterDetails.policeStations = value ?? ''
-                                                : filterDetails.gramaNiladhariDivision = value ?? '';
+                                                : filterDetails.job == "Grama Niladari"
+                                                ? filterDetails.gramaNiladhariDivision = value ?? ''
+                                                : '';
+
                                             kottasaOfficeError = null;
                                             schoolError = null;
 
@@ -1892,8 +1940,13 @@ class _GetDetailsScreenState extends State<GetDetailsScreen> {
                                           setState(() => schoolError = l10n.reqSelectSchool);
                                           isValid = false;
                                         }
-                                      } else if (filterDetails.job == "Nurse") {
-                                        if (filterDetails.institutionTypeForNurse.isEmpty) {
+                                      } else if (filterDetails.job == "Nurse" ||
+                                          filterDetails.job == "Hospital Attendant" ||
+                                          filterDetails.job == "Public Health Inspector" ||
+                                          filterDetails.job == "Public Health Midwife") {
+                                        if ((filterDetails.job == "Nurse" ||
+                                                filterDetails.job == "Hospital Attendant") &&
+                                            filterDetails.institutionTypeForNurse.isEmpty) {
                                           setState(() => kalapaInstitutionError = l10n.reqKalapa);
                                           isValid = false;
                                         }
@@ -1901,7 +1954,9 @@ class _GetDetailsScreenState extends State<GetDetailsScreen> {
                                           setState(() => kottasaOfficeError = l10n.reqSelectOffice);
                                           isValid = false;
                                         }
-                                      } else if (filterDetails.job == "Management Assistant") {
+                                      } else if (filterDetails.job == "Management Assistant" ||
+                                          filterDetails.job == "Development Officer" ||
+                                          filterDetails.job == "Administrative Officer") {
                                         if (filterDetails.institutionTypeForMA.isEmpty) {
                                           setState(() => kalapaInstitutionError = l10n.reqKalapa);
                                           isValid = false;

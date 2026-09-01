@@ -97,9 +97,13 @@ class _FilterScreenState extends State<FilterScreen> {
         extractedNames.add(user.school!);
       } else if (job == "National School Teacher" && user.nationalSchool != null && user.nationalSchool!.isNotEmpty) {
         extractedNames.add(user.nationalSchool!);
-      } else if (job == "Nurse" && user.officeForNurse != null && user.officeForNurse!.isNotEmpty) {
+      } else if ((job == "Nurse" || job == "Public Health Inspector" || job == "Public Health Midwife") &&
+          user.officeForNurse != null &&
+          user.officeForNurse!.isNotEmpty) {
         extractedNames.add(user.officeForNurse!);
-      } else if (job == "Management Assistant" && user.officeForMA != null && user.officeForMA!.isNotEmpty) {
+      } else if ((job == "Management Assistant" || job == "Development Officer" || job == "Administrative Officer") &&
+          user.officeForMA != null &&
+          user.officeForMA!.isNotEmpty) {
         extractedNames.add(user.officeForMA!);
       } else if (job == "Police Officer" && user.policeStations != null && user.policeStations!.isNotEmpty) {
         extractedNames.add(user.policeStations!);

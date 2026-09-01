@@ -201,9 +201,9 @@ class FiltterProvider extends ChangeNotifier {
           ? filtered = filtered.where((u) => (u.school ?? '').toLowerCase() == school.toLowerCase()).toList()
           : job == "National School Teacher"
           ? filtered = filtered.where((u) => (u.nationalSchool ?? '').toLowerCase() == school.toLowerCase()).toList()
-          : job == "Nurse"
+          : (job == "Nurse" || job == "Hospital Attendant" || job == "Public Health Inspector" || job == "Public Health Midwife")
           ? filtered = filtered.where((u) => (u.officeForNurse ?? '').toLowerCase() == school.toLowerCase()).toList()
-          : job == "Management Assistant"
+          : (job == "Management Assistant" || job == "Development Officer" || job == "Administrative Officer")
           ? filtered = filtered.where((u) => (u.officeForMA ?? '').toLowerCase() == school.toLowerCase()).toList()
           : job == "Police Officer"
           ? filtered = filtered.where((u) => (u.policeStations ?? '').toLowerCase() == school.toLowerCase()).toList()
@@ -211,7 +211,7 @@ class FiltterProvider extends ChangeNotifier {
               filtered.where((u) => (u.gramaNiladhariDivision ?? '').toLowerCase() == school.toLowerCase()).toList();
     }
 
-    // ✅ 2. Apply secondary filters (scheme / subject)
+    // 2. Apply secondary filters (scheme / subject)
     if (scheme != null && scheme.isNotEmpty) {
       filtered = filtered.where((u) => (u.scheme ?? '').toLowerCase() == scheme.toLowerCase()).toList();
     }
@@ -224,7 +224,7 @@ class FiltterProvider extends ChangeNotifier {
       filtered = filtered.where((u) => (u.grade ?? '').toLowerCase() == grade.toLowerCase()).toList();
     }
 
-    // ✅ Update provider list
+    // Update provider list
     _filteredUsersData = filtered;
     notifyListeners();
   }

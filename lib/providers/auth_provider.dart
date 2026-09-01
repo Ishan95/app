@@ -571,41 +571,97 @@ class AuthenticationProvider extends ChangeNotifier {
     _errorMessage = null;
     notifyListeners();
 
+    final firebase_auth.User? currentUser = _auth.currentUser;
+    if (currentUser == null) {
+      _errorMessage = "No user is currently logged in to delete.";
+      _isLoading = false;
+      notifyListeners();
+      return;
+    }
+
+    final String uidToDelete = currentUser.uid;
+
     try {
-      firebase_auth.User? currentUser = _auth.currentUser;
-      if (currentUser == null) {
-        throw Exception("No user is currently logged in to delete.");
-      }
-      final uidToDelete = currentUser.uid;
-      await _firestore.collection('users').doc(uidToDelete).delete();
       await currentUser.delete();
-      _appUser = null;
-      _user = null;
-      _errorMessage = null;
-      clearData();
-      Navigator.pushAndRemoveUntil(
-        context,
-        MaterialPageRoute<void>(builder: (BuildContext context) => const LoginScreen()),
-        (route) => false,
-      );
+      await _firestore.collection('users').doc(uidToDelete).delete();
+      _completeDeletion(context);
     } on firebase_auth.FirebaseAuthException catch (e) {
+      debugPrint('FirebaseAuthException during delete: ${e.code} - ${e.message}');
+
       if (e.code == 'requires-recent-login') {
-        final reauthenticated = await Navigator.push(
-          context,
-          MaterialPageRoute<bool>(builder: (BuildContext context) => const ReauthenticateScreen()),
-        );
-        if (reauthenticated == true) {
-          await deleteAccount(context);
+        debugPrint('Token expired. Attempting automatic Google re-authentication...');
+
+        try {
+          final googleSignIn = google_sign_in.GoogleSignIn.instance;
+          await googleSignIn.initialize();
+
+          google_sign_in.GoogleSignInAccount? googleUser;
+          try {
+            googleUser = await googleSignIn.attemptLightweightAuthentication(reportAllExceptions: false);
+          } catch (authErr) {
+            debugPrint('Lightweight auth failed: $authErr');
+          }
+
+          if (googleUser == null) {
+            if (!googleSignIn.supportsAuthenticate()) {
+              throw Exception('Google Sign-In is not supported on this device.');
+            }
+            googleUser = await googleSignIn.authenticate();
+          }
+
+          if (googleUser == null) {
+            _errorMessage = 'Re-authentication was canceled.';
+            _isLoading = false;
+            notifyListeners();
+            return;
+          }
+
+          final googleAuth = googleUser.authentication;
+          final String? idToken = googleAuth.idToken;
+
+          if (idToken == null || idToken.isEmpty) {
+            throw Exception('No Google ID token received during re-authentication.');
+          }
+
+          final firebase_auth.AuthCredential credential = firebase_auth.GoogleAuthProvider.credential(idToken: idToken);
+
+          await currentUser.reauthenticateWithCredential(credential);
+          debugPrint('Re-authentication successful. Retrying account deletion...');
+
+          await currentUser.delete();
+          await _firestore.collection('users').doc(uidToDelete).delete();
+
+          _completeDeletion(context);
+        } on firebase_auth.FirebaseAuthException catch (reAuthError) {
+          debugPrint('Re-authentication FirebaseAuthException: ${reAuthError.code} - ${reAuthError.message}');
+          _errorMessage = reAuthError.message ?? 'Re-authentication failed.';
+        } catch (innerError) {
+          debugPrint('Error during Google re-authentication process: $innerError');
+          _errorMessage = innerError.toString();
         }
       } else {
-        _errorMessage = "Error deleting account: ${e.message ?? 'An unknown error occurred.'}";
+        _errorMessage = e.message ?? 'Failed to delete account.';
       }
     } catch (e) {
-      _errorMessage = "An unexpected error occurred: ${e.toString()}";
-      signOut();
+      debugPrint('Unexpected error in deleteAccount: $e');
+      _errorMessage = e.toString();
     } finally {
       _isLoading = false;
       notifyListeners();
     }
+  }
+
+  void _completeDeletion(BuildContext context) {
+    _appUser = null;
+    _user = null;
+    _errorMessage = null;
+    clearData();
+
+    debugPrint('User account and Firestore data deleted successfully.');
+    Navigator.pushAndRemoveUntil(
+      context,
+      MaterialPageRoute<void>(builder: (BuildContext context) => const LoginScreen()),
+      (route) => false,
+    );
   }
 }
