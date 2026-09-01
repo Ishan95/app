@@ -16,7 +16,6 @@ class TranslationService {
     'Sabaragamuwa Province': {'si': 'සබරගමුව පළාත', 'ta': 'சப்ரகமுவ மாகாணம்'},
 
     // Jobs
-    // Jobs
     'Provincial School Teacher': {'si': 'පළාත් පාසල් ගුරුවරයා', 'ta': 'மாகாண பாடசாலை ஆசிரியர்'},
     'National School Teacher': {'si': 'ජාතික පාසල් ගුරුවරයා', 'ta': 'தேசிய பாடசாலை ஆசிரியர்'},
     'Nurse': {'si': 'හෙදිය', 'ta': 'செவிலியர்'},

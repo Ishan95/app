@@ -23,6 +23,9 @@ class GetDetailsScreen extends StatefulWidget {
 
 class _GetDetailsScreenState extends State<GetDetailsScreen> {
   final informationFormKey = GlobalKey<FormState>();
+
+  final GlobalKey _jobDropdownKey = GlobalKey();
+
   int currentStep = 0; // Tracks the wizard steps (0, 1, 2)
 
   bool isSelected = false;
@@ -30,6 +33,8 @@ class _GetDetailsScreenState extends State<GetDetailsScreen> {
   bool isSchoolSelected = false;
   bool isEnable = false;
   bool isDataLoading = true;
+
+  bool _showAllJobCategories = false;
 
   String? firstNameError;
   String? lastNameError;
@@ -146,6 +151,34 @@ class _GetDetailsScreenState extends State<GetDetailsScreen> {
       print("WhatsApp not available");
     } catch (e) {
       print("Error launching WhatsApp: $e");
+    }
+  }
+
+  void _openJobDropdown() {
+    final BuildContext? context = _jobDropdownKey.currentContext;
+    if (context != null) {
+      GestureDetector? detector;
+      InkWell? inkWell;
+
+      void searchForTap(BuildContext ctx) {
+        ctx.visitChildElements((Element element) {
+          if (element.widget is GestureDetector) {
+            detector = element.widget as GestureDetector;
+          } else if (element.widget is InkWell) {
+            inkWell = element.widget as InkWell;
+          } else {
+            searchForTap(element);
+          }
+        });
+      }
+
+      searchForTap(context);
+
+      if (detector != null && detector!.onTap != null) {
+        detector!.onTap!();
+      } else if (inkWell != null && inkWell!.onTap != null) {
+        inkWell!.onTap!();
+      }
     }
   }
 
@@ -662,13 +695,24 @@ class _GetDetailsScreenState extends State<GetDetailsScreen> {
                                     borderRadius: BorderRadius.circular(20),
                                   ),
                                   child: DropdownButton<String>(
+                                    key: _jobDropdownKey,
                                     value: filterDetails.job.isNotEmpty ? filterDetails.job : null,
                                     hint: Text(
                                       l10n.selectJobCategory,
                                       style: context.regular14(color: ColorManager.disabledText),
                                     ),
                                     items:
-                                        filterDetails.category
+                                        (_showAllJobCategories
+                                                ? filterDetails.category
+                                                : [
+                                                  "Provincial School Teacher",
+                                                  "National School Teacher",
+                                                  "Nurse",
+                                                  "Management Assistant",
+                                                  "Police Officer",
+                                                  "Grama Niladari",
+                                                  "Other",
+                                                ])
                                             .map(
                                               (jobCategory) => DropdownMenuItem<String>(
                                                 value: jobCategory,
@@ -680,36 +724,49 @@ class _GetDetailsScreenState extends State<GetDetailsScreen> {
                                             )
                                             .toList(),
                                     onChanged: (value) {
-                                      setState(() {
-                                        filterDetails.job = value ?? '';
-                                        jobError = null;
-                                        provinceError = null;
-                                        districtError = null;
-                                        kalapaInstitutionError = null;
-                                        kottasaOfficeError = null;
-                                        schoolError = null;
-                                        schemeError = null;
-                                        subjectError = null;
-                                        subjectMediumError = null;
+                                      if (value == 'Other') {
+                                        setState(() {
+                                          _showAllJobCategories = true;
+                                          filterDetails.job = '';
+                                        });
 
-                                        filterDetails.province = '';
-                                        filterDetails.district = '';
-                                        filterDetails.kalapa = '';
-                                        filterDetails.kottasa = '';
-                                        filterDetails.school = '';
-                                        filterDetails.kottasaForNationalScl = '';
-                                        filterDetails.nationalSchool = '';
-                                        filterDetails.institutionTypeForNurse = '';
-                                        filterDetails.officeForNurse = '';
-                                        filterDetails.institutionTypeForMA = '';
-                                        filterDetails.officeForMA = '';
-                                        filterDetails.divisionalSecretariat = '';
-                                        filterDetails.gramaNiladhariDivision = '';
-                                        filterDetails.policeDivisions = '';
-                                        filterDetails.policeStations = '';
-                                        filterDetails.subjectMedium = '';
-                                        // filterDetails.grade = '';
-                                      });
+                                        WidgetsBinding.instance.addPostFrameCallback((_) {
+                                          Future.delayed(const Duration(milliseconds: 150), () {
+                                            _openJobDropdown();
+                                          });
+                                        });
+                                      } else {
+                                        setState(() {
+                                          filterDetails.job = value ?? '';
+                                          jobError = null;
+                                          provinceError = null;
+                                          districtError = null;
+                                          kalapaInstitutionError = null;
+                                          kottasaOfficeError = null;
+                                          schoolError = null;
+                                          schemeError = null;
+                                          subjectError = null;
+                                          subjectMediumError = null;
+
+                                          filterDetails.province = '';
+                                          filterDetails.district = '';
+                                          filterDetails.kalapa = '';
+                                          filterDetails.kottasa = '';
+                                          filterDetails.school = '';
+                                          filterDetails.kottasaForNationalScl = '';
+                                          filterDetails.nationalSchool = '';
+                                          filterDetails.institutionTypeForNurse = '';
+                                          filterDetails.officeForNurse = '';
+                                          filterDetails.institutionTypeForMA = '';
+                                          filterDetails.officeForMA = '';
+                                          filterDetails.divisionalSecretariat = '';
+                                          filterDetails.gramaNiladhariDivision = '';
+                                          filterDetails.policeDivisions = '';
+                                          filterDetails.policeStations = '';
+                                          filterDetails.subjectMedium = '';
+                                          // filterDetails.grade = '';
+                                        });
+                                      }
                                     },
                                     dropdownColor: ColorManager.kPrimaryBlack,
                                     underline: const SizedBox(),

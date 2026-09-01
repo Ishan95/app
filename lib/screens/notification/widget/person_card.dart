@@ -122,7 +122,19 @@ class _PersonCardState extends State<PersonCard> {
                                           '${widget.personDetails.subject?.substring(0, 35)}...',
                                         )
                                         : TranslationService.translate(context, widget.personDetails.subject)
-                                    : TranslationService.translate(context, widget.personDetails.grade),
+                                    : {
+                                          'Nurse': 'Nurse',
+                                          'Management Assistant': 'MA',
+                                          'Police Officer': 'Police',
+                                          'Grama Niladari': 'GN',
+                                          'Public Health Inspector': 'PHI',
+                                          'Public Health Midwife': 'Midwife',
+                                          'Hospital Attendant': 'Attendant',
+                                          'Development Officer': 'DO',
+                                          'Administrative Officer': 'AO',
+                                        }[widget.personDetails.job] ??
+                                        widget.personDetails.job ??
+                                        '',
                                 style: context.regular12(color: ColorManager.blackMedium),
                               ),
                             ),

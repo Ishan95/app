@@ -582,8 +582,10 @@ class AuthenticationProvider extends ChangeNotifier {
     final String uidToDelete = currentUser.uid;
 
     try {
-      await currentUser.delete();
+
       await _firestore.collection('users').doc(uidToDelete).delete();
+      await currentUser.delete();
+
       _completeDeletion(context);
     } on firebase_auth.FirebaseAuthException catch (e) {
       debugPrint('FirebaseAuthException during delete: ${e.code} - ${e.message}');
@@ -616,7 +618,7 @@ class AuthenticationProvider extends ChangeNotifier {
             return;
           }
 
-          final googleAuth = googleUser.authentication;
+          final googleAuth = await googleUser.authentication;
           final String? idToken = googleAuth.idToken;
 
           if (idToken == null || idToken.isEmpty) {
@@ -626,10 +628,9 @@ class AuthenticationProvider extends ChangeNotifier {
           final firebase_auth.AuthCredential credential = firebase_auth.GoogleAuthProvider.credential(idToken: idToken);
 
           await currentUser.reauthenticateWithCredential(credential);
-          debugPrint('Re-authentication successful. Retrying account deletion...');
+          debugPrint('Re-authentication successful. Retrying Auth account deletion...');
 
           await currentUser.delete();
-          await _firestore.collection('users').doc(uidToDelete).delete();
 
           _completeDeletion(context);
         } on firebase_auth.FirebaseAuthException catch (reAuthError) {

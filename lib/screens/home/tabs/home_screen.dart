@@ -24,6 +24,12 @@ class _HomeScreenState extends State<HomeScreen> {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       final filterProvider = Provider.of<FiltterProvider>(context, listen: false);
+      final accountProvider = Provider.of<AccountProvider>(context, listen: false);
+
+      if (accountProvider.appUser == null) {
+        await accountProvider.refreshCurrentUser();
+      }
+
       await filterProvider.getAllUserDetails();
       await filterProvider.reapplySavedFilters();
       if (mounted) {
@@ -40,6 +46,14 @@ class _HomeScreenState extends State<HomeScreen> {
       padding: context.padding(horizontal: 15),
       child: Consumer2<AccountProvider, FiltterProvider>(
         builder: (context, acc, filter, child) {
+          if (filter.isLoading || acc.isLoading) {
+            return SizedBox(
+              width: MediaQuery.of(context).size.width,
+              height: MediaQuery.of(context).size.height,
+              child: Center(child: SpinKitFadingCircle(color: ColorManager.kPrimary, size: 40)),
+            );
+          }
+
           final currentUserJob = acc.appUser?.job;
 
           final displayedUsers =
