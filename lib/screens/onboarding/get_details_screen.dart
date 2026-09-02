@@ -35,6 +35,11 @@ class _GetDetailsScreenState extends State<GetDetailsScreen> {
   bool isDataLoading = true;
 
   bool _showAllJobCategories = false;
+  bool _isDistrictLoading = false;
+  bool _isKalapaInstLoading = false;
+  bool _isKottasaOfficeLoading = false;
+  bool _isSchoolLoading = false;
+  bool _isSubjectLoading = false;
 
   String? firstNameError;
   String? lastNameError;
@@ -759,6 +764,8 @@ class _GetDetailsScreenState extends State<GetDetailsScreen> {
                                           filterDetails.officeForNurse = '';
                                           filterDetails.institutionTypeForMA = '';
                                           filterDetails.officeForMA = '';
+                                          filterDetails.institutionTypeForPS = '';
+                                          filterDetails.officeForPS = '';
                                           filterDetails.divisionalSecretariat = '';
                                           filterDetails.gramaNiladhariDivision = '';
                                           filterDetails.policeDivisions = '';
@@ -880,19 +887,29 @@ class _GetDetailsScreenState extends State<GetDetailsScreen> {
                                         filterDetails.officeForNurse = '';
                                         filterDetails.institutionTypeForMA = '';
                                         filterDetails.officeForMA = '';
+                                        filterDetails.institutionTypeForPS = '';
+                                        filterDetails.officeForPS = '';
                                         filterDetails.divisionalSecretariat = '';
                                         filterDetails.gramaNiladhariDivision = '';
                                         filterDetails.policeDivisions = '';
                                         filterDetails.policeStations = '';
                                       });
                                       if (value != null && value.isNotEmpty) {
+                                        setState(() => _isDistrictLoading = true);
                                         await StaticDataService.fetchDistricts(filterDetails, value);
-                                        setState(() {});
+                                        if (mounted) setState(() => _isDistrictLoading = false);
                                       }
                                     },
                                     dropdownColor: ColorManager.kPrimaryBlack,
                                     underline: const SizedBox(),
-                                    icon: Icon(Icons.arrow_drop_down, color: ColorManager.disabledText),
+                                    icon:
+                                        _isDistrictLoading
+                                            ? SizedBox(
+                                              width: 24,
+                                              height: 24,
+                                              child: SpinKitFadingCircle(color: ColorManager.kPrimary, size: 20),
+                                            )
+                                            : Icon(Icons.arrow_drop_down, color: ColorManager.disabledText),
                                     isExpanded: true,
                                   ),
                                 ),
@@ -956,12 +973,15 @@ class _GetDetailsScreenState extends State<GetDetailsScreen> {
                                             filterDetails.officeForNurse = '';
                                             filterDetails.institutionTypeForMA = '';
                                             filterDetails.officeForMA = '';
+                                            filterDetails.institutionTypeForPS = '';
+                                            filterDetails.officeForPS = '';
                                             filterDetails.divisionalSecretariat = '';
                                             filterDetails.gramaNiladhariDivision = '';
                                             filterDetails.policeDivisions = '';
                                             filterDetails.policeStations = '';
                                           });
                                           if (value != null && value.isNotEmpty) {
+                                            setState(() => _isKalapaInstLoading = true);
                                             if (filterDetails.job == "Provincial School Teacher" ||
                                                 filterDetails.job == "National School Teacher") {
                                               await StaticDataService.fetchKalapas(filterDetails, value);
@@ -979,17 +999,27 @@ class _GetDetailsScreenState extends State<GetDetailsScreen> {
                                                 filterDetails.job == "Development Officer" ||
                                                 filterDetails.job == "Administrative Officer") {
                                               await StaticDataService.fetchMAInstitutions(filterDetails, value);
+                                            } else if (filterDetails.job == "MA (Pradesiya Sabha)") {
+                                              filterDetails.institutionTypeForPS = 'Pradesiya Sabha';
+                                              await StaticDataService.fetchPradesiyaSabhas(filterDetails, value);
                                             } else if (filterDetails.job == "Police Officer") {
                                               await StaticDataService.fetchPoliceDivisions(filterDetails, value);
                                             } else if (filterDetails.job == "Grama Niladari") {
                                               await StaticDataService.fetchDSDivisions(filterDetails, value);
                                             }
-                                            setState(() {});
+                                            if (mounted) setState(() => _isKalapaInstLoading = false);
                                           }
                                         },
                                         dropdownColor: ColorManager.kPrimaryBlack,
                                         underline: const SizedBox(),
-                                        icon: Icon(Icons.arrow_drop_down, color: ColorManager.disabledText),
+                                        icon:
+                                            _isKalapaInstLoading
+                                                ? SizedBox(
+                                                  width: 24,
+                                                  height: 24,
+                                                  child: SpinKitFadingCircle(color: ColorManager.kPrimary, size: 20),
+                                                )
+                                                : Icon(Icons.arrow_drop_down, color: ColorManager.disabledText),
                                         isExpanded: true,
                                       ),
                                     )
@@ -1036,6 +1066,11 @@ class _GetDetailsScreenState extends State<GetDetailsScreen> {
                                                     filterDetails.job == "Administrative Officer")
                                                 ? filterDetails.institutionTypeForMA.isNotEmpty
                                                     ? filterDetails.institutionTypeForMA
+                                                    : null
+                                                : filterDetails.job ==
+                                                    "MA (Pradesiya Sabha)"
+                                                ? filterDetails.institutionTypeForPS.isNotEmpty
+                                                    ? filterDetails.institutionTypeForPS
                                                     : null
                                                 : filterDetails.job == "Police Officer"
                                                 ? filterDetails.policeDivisions.isNotEmpty
@@ -1103,6 +1138,17 @@ class _GetDetailsScreenState extends State<GetDetailsScreen> {
                                                             ),
                                                           ),
                                                         )
+                                                    : filterDetails.job ==
+                                                        "MA (Pradesiya Sabha)"
+                                                    ? ["Pradesiya Sabha"].map(
+                                                      (institute) => DropdownMenuItem(
+                                                        value: institute,
+                                                        child: Text(
+                                                          TranslationService.translate(context, institute),
+                                                          style: context.regular14(color: ColorManager.blackMedium),
+                                                        ),
+                                                      ),
+                                                    )
                                                     : filterDetails.job == "Police Officer"
                                                     ? (filterDetails.district.isNotEmpty
                                                             ? filterDetails.districtPoliceDivisions[filterDetails
@@ -1145,6 +1191,9 @@ class _GetDetailsScreenState extends State<GetDetailsScreen> {
                                                     filterDetails.job == "Development Officer" ||
                                                     filterDetails.job == "Administrative Officer")
                                                 ? filterDetails.institutionTypeForMA = value ?? ''
+                                                : filterDetails.job ==
+                                                    "MA (Pradesiya Sabha)"
+                                                ? filterDetails.institutionTypeForPS = value ?? ''
                                                 : filterDetails.job == "Police Officer"
                                                 ? filterDetails.policeDivisions = value ?? ''
                                                 : filterDetails.job == "Grama Niladari"
@@ -1161,11 +1210,13 @@ class _GetDetailsScreenState extends State<GetDetailsScreen> {
                                             filterDetails.nationalSchool = '';
                                             filterDetails.officeForNurse = '';
                                             filterDetails.officeForMA = '';
+                                            filterDetails.officeForPS = '';
                                             filterDetails.policeStations = '';
                                             filterDetails.gramaNiladhariDivision = '';
                                           });
 
                                           if (value != null && value.isNotEmpty) {
+                                            setState(() => _isKottasaOfficeLoading = true);
                                             if (filterDetails.job == "Provincial School Teacher") {
                                               await StaticDataService.fetchKottasas(filterDetails, value);
                                             } else if (filterDetails.job == "National School Teacher") {
@@ -1182,12 +1233,19 @@ class _GetDetailsScreenState extends State<GetDetailsScreen> {
                                             } else if (filterDetails.job == "Grama Niladari") {
                                               await StaticDataService.fetchGNDivisions(filterDetails, value);
                                             }
-                                            setState(() {});
+                                            if (mounted) setState(() => _isKottasaOfficeLoading = false);
                                           }
                                         },
                                         dropdownColor: ColorManager.kPrimaryBlack,
                                         underline: const SizedBox(),
-                                        icon: Icon(Icons.arrow_drop_down, color: ColorManager.disabledText),
+                                        icon:
+                                            _isKottasaOfficeLoading
+                                                ? SizedBox(
+                                                  width: 24,
+                                                  height: 24,
+                                                  child: SpinKitFadingCircle(color: ColorManager.kPrimary, size: 20),
+                                                )
+                                                : Icon(Icons.arrow_drop_down, color: ColorManager.disabledText),
                                         isExpanded: true,
                                       ),
                                     )
@@ -1211,6 +1269,7 @@ class _GetDetailsScreenState extends State<GetDetailsScreen> {
                                             (filterDetails.kalapa.isNotEmpty ||
                                                 filterDetails.institutionTypeForNurse.isNotEmpty ||
                                                 filterDetails.institutionTypeForMA.isNotEmpty ||
+                                                filterDetails.institutionTypeForPS.isNotEmpty ||
                                                 filterDetails.policeDivisions.isNotEmpty ||
                                                 filterDetails.divisionalSecretariat.isNotEmpty))
                                         ? 20
@@ -1223,6 +1282,7 @@ class _GetDetailsScreenState extends State<GetDetailsScreen> {
                                             filterDetails.kalapa.isNotEmpty) ||
                                         filterDetails.institutionTypeForNurse.isNotEmpty ||
                                         filterDetails.institutionTypeForMA.isNotEmpty ||
+                                        filterDetails.institutionTypeForPS.isNotEmpty ||
                                         filterDetails.policeDivisions.isNotEmpty ||
                                         filterDetails.divisionalSecretariat.isNotEmpty ||
                                         ((filterDetails.job == "Public Health Inspector" ||
@@ -1258,6 +1318,11 @@ class _GetDetailsScreenState extends State<GetDetailsScreen> {
                                                     filterDetails.job == "Administrative Officer")
                                                 ? filterDetails.officeForMA.isNotEmpty
                                                     ? filterDetails.officeForMA
+                                                    : null
+                                                : filterDetails.job ==
+                                                    "MA (Pradesiya Sabha)"
+                                                ? filterDetails.officeForPS.isNotEmpty
+                                                    ? filterDetails.officeForPS
                                                     : null
                                                 : filterDetails.job == "Police Officer"
                                                 ? filterDetails.policeStations.isNotEmpty
@@ -1339,6 +1404,22 @@ class _GetDetailsScreenState extends State<GetDetailsScreen> {
                                                             ),
                                                           ),
                                                         )
+                                                    : filterDetails.job ==
+                                                        "MA (Pradesiya Sabha)"
+                                                    ? (filterDetails.institutionTypeForPS.isNotEmpty
+                                                            ? filterDetails.districtPradesiyaSabhas[filterDetails
+                                                                    .district] ??
+                                                                []
+                                                            : <String>[])
+                                                        .map(
+                                                          (office) => DropdownMenuItem(
+                                                            value: office,
+                                                            child: Text(
+                                                              TranslationService.translate(context, office),
+                                                              style: context.regular14(color: ColorManager.blackMedium),
+                                                            ),
+                                                          ),
+                                                        )
                                                     : filterDetails.job == "Police Officer"
                                                     ? (filterDetails.policeDivisions.isNotEmpty
                                                             ? filterDetails.policeDivisionStations[filterDetails
@@ -1384,6 +1465,9 @@ class _GetDetailsScreenState extends State<GetDetailsScreen> {
                                                     filterDetails.job == "Development Officer" ||
                                                     filterDetails.job == "Administrative Officer")
                                                 ? filterDetails.officeForMA = value ?? ''
+                                                : filterDetails.job ==
+                                                    "MA (Pradesiya Sabha)"
+                                                ? filterDetails.officeForPS = value ?? ''
                                                 : filterDetails.job == "Police Officer"
                                                 ? filterDetails.policeStations = value ?? ''
                                                 : filterDetails.job == "Grama Niladari"
@@ -1398,17 +1482,25 @@ class _GetDetailsScreenState extends State<GetDetailsScreen> {
                                           });
 
                                           if (value != null && value.isNotEmpty) {
+                                            setState(() => _isSchoolLoading = true);
                                             if (filterDetails.job == "Provincial School Teacher") {
                                               await StaticDataService.fetchSchools(filterDetails, value);
                                             } else if (filterDetails.job == "National School Teacher") {
                                               await StaticDataService.fetchNationalSchools(filterDetails, value);
                                             }
-                                            setState(() {});
+                                            if (mounted) setState(() => _isSchoolLoading = false);
                                           }
                                         },
                                         dropdownColor: ColorManager.kPrimaryBlack,
                                         underline: const SizedBox(),
-                                        icon: Icon(Icons.arrow_drop_down, color: ColorManager.disabledText),
+                                        icon:
+                                            _isSchoolLoading
+                                                ? SizedBox(
+                                                  width: 24,
+                                                  height: 24,
+                                                  child: SpinKitFadingCircle(color: ColorManager.kPrimary, size: 20),
+                                                )
+                                                : Icon(Icons.arrow_drop_down, color: ColorManager.disabledText),
                                         isExpanded: true,
                                       ),
                                     )
@@ -1553,8 +1645,9 @@ class _GetDetailsScreenState extends State<GetDetailsScreen> {
                                           }
                                         });
                                         if (value != null) {
+                                          setState(() => _isSubjectLoading = true);
                                           await StaticDataService.fetchSubjects(filterDetails, value);
-                                          setState(() {});
+                                          if (mounted) setState(() => _isSubjectLoading = false);
                                         }
                                       },
                                       dropdownColor: ColorManager.kPrimaryBlack,
@@ -1619,7 +1712,14 @@ class _GetDetailsScreenState extends State<GetDetailsScreen> {
                                         },
                                         dropdownColor: ColorManager.kPrimaryBlack,
                                         underline: const SizedBox(),
-                                        icon: Icon(Icons.arrow_drop_down, color: ColorManager.disabledText),
+                                        icon:
+                                            _isSubjectLoading
+                                                ? SizedBox(
+                                                  width: 24,
+                                                  height: 24,
+                                                  child: SpinKitFadingCircle(color: ColorManager.kPrimary, size: 20),
+                                                )
+                                                : Icon(Icons.arrow_drop_down, color: ColorManager.disabledText),
                                         isExpanded: true,
                                       ),
                                     ),
@@ -2018,6 +2118,15 @@ class _GetDetailsScreenState extends State<GetDetailsScreen> {
                                           isValid = false;
                                         }
                                         if (filterDetails.officeForMA.isEmpty) {
+                                          setState(() => kottasaOfficeError = l10n.reqSelectOffice);
+                                          isValid = false;
+                                        }
+                                      } else if (filterDetails.job == "MA (Pradesiya Sabha)") {
+                                        if (filterDetails.institutionTypeForPS.isEmpty) {
+                                          setState(() => kalapaInstitutionError = "Institution Type Required");
+                                          isValid = false;
+                                        }
+                                        if (filterDetails.officeForPS.isEmpty) {
                                           setState(() => kottasaOfficeError = l10n.reqSelectOffice);
                                           isValid = false;
                                         }

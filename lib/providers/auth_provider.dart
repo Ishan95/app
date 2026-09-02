@@ -183,6 +183,8 @@ class AuthenticationProvider extends ChangeNotifier {
           'officeForNurse': filterDetails.officeForNurse,
           'institutionTypeForMA': filterDetails.institutionTypeForMA,
           'officeForMA': filterDetails.officeForMA,
+          'institutionTypeForPS': filterDetails.institutionTypeForPS,
+          'officeForPS': filterDetails.officeForPS,
           'policeDivisions': filterDetails.policeDivisions,
           'policeStations': filterDetails.policeStations,
           'divisionalSecretariat': filterDetails.divisionalSecretariat,
@@ -582,7 +584,6 @@ class AuthenticationProvider extends ChangeNotifier {
     final String uidToDelete = currentUser.uid;
 
     try {
-
       await _firestore.collection('users').doc(uidToDelete).delete();
       await currentUser.delete();
 

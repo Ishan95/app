@@ -33,6 +33,8 @@ class PersonDetailsModel {
   String? officeForNurse;
   String? institutionTypeForMA;
   String? officeForMA;
+  String? institutionTypeForPS;
+  String? officeForPS;
   String? policeDivisions;
   String? policeStations;
   String? divisionalSecretariat;
@@ -87,6 +89,8 @@ class PersonDetailsModel {
     this.officeForNurse,
     this.institutionTypeForMA,
     this.officeForMA,
+    this.institutionTypeForPS,
+    this.officeForPS,
     this.policeDivisions,
     this.policeStations,
     this.divisionalSecretariat,
@@ -146,6 +150,8 @@ class PersonDetailsModel {
       officeForNurse: firestoreData['officeForNurse'] as String?,
       institutionTypeForMA: firestoreData['institutionTypeForMA'] as String?,
       officeForMA: firestoreData['officeForMA'] as String?,
+      institutionTypeForPS: firestoreData['institutionTypeForPS'] as String?,
+      officeForPS: firestoreData['officeForPS'] as String?,
       policeDivisions: firestoreData['policeDivisions'] as String?,
       policeStations: firestoreData['policeStations'] as String?,
       divisionalSecretariat: firestoreData['divisionalSecretariat'] as String?,
@@ -204,6 +210,8 @@ class PersonDetailsModel {
       officeForNurse: json['officeForNurse'] as String?,
       institutionTypeForMA: json['institutionTypeForMA'] as String?,
       officeForMA: json['officeForMA'] as String?,
+      institutionTypeForPS: json['institutionTypeForPS'] as String?,
+      officeForPS: json['officeForPS'] as String?,
       policeDivisions: json['policeDivisions'] as String?,
       policeStations: json['policeStations'] as String?,
       divisionalSecretariat: json['divisionalSecretariat'] as String?,
@@ -252,6 +260,8 @@ class PersonDetailsModel {
       'officeForNurse': officeForNurse,
       'institutionTypeForMA': institutionTypeForMA,
       'officeForMA': officeForMA,
+      'institutionTypeForPS': institutionTypeForPS,
+      'officeForPS': officeForPS,
       'policeDivisions': policeDivisions,
       'policeStations': policeStations,
       'divisionalSecretariat': divisionalSecretariat,

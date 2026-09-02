@@ -271,6 +271,14 @@ class AccountProvider extends ChangeNotifier {
         updatedData['officeForMA'] = editDetails.officeForMA;
       }
 
+      if (editDetails.institutionTypeForPS != "" &&
+          _appUser!.institutionTypeForPS != editDetails.institutionTypeForPS) {
+        updatedData['institutionTypeForPS'] = editDetails.institutionTypeForPS;
+      }
+      if (editDetails.officeForPS != "" && _appUser!.officeForPS != editDetails.officeForPS) {
+        updatedData['officeForPS'] = editDetails.officeForPS;
+      }
+
       if (editDetails.policeDivisions != "" && _appUser!.policeDivisions != editDetails.policeDivisions) {
         updatedData['policeDivisions'] = editDetails.policeDivisions;
       }
