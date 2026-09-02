@@ -1206,14 +1206,13 @@ class _GetDetailsScreenState extends State<GetDetailsScreen> {
 
                                 SizedBox(
                                   height: context.verticalSize(
-                                    (filterDetails.kalapa.isNotEmpty ||
-                                            filterDetails.institutionTypeForNurse.isNotEmpty ||
-                                            filterDetails.institutionTypeForMA.isNotEmpty ||
-                                            filterDetails.policeDivisions.isNotEmpty ||
-                                            filterDetails.divisionalSecretariat.isNotEmpty ||
-                                            ((filterDetails.job == "Public Health Inspector" ||
-                                                    filterDetails.job == "Public Health Midwife") &&
-                                                filterDetails.district.isNotEmpty))
+                                    ((filterDetails.job != "Public Health Inspector" &&
+                                                filterDetails.job != "Public Health Midwife") &&
+                                            (filterDetails.kalapa.isNotEmpty ||
+                                                filterDetails.institutionTypeForNurse.isNotEmpty ||
+                                                filterDetails.institutionTypeForMA.isNotEmpty ||
+                                                filterDetails.policeDivisions.isNotEmpty ||
+                                                filterDetails.divisionalSecretariat.isNotEmpty))
                                         ? 20
                                         : 0,
                                   ),
