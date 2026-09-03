@@ -45,7 +45,7 @@ class _SplashScreenState extends State<SplashScreen> {
 
       if (!mounted) return;
     });
-    _controller = VideoPlayerController.asset(Assets.splashVideo)
+    _controller = VideoPlayerController.asset(Assets.splashScreenVideo)
       ..initialize()
           .then((_) {
             if (mounted) {
@@ -71,7 +71,7 @@ class _SplashScreenState extends State<SplashScreen> {
   }
 
   Future<void> _initializeFirebaseAndCheckForUpdates() async {
-    await Future.delayed(const Duration(seconds: 2));
+    await Future.delayed(const Duration(seconds: 4));
     await Firebase.initializeApp();
 
     PackageInfo packageInfo = await PackageInfo.fromPlatform();
@@ -222,23 +222,23 @@ class _SplashScreenState extends State<SplashScreen> {
   Widget build(BuildContext context) {
     final screenSize = MediaQuery.of(context).size;
     return Scaffold(
-      backgroundColor: ColorManager.white,
-      body: SizedBox.expand(child: Image.asset(Assets.appIcon2, fit: BoxFit.fill)),
-    );
-    //       body: _controller.value.isInitialized
-    //         ? SizedBox.expand(
-    //   child: Transform.scale(
-    //     scale: 0.85, // Reduces BoxFit.cover zoom by 8%
-    //     child: FittedBox(
-    //       fit: BoxFit.cover,
-    //       child: SizedBox(
-    //         width: _controller.value.size.width,
-    //         height: _controller.value.size.height,
-    //         child: VideoPlayer(_controller),
-    //       ),
-    //     ),
-    //   ),
-    // ) : const Center(child: CircularProgressIndicator()),
-    //   );
+      backgroundColor: ColorManager.black2,
+    //   body: SizedBox.expand(child: Image.asset(Assets.appIcon2, fit: BoxFit.fill)),
+    // );
+          body: _controller.value.isInitialized
+            ? SizedBox.expand(
+      child: Transform.scale(
+        scale: 1, // Reduces BoxFit.cover zoom by 8%
+        child: FittedBox(
+          fit: BoxFit.cover,
+          child: SizedBox(
+            width: _controller.value.size.width * 0.8,
+            height: _controller.value.size.height,
+            child: VideoPlayer(_controller),
+          ),
+        ),
+      ),
+    ) : const Center(child: CircularProgressIndicator()),
+      );
   }
 }
