@@ -139,6 +139,8 @@ class _PersonCardState extends State<PersonCard> {
                               ),
                             ),
                           ),
+                          if (widget.personDetails.job != "MA (Pradesiya Sabha)" &&
+                              widget.personDetails.job != "Pirivena Teacher")
                           Card(
                             elevation: 0,
                             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),

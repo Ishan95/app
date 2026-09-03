@@ -26,9 +26,7 @@ class _HomeScreenState extends State<HomeScreen> {
       final filterProvider = Provider.of<FiltterProvider>(context, listen: false);
       final accountProvider = Provider.of<AccountProvider>(context, listen: false);
 
-      if (accountProvider.appUser == null) {
-        await accountProvider.refreshCurrentUser();
-      }
+      await accountProvider.refreshCurrentUser();
 
       await filterProvider.getAllUserDetails();
       await filterProvider.reapplySavedFilters();

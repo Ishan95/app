@@ -28,6 +28,7 @@ class TranslationService {
     'Development Officer': {'si': 'සංවර්ධන නිලධාරී', 'ta': 'அபிவிருத்தி உத்தியோகத்தர்'},
     'Administrative Officer': {'si': 'පරිපාලන නිලධාරී', 'ta': 'நிர்வாக உத்தியோகத்தர்'},
     'MA (Pradesiya Sabha)': {'si': 'කළමනාකරණ සහකාර (ප්‍රාදේශීය සභා)', 'ta': 'முகாமைத்துவ உதவியாளர் (பிரதேச சபை)'},
+    'Pirivena Teacher': {'si': 'පිරිවෙන ගුරු', 'ta': 'பிரிவேனா ஆசிரியர்'},
 
     'Pradesiya Sabha': {'si': 'ප්‍රාදේශීය සභා', 'ta': 'பிரதேச சபை'},
 
