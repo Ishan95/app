@@ -37,6 +37,8 @@ class _EditDetailsScreenState extends State<EditDetailsScreen> {
   String? whatsappError;
   String? passwordError;
   String? confirmPasswordError;
+  String? kalapaInstitutionError;
+  String? kottasaOfficeError;
   String? schoolError;
   String? subjectError;
   String? gradeError;
@@ -47,6 +49,8 @@ class _EditDetailsScreenState extends State<EditDetailsScreen> {
   File? selectedImage;
   bool _isBottomSheetVisible = false;
   bool isDataLoading = true;
+
+  String? _loadingField;
 
   late AccountProvider accProvider;
   FilterModel filterDetails = FilterModel();
@@ -70,6 +74,9 @@ class _EditDetailsScreenState extends State<EditDetailsScreen> {
       officeForNurse: accProvider.appUser?.officeForNurse ?? '',
       institutionTypeForMA: accProvider.appUser?.institutionTypeForMA ?? '',
       officeForMA: accProvider.appUser?.officeForMA ?? '',
+      institutionTypeForPS: accProvider.appUser?.institutionTypeForPS ?? '',
+      officeForPS: accProvider.appUser?.officeForPS ?? '',
+      pirivenaInstitute: accProvider.appUser?.pirivenaInstitute ?? '',
       policeDivisions: accProvider.appUser?.policeDivisions ?? '',
       policeStations: accProvider.appUser?.policeStations ?? '',
       divisionalSecretariat: accProvider.appUser?.divisionalSecretariat ?? '',
@@ -95,10 +102,19 @@ class _EditDetailsScreenState extends State<EditDetailsScreen> {
     if (filterDetails.district.isNotEmpty) {
       if (filterDetails.job == "Provincial School Teacher" || filterDetails.job == "National School Teacher") {
         await StaticDataService.fetchKalapas(filterDetails, filterDetails.district);
-      } else if (filterDetails.job == "Nurse") {
+      } else if (filterDetails.job == "Pirivena Teacher") {
+        await StaticDataService.fetchPirivenas(filterDetails, filterDetails.district);
+      } else if (filterDetails.job == "Nurse" || filterDetails.job == "Hospital Attendant") {
         await StaticDataService.fetchNurseInstitutions(filterDetails, filterDetails.district);
-      } else if (filterDetails.job == "Management Assistant") {
+      } else if (filterDetails.job == "Public Health Inspector" || filterDetails.job == "Public Health Midwife") {
+        await StaticDataService.fetchNurseOffices(filterDetails, "MOH Office ${filterDetails.district}");
+      } else if (filterDetails.job == "Management Assistant" ||
+          filterDetails.job == "Development Officer" ||
+          filterDetails.job == "Administrative Officer") {
         await StaticDataService.fetchMAInstitutions(filterDetails, filterDetails.district);
+      } else if (filterDetails.job == "MA (Pradesiya Sabha)") {
+        filterDetails.institutionTypeForPS = 'Pradesiya Sabha';
+        await StaticDataService.fetchPradesiyaSabhas(filterDetails, filterDetails.district);
       } else if (filterDetails.job == "Police Officer") {
         await StaticDataService.fetchPoliceDivisions(filterDetails, filterDetails.district);
       } else if (filterDetails.job == "Grama Niladari") {
@@ -141,6 +157,12 @@ class _EditDetailsScreenState extends State<EditDetailsScreen> {
         isDataLoading = false;
       });
     }
+  }
+
+  Widget _buildDropdownIcon(bool isLoading) {
+    return isLoading
+        ? SizedBox(width: 24, height: 24, child: SpinKitFadingCircle(color: ColorManager.kPrimary, size: 20))
+        : Icon(Icons.arrow_drop_down, color: ColorManager.disabledText);
   }
 
   Future<void> _pickImage() async {
@@ -275,7 +297,7 @@ class _EditDetailsScreenState extends State<EditDetailsScreen> {
     summary.add('WhatsApp Visibility: ${accProvider.isWhatsappVisible ? "Hidden" : "Visible"}');
 
     summary.add(
-      '${(filterDetails.job == "Provincial School Teacher" || filterDetails.job == "National School Teacher")
+      '${(filterDetails.job == "Provincial School Teacher" || filterDetails.job == "National School Teacher" || filterDetails.job == "Pirivena Teacher")
           ? "School Visibility"
           : filterDetails.job == "Police Officer"
           ? "Police Station Visibility"
@@ -283,6 +305,9 @@ class _EditDetailsScreenState extends State<EditDetailsScreen> {
     );
     if (filter.province.isNotEmpty) summary.add('Province: ${filter.province}');
     if (filter.district.isNotEmpty) summary.add('District: ${filter.district}');
+    if (filter.pirivenaInstitute.isNotEmpty) {
+      summary.add('Pirivena Institute: ${filter.pirivenaInstitute}');
+    }
     if (filter.kalapa.isNotEmpty) summary.add('Kalapa: ${filter.kalapa}');
     if (filter.kottasa.isNotEmpty) summary.add('Kottasa: ${filter.kottasa}');
     if (filter.school.isNotEmpty) summary.add('School: ${filter.school}');
@@ -296,6 +321,12 @@ class _EditDetailsScreenState extends State<EditDetailsScreen> {
       summary.add('Institution Type: ${filter.institutionTypeForMA}');
     }
     if (filter.officeForMA.isNotEmpty) summary.add('Office: ${filter.officeForMA}');
+
+    if (filter.institutionTypeForPS.isNotEmpty) {
+      summary.add('Institution Type: ${filter.institutionTypeForPS}');
+    }
+    if (filter.officeForPS.isNotEmpty) summary.add('Office: ${filter.officeForPS}');
+
     if (filter.policeDivisions.isNotEmpty) {
       summary.add('Police Division: ${filter.policeDivisions}');
     }
@@ -309,13 +340,13 @@ class _EditDetailsScreenState extends State<EditDetailsScreen> {
     if (filter.subjectMedium.isNotEmpty) summary.add('Subject Medium: ${filter.subjectMedium}');
     if (filter.grade.isNotEmpty) summary.add('Grade: ${filter.grade}');
     if (filter.choice1.isNotEmpty) {
-      summary.add('First Choise: ${filter.choice1}');
+      summary.add('First Choice: ${filter.choice1}');
     }
     if (filter.choice2.isNotEmpty) {
-      summary.add('Second Choise: ${filter.choice2}');
+      summary.add('Second Choice: ${filter.choice2}');
     }
     if (filter.choice3.isNotEmpty) {
-      summary.add('Third Choise: ${filter.choice3}');
+      summary.add('Third Choice: ${filter.choice3}');
     }
     if (accProvider.noteController.text.isNotEmpty) {
       summary.add('Note: ${accProvider.noteController.text}');
@@ -545,9 +576,14 @@ class _EditDetailsScreenState extends State<EditDetailsScreen> {
                                 Row(
                                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                   children: [
-                                    Text(
-                                      l10n.contactNumber,
-                                      style: context.semiBold14(color: ColorManager.blackMedium),
+                                    Flexible(
+                                      child: FittedBox(
+                                        fit: BoxFit.scaleDown,
+                                        child: Text(
+                                          l10n.contactNumber,
+                                          style: context.semiBold14(color: ColorManager.blackMedium),
+                                        ),
+                                      ),
                                     ),
                                     GestureDetector(
                                       onTap: () {
@@ -680,12 +716,18 @@ class _EditDetailsScreenState extends State<EditDetailsScreen> {
                                 Row(
                                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                   children: [
-                                    Text(
-                                      (filterDetails.job == "Provincial School Teacher" ||
-                                              filterDetails.job == "National School Teacher")
-                                          ? l10n.setupSchoolingDetails
-                                          : l10n.setupOfficeDetails,
-                                      style: context.semiBold14(color: ColorManager.blackMedium),
+                                    Flexible(
+                                      child: FittedBox(
+                                        fit: BoxFit.scaleDown,
+                                        child: Text(
+                                          (filterDetails.job == "Provincial School Teacher" ||
+                                                  filterDetails.job == "National School Teacher" ||
+                                                  filterDetails.job == "Pirivena Teacher")
+                                              ? l10n.setupSchoolingDetails
+                                              : l10n.setupOfficeDetails,
+                                          style: context.semiBold14(color: ColorManager.blackMedium),
+                                        ),
+                                      ),
                                     ),
                                     GestureDetector(
                                       onTap: () {
@@ -741,8 +783,8 @@ class _EditDetailsScreenState extends State<EditDetailsScreen> {
                                               (province) => DropdownMenuItem(
                                                 value: province,
                                                 child: Text(
-                                                  TranslationService.translate(context, province), 
-                                                  style: context.regular14(color: ColorManager.disabledText),
+                                                  TranslationService.translate(context, province),
+                                                  style: context.regular14(color: ColorManager.blackMedium),
                                                 ),
                                               ),
                                             )
@@ -756,23 +798,31 @@ class _EditDetailsScreenState extends State<EditDetailsScreen> {
                                         filterDetails.school = '';
                                         filterDetails.kottasaForNationalScl = '';
                                         filterDetails.nationalSchool = '';
+                                        filterDetails.pirivenaInstitute = '';
                                         filterDetails.institutionTypeForNurse = '';
                                         filterDetails.officeForNurse = '';
                                         filterDetails.institutionTypeForMA = '';
                                         filterDetails.officeForMA = '';
+                                        filterDetails.institutionTypeForPS = '';
+                                        filterDetails.officeForPS = '';
                                         filterDetails.divisionalSecretariat = '';
                                         filterDetails.gramaNiladhariDivision = '';
                                         filterDetails.policeDivisions = '';
                                         filterDetails.policeStations = '';
+                                        _loadingField = 'province';
                                       });
                                       if (value != null && value.isNotEmpty) {
                                         await StaticDataService.fetchDistricts(filterDetails, value);
-                                        setState(() {});
+                                      }
+                                      if (mounted) {
+                                        setState(() {
+                                          _loadingField = null;
+                                        });
                                       }
                                     },
                                     dropdownColor: ColorManager.kPrimaryBlack,
                                     underline: const SizedBox(),
-                                    icon: Icon(Icons.arrow_drop_down, color: ColorManager.disabledText),
+                                    icon: _buildDropdownIcon(_loadingField == 'province'),
                                     isExpanded: true,
                                   ),
                                 ),
@@ -802,7 +852,7 @@ class _EditDetailsScreenState extends State<EditDetailsScreen> {
                                                   (district) => DropdownMenuItem(
                                                     value: district,
                                                     child: Text(
-                                                      TranslationService.translate(context, district), 
+                                                      TranslationService.translate(context, district),
                                                       style: context.regular14(color: ColorManager.blackMedium),
                                                     ),
                                                   ),
@@ -816,41 +866,66 @@ class _EditDetailsScreenState extends State<EditDetailsScreen> {
                                             filterDetails.school = '';
                                             filterDetails.kottasaForNationalScl = '';
                                             filterDetails.nationalSchool = '';
+                                            filterDetails.pirivenaInstitute = '';
                                             filterDetails.institutionTypeForNurse = '';
                                             filterDetails.officeForNurse = '';
                                             filterDetails.institutionTypeForMA = '';
                                             filterDetails.officeForMA = '';
+                                            filterDetails.institutionTypeForPS = '';
+                                            filterDetails.officeForPS = '';
                                             filterDetails.divisionalSecretariat = '';
                                             filterDetails.gramaNiladhariDivision = '';
                                             filterDetails.policeDivisions = '';
                                             filterDetails.policeStations = '';
+                                            _loadingField = 'district';
                                           });
                                           if (value != null && value.isNotEmpty) {
                                             if (filterDetails.job == "Provincial School Teacher" ||
                                                 filterDetails.job == "National School Teacher") {
                                               await StaticDataService.fetchKalapas(filterDetails, value);
-                                            } else if (filterDetails.job == "Nurse") {
+                                            } else if (filterDetails.job == "Pirivena Teacher") {
+                                              await StaticDataService.fetchPirivenas(filterDetails, value);
+                                            } else if (filterDetails.job == "Nurse" ||
+                                                filterDetails.job == "Hospital Attendant") {
                                               await StaticDataService.fetchNurseInstitutions(filterDetails, value);
-                                            } else if (filterDetails.job == "Management Assistant") {
+                                            } else if (filterDetails.job == "Public Health Inspector" ||
+                                                filterDetails.job == "Public Health Midwife") {
+                                              filterDetails.institutionTypeForNurse = "MOH Office $value";
+                                              await StaticDataService.fetchNurseOffices(
+                                                filterDetails,
+                                                "MOH Office $value",
+                                              );
+                                            } else if (filterDetails.job == "Management Assistant" ||
+                                                filterDetails.job == "Development Officer" ||
+                                                filterDetails.job == "Administrative Officer") {
                                               await StaticDataService.fetchMAInstitutions(filterDetails, value);
+                                            } else if (filterDetails.job == "MA (Pradesiya Sabha)") {
+                                              filterDetails.institutionTypeForPS = 'Pradesiya Sabha';
+                                              await StaticDataService.fetchPradesiyaSabhas(filterDetails, value);
                                             } else if (filterDetails.job == "Police Officer") {
                                               await StaticDataService.fetchPoliceDivisions(filterDetails, value);
                                             } else if (filterDetails.job == "Grama Niladari") {
                                               await StaticDataService.fetchDSDivisions(filterDetails, value);
                                             }
-                                            setState(() {});
+                                          }
+                                          if (mounted) {
+                                            setState(() {
+                                              _loadingField = null;
+                                            });
                                           }
                                         },
                                         dropdownColor: ColorManager.kPrimaryBlack,
                                         underline: const SizedBox(),
-                                        icon: Icon(Icons.arrow_drop_down, color: ColorManager.disabledText),
+                                        icon: _buildDropdownIcon(_loadingField == 'district'),
                                         isExpanded: true,
                                       ),
                                     )
-                                    : SizedBox.shrink(),
+                                    : const SizedBox.shrink(),
                                 SizedBox(height: context.verticalSize(filterDetails.district.isNotEmpty ? 20 : 0)),
 
-                                filterDetails.district.isNotEmpty
+                                (filterDetails.district.isNotEmpty &&
+                                        filterDetails.job != "Public Health Inspector" &&
+                                        filterDetails.job != "Public Health Midwife")
                                     ? Container(
                                       height: context.verticalSize(40),
                                       width: double.infinity,
@@ -866,13 +941,24 @@ class _EditDetailsScreenState extends State<EditDetailsScreen> {
                                                 ? filterDetails.kalapa.isNotEmpty
                                                     ? filterDetails.kalapa
                                                     : null
-                                                : filterDetails.job == "Nurse"
+                                                : filterDetails.job == "Pirivena Teacher"
+                                                ? filterDetails.pirivenaInstitute.isNotEmpty
+                                                    ? filterDetails.pirivenaInstitute
+                                                    : null
+                                                : (filterDetails.job == "Nurse" ||
+                                                    filterDetails.job == "Hospital Attendant")
                                                 ? filterDetails.institutionTypeForNurse.isNotEmpty
                                                     ? filterDetails.institutionTypeForNurse
                                                     : null
-                                                : filterDetails.job == "Management Assistant"
+                                                : (filterDetails.job == "Management Assistant" ||
+                                                    filterDetails.job == "Development Officer" ||
+                                                    filterDetails.job == "Administrative Officer")
                                                 ? filterDetails.institutionTypeForMA.isNotEmpty
                                                     ? filterDetails.institutionTypeForMA
+                                                    : null
+                                                : filterDetails.job == "MA (Pradesiya Sabha)"
+                                                ? filterDetails.institutionTypeForPS.isNotEmpty
+                                                    ? filterDetails.institutionTypeForPS
                                                     : null
                                                 : filterDetails.job == "Police Officer"
                                                 ? filterDetails.policeDivisions.isNotEmpty
@@ -887,6 +973,8 @@ class _EditDetailsScreenState extends State<EditDetailsScreen> {
                                           (filterDetails.job == "Provincial School Teacher" ||
                                                   filterDetails.job == "National School Teacher")
                                               ? l10n.selectKalapa
+                                              : filterDetails.job == "Pirivena Teacher"
+                                              ? TranslationService.translate(context, "Select Pirivena Institute")
                                               : l10n.selectInstitutionType,
                                           style: context.regular14(color: ColorManager.disabledText),
                                         ),
@@ -901,17 +989,27 @@ class _EditDetailsScreenState extends State<EditDetailsScreen> {
                                                           (kalapa) => DropdownMenuItem(
                                                             value: kalapa,
                                                             child: Text(
-                                                              TranslationService.translate(
-                                                                context,
-                                                                kalapa,
-                                                              ), 
-                                                              style: context.regular14(
-                                                                color: ColorManager.disabledText,
-                                                              ),
+                                                              TranslationService.translate(context, kalapa),
+                                                              style: context.regular14(color: ColorManager.blackMedium),
                                                             ),
                                                           ),
                                                         )
-                                                    : filterDetails.job == "Nurse"
+                                                    : filterDetails.job == "Pirivena Teacher"
+                                                    ? (filterDetails.district.isNotEmpty
+                                                            ? filterDetails.districtPirivenas[filterDetails.district] ??
+                                                                []
+                                                            : <String>[])
+                                                        .map(
+                                                          (institute) => DropdownMenuItem(
+                                                            value: institute,
+                                                            child: Text(
+                                                              TranslationService.translate(context, institute),
+                                                              style: context.regular14(color: ColorManager.blackMedium),
+                                                            ),
+                                                          ),
+                                                        )
+                                                    : (filterDetails.job == "Nurse" ||
+                                                        filterDetails.job == "Hospital Attendant")
                                                     ? (filterDetails.district.isNotEmpty
                                                             ? filterDetails
                                                                     .districtInstitutionTypeForNurse[filterDetails
@@ -922,17 +1020,14 @@ class _EditDetailsScreenState extends State<EditDetailsScreen> {
                                                           (institute) => DropdownMenuItem(
                                                             value: institute,
                                                             child: Text(
-                                                              TranslationService.translate(
-                                                                context,
-                                                                institute,
-                                                              ), 
-                                                              style: context.regular14(
-                                                                color: ColorManager.disabledText,
-                                                              ),
+                                                              TranslationService.translate(context, institute),
+                                                              style: context.regular14(color: ColorManager.blackMedium),
                                                             ),
                                                           ),
                                                         )
-                                                    : filterDetails.job == "Management Assistant"
+                                                    : (filterDetails.job == "Management Assistant" ||
+                                                        filterDetails.job == "Development Officer" ||
+                                                        filterDetails.job == "Administrative Officer")
                                                     ? (filterDetails.district.isNotEmpty
                                                             ? filterDetails.districtInstitutionTypeForMA[filterDetails
                                                                     .district] ??
@@ -942,16 +1037,21 @@ class _EditDetailsScreenState extends State<EditDetailsScreen> {
                                                           (institute) => DropdownMenuItem(
                                                             value: institute,
                                                             child: Text(
-                                                              TranslationService.translate(
-                                                                context,
-                                                                institute,
-                                                              ), 
-                                                              style: context.regular14(
-                                                                color: ColorManager.disabledText,
-                                                              ),
+                                                              TranslationService.translate(context, institute),
+                                                              style: context.regular14(color: ColorManager.blackMedium),
                                                             ),
                                                           ),
                                                         )
+                                                    : filterDetails.job == "MA (Pradesiya Sabha)"
+                                                    ? ["Pradesiya Sabha"].map(
+                                                      (institute) => DropdownMenuItem(
+                                                        value: institute,
+                                                        child: Text(
+                                                          TranslationService.translate(context, institute),
+                                                          style: context.regular14(color: ColorManager.blackMedium),
+                                                        ),
+                                                      ),
+                                                    )
                                                     : filterDetails.job == "Police Officer"
                                                     ? (filterDetails.district.isNotEmpty
                                                             ? filterDetails.districtPoliceDivisions[filterDetails
@@ -962,13 +1062,8 @@ class _EditDetailsScreenState extends State<EditDetailsScreen> {
                                                           (policeDivisions) => DropdownMenuItem(
                                                             value: policeDivisions,
                                                             child: Text(
-                                                              TranslationService.translate(
-                                                                context,
-                                                                policeDivisions,
-                                                              ), 
-                                                              style: context.regular14(
-                                                                color: ColorManager.disabledText,
-                                                              ),
+                                                              TranslationService.translate(context, policeDivisions),
+                                                              style: context.regular14(color: ColorManager.blackMedium),
                                                             ),
                                                           ),
                                                         )
@@ -981,13 +1076,8 @@ class _EditDetailsScreenState extends State<EditDetailsScreen> {
                                                           (dsDivisions) => DropdownMenuItem(
                                                             value: dsDivisions,
                                                             child: Text(
-                                                              TranslationService.translate(
-                                                                context,
-                                                                dsDivisions,
-                                                              ), 
-                                                              style: context.regular14(
-                                                                color: ColorManager.disabledText,
-                                                              ),
+                                                              TranslationService.translate(context, dsDivisions),
+                                                              style: context.regular14(color: ColorManager.blackMedium),
                                                             ),
                                                           ),
                                                         ))
@@ -997,10 +1087,17 @@ class _EditDetailsScreenState extends State<EditDetailsScreen> {
                                             (filterDetails.job == "Provincial School Teacher" ||
                                                     filterDetails.job == "National School Teacher")
                                                 ? filterDetails.kalapa = value ?? ''
-                                                : filterDetails.job == "Nurse"
+                                                : filterDetails.job == "Pirivena Teacher"
+                                                ? filterDetails.pirivenaInstitute = value ?? ''
+                                                : (filterDetails.job == "Nurse" ||
+                                                    filterDetails.job == "Hospital Attendant")
                                                 ? filterDetails.institutionTypeForNurse = value ?? ''
-                                                : filterDetails.job == "Management Assistant"
+                                                : (filterDetails.job == "Management Assistant" ||
+                                                    filterDetails.job == "Development Officer" ||
+                                                    filterDetails.job == "Administrative Officer")
                                                 ? filterDetails.institutionTypeForMA = value ?? ''
+                                                : filterDetails.job == "MA (Pradesiya Sabha)"
+                                                ? filterDetails.institutionTypeForPS = value ?? ''
                                                 : filterDetails.job == "Police Officer"
                                                 ? filterDetails.policeDivisions = value ?? ''
                                                 : filterDetails.job == "Grama Niladari"
@@ -1012,40 +1109,68 @@ class _EditDetailsScreenState extends State<EditDetailsScreen> {
                                             filterDetails.nationalSchool = '';
                                             filterDetails.officeForNurse = '';
                                             filterDetails.officeForMA = '';
+                                            filterDetails.officeForPS = '';
                                             filterDetails.policeStations = '';
                                             filterDetails.gramaNiladhariDivision = '';
+                                            kalapaInstitutionError = null;
+                                            _loadingField = 'kalapa_institute';
                                           });
-                                          if (value != null && value.isNotEmpty) {
+                                          if (value != null &&
+                                              value.isNotEmpty &&
+                                              filterDetails.job != "Pirivena Teacher") {
                                             if (filterDetails.job == "Provincial School Teacher") {
                                               await StaticDataService.fetchKottasas(filterDetails, value);
                                             } else if (filterDetails.job == "National School Teacher") {
                                               await StaticDataService.fetchKottasasNational(filterDetails, value);
-                                            } else if (filterDetails.job == "Nurse") {
+                                            } else if (filterDetails.job == "Nurse" ||
+                                                filterDetails.job == "Hospital Attendant") {
                                               await StaticDataService.fetchNurseOffices(filterDetails, value);
-                                            } else if (filterDetails.job == "Management Assistant") {
+                                            } else if (filterDetails.job == "Management Assistant" ||
+                                                filterDetails.job == "Development Officer" ||
+                                                filterDetails.job == "Administrative Officer") {
                                               await StaticDataService.fetchMAOffices(filterDetails, value);
                                             } else if (filterDetails.job == "Police Officer") {
                                               await StaticDataService.fetchPoliceStations(filterDetails, value);
                                             } else if (filterDetails.job == "Grama Niladari") {
                                               await StaticDataService.fetchGNDivisions(filterDetails, value);
                                             }
-                                            setState(() {});
+                                          }
+                                          if (mounted) {
+                                            setState(() {
+                                              _loadingField = null;
+                                            });
                                           }
                                         },
                                         dropdownColor: ColorManager.kPrimaryBlack,
                                         underline: const SizedBox(),
-                                        icon: Icon(Icons.arrow_drop_down, color: ColorManager.disabledText),
+                                        icon: _buildDropdownIcon(_loadingField == 'kalapa_institute'),
                                         isExpanded: true,
                                       ),
                                     )
                                     : const SizedBox.shrink(),
+                                if (kalapaInstitutionError != null)
+                                  Align(
+                                    alignment: Alignment.centerLeft,
+                                    child: Padding(
+                                      padding: const EdgeInsets.only(top: 4.0, left: 5.0),
+                                      child: Text(
+                                        kalapaInstitutionError!,
+                                        style: const TextStyle(color: Colors.red, fontSize: 12.0),
+                                      ),
+                                    ),
+                                  ),
+
                                 SizedBox(
                                   height: context.verticalSize(
-                                    (filterDetails.kalapa.isNotEmpty ||
-                                            filterDetails.institutionTypeForNurse.isNotEmpty ||
-                                            filterDetails.institutionTypeForMA.isNotEmpty ||
-                                            filterDetails.policeDivisions.isNotEmpty ||
-                                            filterDetails.divisionalSecretariat.isNotEmpty)
+                                    ((filterDetails.job != "Public Health Inspector" &&
+                                                filterDetails.job != "Public Health Midwife" &&
+                                                filterDetails.job != "Pirivena Teacher") &&
+                                            (filterDetails.kalapa.isNotEmpty ||
+                                                filterDetails.institutionTypeForNurse.isNotEmpty ||
+                                                filterDetails.institutionTypeForMA.isNotEmpty ||
+                                                filterDetails.institutionTypeForPS.isNotEmpty ||
+                                                filterDetails.policeDivisions.isNotEmpty ||
+                                                filterDetails.divisionalSecretariat.isNotEmpty))
                                         ? 20
                                         : 0,
                                   ),
@@ -1054,10 +1179,15 @@ class _EditDetailsScreenState extends State<EditDetailsScreen> {
                                 (((filterDetails.job == "Provincial School Teacher" ||
                                                 filterDetails.job == "National School Teacher") &&
                                             filterDetails.kalapa.isNotEmpty) ||
-                                        filterDetails.institutionTypeForNurse.isNotEmpty ||
-                                        filterDetails.institutionTypeForMA.isNotEmpty ||
-                                        filterDetails.policeDivisions.isNotEmpty ||
-                                        filterDetails.divisionalSecretariat.isNotEmpty)
+                                        (filterDetails.job != "Pirivena Teacher" &&
+                                            (filterDetails.institutionTypeForNurse.isNotEmpty ||
+                                                filterDetails.institutionTypeForMA.isNotEmpty ||
+                                                filterDetails.institutionTypeForPS.isNotEmpty ||
+                                                filterDetails.policeDivisions.isNotEmpty ||
+                                                filterDetails.divisionalSecretariat.isNotEmpty)) ||
+                                        ((filterDetails.job == "Public Health Inspector" ||
+                                                filterDetails.job == "Public Health Midwife") &&
+                                            filterDetails.district.isNotEmpty))
                                     ? Container(
                                       height: context.verticalSize(40),
                                       width: double.infinity,
@@ -1076,13 +1206,22 @@ class _EditDetailsScreenState extends State<EditDetailsScreen> {
                                                 ? filterDetails.kottasaForNationalScl.isNotEmpty
                                                     ? filterDetails.kottasaForNationalScl
                                                     : null
-                                                : filterDetails.job == "Nurse"
+                                                : (filterDetails.job == "Nurse" ||
+                                                    filterDetails.job == "Hospital Attendant" ||
+                                                    filterDetails.job == "Public Health Inspector" ||
+                                                    filterDetails.job == "Public Health Midwife")
                                                 ? filterDetails.officeForNurse.isNotEmpty
                                                     ? filterDetails.officeForNurse
                                                     : null
-                                                : filterDetails.job == "Management Assistant"
+                                                : (filterDetails.job == "Management Assistant" ||
+                                                    filterDetails.job == "Development Officer" ||
+                                                    filterDetails.job == "Administrative Officer")
                                                 ? filterDetails.officeForMA.isNotEmpty
                                                     ? filterDetails.officeForMA
+                                                    : null
+                                                : filterDetails.job == "MA (Pradesiya Sabha)"
+                                                ? filterDetails.officeForPS.isNotEmpty
+                                                    ? filterDetails.officeForPS
                                                     : null
                                                 : filterDetails.job == "Police Officer"
                                                 ? filterDetails.policeStations.isNotEmpty
@@ -1109,10 +1248,7 @@ class _EditDetailsScreenState extends State<EditDetailsScreen> {
                                                           (kottasa) => DropdownMenuItem(
                                                             value: kottasa,
                                                             child: Text(
-                                                              TranslationService.translate(
-                                                                context,
-                                                                kottasa,
-                                                              ), 
+                                                              TranslationService.translate(context, kottasa),
                                                               style: context.regular14(color: ColorManager.blackMedium),
                                                             ),
                                                           ),
@@ -1127,15 +1263,15 @@ class _EditDetailsScreenState extends State<EditDetailsScreen> {
                                                           (kottasa) => DropdownMenuItem(
                                                             value: kottasa,
                                                             child: Text(
-                                                              TranslationService.translate(
-                                                                context,
-                                                                kottasa,
-                                                              ), 
+                                                              TranslationService.translate(context, kottasa),
                                                               style: context.regular14(color: ColorManager.blackMedium),
                                                             ),
                                                           ),
                                                         )
-                                                    : filterDetails.job == "Nurse"
+                                                    : (filterDetails.job == "Nurse" ||
+                                                        filterDetails.job == "Hospital Attendant" ||
+                                                        filterDetails.job == "Public Health Inspector" ||
+                                                        filterDetails.job == "Public Health Midwife")
                                                     ? (filterDetails.institutionTypeForNurse.isNotEmpty
                                                             ? filterDetails.institutionTypeOfficesForNurse[filterDetails
                                                                     .institutionTypeForNurse] ??
@@ -1145,15 +1281,14 @@ class _EditDetailsScreenState extends State<EditDetailsScreen> {
                                                           (office) => DropdownMenuItem(
                                                             value: office,
                                                             child: Text(
-                                                              TranslationService.translate(
-                                                                context,
-                                                                office,
-                                                              ), 
+                                                              TranslationService.translate(context, office),
                                                               style: context.regular14(color: ColorManager.blackMedium),
                                                             ),
                                                           ),
                                                         )
-                                                    : filterDetails.job == "Management Assistant"
+                                                    : (filterDetails.job == "Management Assistant" ||
+                                                        filterDetails.job == "Development Officer" ||
+                                                        filterDetails.job == "Administrative Officer")
                                                     ? (filterDetails.institutionTypeForMA.isNotEmpty
                                                             ? filterDetails.institutionTypeOfficesForMA[filterDetails
                                                                     .institutionTypeForMA] ??
@@ -1163,10 +1298,22 @@ class _EditDetailsScreenState extends State<EditDetailsScreen> {
                                                           (office) => DropdownMenuItem(
                                                             value: office,
                                                             child: Text(
-                                                              TranslationService.translate(
-                                                                context,
-                                                                office,
-                                                              ), 
+                                                              TranslationService.translate(context, office),
+                                                              style: context.regular14(color: ColorManager.blackMedium),
+                                                            ),
+                                                          ),
+                                                        )
+                                                    : filterDetails.job == "MA (Pradesiya Sabha)"
+                                                    ? (filterDetails.institutionTypeForPS.isNotEmpty
+                                                            ? filterDetails.districtPradesiyaSabhas[filterDetails
+                                                                    .district] ??
+                                                                []
+                                                            : <String>[])
+                                                        .map(
+                                                          (office) => DropdownMenuItem(
+                                                            value: office,
+                                                            child: Text(
+                                                              TranslationService.translate(context, office),
                                                               style: context.regular14(color: ColorManager.blackMedium),
                                                             ),
                                                           ),
@@ -1181,10 +1328,7 @@ class _EditDetailsScreenState extends State<EditDetailsScreen> {
                                                           (office) => DropdownMenuItem(
                                                             value: office,
                                                             child: Text(
-                                                              TranslationService.translate(
-                                                                context,
-                                                                office,
-                                                              ), 
+                                                              TranslationService.translate(context, office),
                                                               style: context.regular14(color: ColorManager.blackMedium),
                                                             ),
                                                           ),
@@ -1198,10 +1342,7 @@ class _EditDetailsScreenState extends State<EditDetailsScreen> {
                                                           (office) => DropdownMenuItem(
                                                             value: office,
                                                             child: Text(
-                                                              TranslationService.translate(
-                                                                context,
-                                                                office,
-                                                              ), 
+                                                              TranslationService.translate(context, office),
                                                               style: context.regular14(color: ColorManager.blackMedium),
                                                             ),
                                                           ),
@@ -1213,15 +1354,25 @@ class _EditDetailsScreenState extends State<EditDetailsScreen> {
                                                 ? filterDetails.kottasa = value ?? ''
                                                 : filterDetails.job == "National School Teacher"
                                                 ? filterDetails.kottasaForNationalScl = value ?? ''
-                                                : filterDetails.job == "Nurse"
+                                                : (filterDetails.job == "Nurse" ||
+                                                    filterDetails.job == "Hospital Attendant" ||
+                                                    filterDetails.job == "Public Health Inspector" ||
+                                                    filterDetails.job == "Public Health Midwife")
                                                 ? filterDetails.officeForNurse = value ?? ''
-                                                : filterDetails.job == "Management Assistant"
+                                                : (filterDetails.job == "Management Assistant" ||
+                                                    filterDetails.job == "Development Officer" ||
+                                                    filterDetails.job == "Administrative Officer")
                                                 ? filterDetails.officeForMA = value ?? ''
+                                                : filterDetails.job == "MA (Pradesiya Sabha)"
+                                                ? filterDetails.officeForPS = value ?? ''
                                                 : filterDetails.job == "Police Officer"
                                                 ? filterDetails.policeStations = value ?? ''
-                                                : filterDetails.gramaNiladhariDivision = value ?? '';
+                                                : filterDetails.job == "Grama Niladari"
+                                                ? filterDetails.gramaNiladhariDivision = value ?? ''
+                                                : '';
                                             filterDetails.school = '';
                                             filterDetails.nationalSchool = '';
+                                            _loadingField = 'kottasa_office';
                                           });
                                           if (value != null && value.isNotEmpty) {
                                             if (filterDetails.job == "Provincial School Teacher") {
@@ -1229,12 +1380,16 @@ class _EditDetailsScreenState extends State<EditDetailsScreen> {
                                             } else if (filterDetails.job == "National School Teacher") {
                                               await StaticDataService.fetchNationalSchools(filterDetails, value);
                                             }
-                                            setState(() {});
+                                          }
+                                          if (mounted) {
+                                            setState(() {
+                                              _loadingField = null;
+                                            });
                                           }
                                         },
                                         dropdownColor: ColorManager.kPrimaryBlack,
                                         underline: const SizedBox(),
-                                        icon: Icon(Icons.arrow_drop_down, color: ColorManager.disabledText),
+                                        icon: _buildDropdownIcon(_loadingField == 'kottasa_office'),
                                         isExpanded: true,
                                       ),
                                     )
@@ -1285,7 +1440,7 @@ class _EditDetailsScreenState extends State<EditDetailsScreen> {
                                                   (school) => DropdownMenuItem(
                                                     value: school,
                                                     child: Text(
-                                                      TranslationService.translate(context, school), 
+                                                      TranslationService.translate(context, school),
                                                       style: context.regular14(color: ColorManager.blackMedium),
                                                     ),
                                                   ),
@@ -1306,72 +1461,56 @@ class _EditDetailsScreenState extends State<EditDetailsScreen> {
                                       ),
                                     )
                                     : const SizedBox.shrink(),
-                                Align(
-                                  alignment: Alignment.centerLeft,
-                                  child: Padding(
-                                    padding: EdgeInsets.only(top: schoolError != null ? 4.0 : 4.0, left: 5.0),
+
+                                if (filterDetails.job == "Provincial School Teacher" ||
+                                    filterDetails.job == "National School Teacher") ...[
+                                  Align(
+                                    alignment: Alignment.centerLeft,
+                                    child: Padding(
+                                      padding: EdgeInsets.only(top: schoolError != null ? 4.0 : 4.0, left: 5.0),
+                                      child: Text(
+                                        schoolError != null ? schoolError! : '',
+                                        style: const TextStyle(color: Colors.red, fontSize: 12.0),
+                                      ),
+                                    ),
+                                  ),
+                                  SizedBox(height: context.verticalSize(30)),
+                                  Align(
+                                    alignment: Alignment.centerLeft,
                                     child: Text(
-                                      schoolError != null ? schoolError! : '',
-                                      style: const TextStyle(color: Colors.red, fontSize: 12.0),
+                                      l10n.setupSubjectDetails,
+                                      style: context.semiBold14(color: ColorManager.blackMedium),
                                     ),
                                   ),
-                                ),
-                                SizedBox(height: context.verticalSize(30)),
-                                Align(
-                                  alignment: Alignment.centerLeft,
-                                  child: Text(
-                                    (filterDetails.job == "Provincial School Teacher" ||
-                                            filterDetails.job == "National School Teacher")
-                                        ? l10n.setupSubjectDetails
-                                        : l10n.setupGradeDetails,
-                                    style: context.semiBold14(color: ColorManager.blackMedium),
-                                  ),
-                                ),
-                                SizedBox(height: context.verticalSize(8)),
-                                Container(
-                                  height: context.verticalSize(40),
-                                  width: double.infinity,
-                                  padding: const EdgeInsets.symmetric(horizontal: 12),
-                                  decoration: BoxDecoration(
-                                    color: ColorManager.white10,
-                                    borderRadius: BorderRadius.circular(20),
-                                  ),
-                                  child: DropdownButton<String>(
-                                    value:
-                                        (filterDetails.job == "Provincial School Teacher" ||
-                                                filterDetails.job == "National School Teacher")
-                                            ? filterDetails.scheme.isNotEmpty
-                                                ? filterDetails.scheme
-                                                : null
-                                            : filterDetails.grade.isNotEmpty
-                                            ? filterDetails.grade
-                                            : null,
-                                    hint: Text(
-                                      (filterDetails.job == "Provincial School Teacher" ||
-                                              filterDetails.job == "National School Teacher")
-                                          ? l10n.selectScheme
-                                          : l10n.selectGrade,
-                                      style: context.regular14(color: ColorManager.disabledText),
+                                  SizedBox(height: context.verticalSize(8)),
+                                  Container(
+                                    height: context.verticalSize(40),
+                                    width: double.infinity,
+                                    padding: const EdgeInsets.symmetric(horizontal: 12),
+                                    decoration: BoxDecoration(
+                                      color: ColorManager.white10,
+                                      borderRadius: BorderRadius.circular(20),
                                     ),
-                                    items:
-                                        ((filterDetails.job == "Provincial School Teacher" ||
-                                                    filterDetails.job == "National School Teacher")
-                                                ? filterDetails.schemes
-                                                : filterDetails.gradeList)
-                                            .map(
-                                              (value) => DropdownMenuItem(
-                                                value: value,
-                                                child: Text(
-                                                  TranslationService.translate(context, value), 
-                                                  style: context.regular14(color: ColorManager.disabledText),
+                                    child: DropdownButton<String>(
+                                      value: filterDetails.scheme.isNotEmpty ? filterDetails.scheme : null,
+                                      hint: Text(
+                                        l10n.selectScheme,
+                                        style: context.regular14(color: ColorManager.disabledText),
+                                      ),
+                                      items:
+                                          filterDetails.schemes
+                                              .map(
+                                                (scheme) => DropdownMenuItem(
+                                                  value: scheme,
+                                                  child: Text(
+                                                    TranslationService.translate(context, scheme),
+                                                    style: context.regular14(color: ColorManager.blackMedium),
+                                                  ),
                                                 ),
-                                              ),
-                                            )
-                                            .toList(),
-                                    onChanged: (value) async {
-                                      setState(() {
-                                        if (filterDetails.job == "Provincial School Teacher" ||
-                                            filterDetails.job == "National School Teacher") {
+                                              )
+                                              .toList(),
+                                      onChanged: (value) async {
+                                        setState(() {
                                           filterDetails.scheme = value ?? '';
                                           filterDetails.subject = ''; // reset subject
                                           if (filterDetails.scheme != "PRIMARY") {
@@ -1379,38 +1518,32 @@ class _EditDetailsScreenState extends State<EditDetailsScreen> {
                                           } else {
                                             subjectError = null;
                                           }
-                                        } else {
-                                          filterDetails.grade = value ?? '';
+                                          _loadingField = 'scheme_grade';
+                                        });
+                                        if (value != null) {
+                                          await StaticDataService.fetchSubjects(filterDetails, value);
                                         }
-                                      });
-                                      if ((filterDetails.job == "Provincial School Teacher" ||
-                                              filterDetails.job == "National School Teacher") &&
-                                          value != null) {
-                                        await StaticDataService.fetchSubjects(filterDetails, value);
-                                        setState(() {});
-                                      }
-                                    },
-                                    dropdownColor: ColorManager.kPrimaryBlack,
-                                    underline: const SizedBox(),
-                                    icon: Icon(Icons.arrow_drop_down, color: ColorManager.disabledText),
-                                    isExpanded: true,
+                                        if (mounted) {
+                                          setState(() {
+                                            _loadingField = null;
+                                          });
+                                        }
+                                      },
+                                      dropdownColor: ColorManager.kPrimaryBlack,
+                                      underline: const SizedBox(),
+                                      icon: _buildDropdownIcon(_loadingField == 'scheme_grade'),
+                                      isExpanded: true,
+                                    ),
                                   ),
-                                ),
-
-                                SizedBox(
-                                  height: context.verticalSize(
-                                    (filterDetails.scheme != "PRIMARY" && filterDetails.scheme.isNotEmpty) ||
-                                            filterDetails.grade.isNotEmpty
-                                        ? 20
-                                        : 0,
+                                  SizedBox(
+                                    height: context.verticalSize(
+                                      (filterDetails.scheme != "PRIMARY" && filterDetails.scheme.isNotEmpty) ? 20 : 0,
+                                    ),
                                   ),
-                                ),
 
-                                // Subject Dropdown
-                                ((filterDetails.scheme != "PRIMARY" && filterDetails.scheme.isNotEmpty) &&
-                                        (filterDetails.job == "Provincial School Teacher" ||
-                                            filterDetails.job == "National School Teacher"))
-                                    ? Container(
+                                  // Subject Dropdown
+                                  if (filterDetails.scheme != "PRIMARY" && filterDetails.scheme.isNotEmpty) ...[
+                                    Container(
                                       height: context.verticalSize(40),
                                       width: double.infinity,
                                       padding: const EdgeInsets.symmetric(horizontal: 12),
@@ -1432,7 +1565,7 @@ class _EditDetailsScreenState extends State<EditDetailsScreen> {
                                                   (subject) => DropdownMenuItem(
                                                     value: subject,
                                                     child: Text(
-                                                      TranslationService.translate(context, subject), 
+                                                      TranslationService.translate(context, subject),
                                                       style: context.regular14(color: ColorManager.blackMedium),
                                                     ),
                                                   ),
@@ -1449,107 +1582,133 @@ class _EditDetailsScreenState extends State<EditDetailsScreen> {
                                         icon: Icon(Icons.arrow_drop_down, color: ColorManager.disabledText),
                                         isExpanded: true,
                                       ),
-                                    )
-                                    : const SizedBox.shrink(),
-                                Align(
-                                  alignment: Alignment.centerLeft,
-                                  child: Padding(
-                                    padding: EdgeInsets.only(
-                                      top:
-                                          (filterDetails.job == "Provincial School Teacher" ||
-                                                  filterDetails.job == "National School Teacher")
-                                              ? subjectError != null
-                                                  ? 4.0
-                                                  : 4.0
-                                              : gradeError != null
-                                              ? 4.0
-                                              : 4.0,
-                                      left: 5.0,
                                     ),
-                                    child: Text(
-                                      (filterDetails.job == "Provincial School Teacher" ||
-                                              filterDetails.job == "National School Teacher")
+                                  ],
+                                  Align(
+                                    alignment: Alignment.centerLeft,
+                                    child: Padding(
+                                      padding: EdgeInsets.only(top: subjectError != null ? 4.0 : 4.0, left: 5.0),
+                                      child: Text(
+                                        subjectError != null ? subjectError! : '',
+                                        style: const TextStyle(color: Colors.red, fontSize: 12.0),
+                                      ),
+                                    ),
+                                  ),
+                                  SizedBox(
+                                    height: context.verticalSize(
+                                      (filterDetails.scheme != "PRIMARY" && filterDetails.scheme.isNotEmpty)
                                           ? subjectError != null
-                                              ? subjectError!
-                                              : ''
-                                          : gradeError != null
-                                          ? gradeError!
-                                          : '',
-                                      style: const TextStyle(color: Colors.red, fontSize: 12.0),
+                                              ? 12
+                                              : 2
+                                          : 0,
                                     ),
                                   ),
-                                ),
-                                SizedBox(
-                                  height: context.verticalSize(
-                                    (filterDetails.scheme != "PRIMARY" && filterDetails.scheme.isNotEmpty) ||
-                                            filterDetails.grade.isNotEmpty
-                                        ? subjectError != null
-                                            ? 12
-                                            : 2
-                                        : 0,
-                                  ),
-                                ),
-                                (filterDetails.job == "Provincial School Teacher" ||
-                                        filterDetails.job == "National School Teacher")
-                                    ? Column(
-                                      children: [
-                                        Container(
-                                          height: context.verticalSize(40),
-                                          width: double.infinity,
-                                          padding: const EdgeInsets.symmetric(horizontal: 12),
-                                          decoration: BoxDecoration(
-                                            color: ColorManager.white10,
-                                            borderRadius: BorderRadius.circular(20),
+                                  Column(
+                                    children: [
+                                      Container(
+                                        height: context.verticalSize(40),
+                                        width: double.infinity,
+                                        padding: const EdgeInsets.symmetric(horizontal: 12),
+                                        decoration: BoxDecoration(
+                                          color: ColorManager.white10,
+                                          borderRadius: BorderRadius.circular(20),
+                                        ),
+                                        child: DropdownButton<String>(
+                                          value:
+                                              filterDetails.subjectMedium.isNotEmpty
+                                                  ? filterDetails.subjectMedium
+                                                  : null,
+                                          hint: Text(
+                                            l10n.selectSubjectMedium,
+                                            style: context.regular14(color: ColorManager.disabledText),
                                           ),
-                                          child: DropdownButton<String>(
-                                            value:
-                                                filterDetails.subjectMedium.isNotEmpty
-                                                    ? filterDetails.subjectMedium
-                                                    : null,
-                                            hint: Text(
-                                              l10n.selectSubjectMedium,
-                                              style: context.regular14(color: ColorManager.disabledText),
-                                            ),
-                                            items:
-                                                ["Sinhala", "English", "Tamil"]
-                                                    .map(
-                                                      (medium) => DropdownMenuItem(
-                                                        value: medium,
-                                                        child: Text(
-                                                          TranslationService.translate(context, medium),
-                                                          style: context.regular14(color: ColorManager.blackMedium),
-                                                        ),
+                                          items:
+                                              ["Sinhala", "English", "Tamil"]
+                                                  .map(
+                                                    (medium) => DropdownMenuItem(
+                                                      value: medium,
+                                                      child: Text(
+                                                        TranslationService.translate(context, medium),
+                                                        style: context.regular14(color: ColorManager.blackMedium),
                                                       ),
-                                                    )
-                                                    .toList(),
-                                            onChanged: (value) {
-                                              setState(() {
-                                                filterDetails.subjectMedium = value ?? '';
-                                                subjectMediumError = null;
-                                              });
-                                            },
-                                            dropdownColor: ColorManager.kPrimaryBlack,
-                                            underline: const SizedBox(),
-                                            icon: Icon(Icons.arrow_drop_down, color: ColorManager.disabledText),
-                                            isExpanded: true,
+                                                    ),
+                                                  )
+                                                  .toList(),
+                                          onChanged: (value) {
+                                            setState(() {
+                                              filterDetails.subjectMedium = value ?? '';
+                                              subjectMediumError = null;
+                                            });
+                                          },
+                                          dropdownColor: ColorManager.kPrimaryBlack,
+                                          underline: const SizedBox(),
+                                          icon: Icon(Icons.arrow_drop_down, color: ColorManager.disabledText),
+                                          isExpanded: true,
+                                        ),
+                                      ),
+                                      Align(
+                                        alignment: Alignment.centerLeft,
+                                        child: Padding(
+                                          padding: EdgeInsets.only(
+                                            top: subjectMediumError != null ? 4.0 : 4.0,
+                                            left: 5.0,
+                                          ),
+                                          child: Text(
+                                            subjectMediumError != null ? subjectMediumError! : '',
+                                            style: const TextStyle(color: Colors.red, fontSize: 12.0),
                                           ),
                                         ),
-                                        Align(
-                                          alignment: Alignment.centerLeft,
-                                          child: Padding(
-                                            padding: EdgeInsets.only(
-                                              top: subjectMediumError != null ? 4.0 : 4.0,
-                                              left: 5.0,
-                                            ),
-                                            child: Text(
-                                              subjectMediumError != null ? subjectMediumError! : '',
-                                              style: const TextStyle(color: Colors.red, fontSize: 12.0),
-                                            ),
-                                          ),
-                                        ),
-                                      ],
-                                    )
-                                    : const SizedBox.shrink(),
+                                      ),
+                                    ],
+                                  ),
+                                ] else if (filterDetails.job != "Pirivena Teacher") ...[
+                                  SizedBox(height: context.verticalSize(30)),
+                                  Align(
+                                    alignment: Alignment.centerLeft,
+                                    child: Text(
+                                      l10n.setupGradeDetails,
+                                      style: context.semiBold14(color: ColorManager.blackMedium),
+                                    ),
+                                  ),
+                                  SizedBox(height: context.verticalSize(8)),
+                                  Container(
+                                    height: context.verticalSize(40),
+                                    width: double.infinity,
+                                    padding: const EdgeInsets.symmetric(horizontal: 12),
+                                    decoration: BoxDecoration(
+                                      color: ColorManager.white10,
+                                      borderRadius: BorderRadius.circular(20),
+                                    ),
+                                    child: DropdownButton<String>(
+                                      value: filterDetails.grade.isNotEmpty ? filterDetails.grade : null,
+                                      hint: Text(
+                                        l10n.selectGrade,
+                                        style: context.regular14(color: ColorManager.disabledText),
+                                      ),
+                                      items:
+                                          filterDetails.gradeList
+                                              .map(
+                                                (value) => DropdownMenuItem(
+                                                  value: value,
+                                                  child: Text(
+                                                    TranslationService.translate(context, value),
+                                                    style: context.regular14(color: ColorManager.blackMedium),
+                                                  ),
+                                                ),
+                                              )
+                                              .toList(),
+                                      onChanged: (value) {
+                                        setState(() {
+                                          filterDetails.grade = value ?? '';
+                                        });
+                                      },
+                                      dropdownColor: ColorManager.kPrimaryBlack,
+                                      underline: const SizedBox(),
+                                      icon: Icon(Icons.arrow_drop_down, color: ColorManager.disabledText),
+                                      isExpanded: true,
+                                    ),
+                                  ),
+                                ],
 
                                 SizedBox(height: context.verticalSize(20)),
                                 Align(
@@ -1588,7 +1747,7 @@ class _EditDetailsScreenState extends State<EditDetailsScreen> {
                                               (district) => DropdownMenuItem(
                                                 value: district,
                                                 child: Text(
-                                                  TranslationService.translate(context, district), 
+                                                  TranslationService.translate(context, district),
                                                   style: context.regular14(color: ColorManager.blackMedium),
                                                 ),
                                               ),
@@ -1641,7 +1800,7 @@ class _EditDetailsScreenState extends State<EditDetailsScreen> {
                                                   (district) => DropdownMenuItem(
                                                     value: district,
                                                     child: Text(
-                                                      TranslationService.translate(context, district), 
+                                                      TranslationService.translate(context, district),
                                                       style: context.regular14(color: ColorManager.blackMedium),
                                                     ),
                                                   ),
@@ -1693,7 +1852,7 @@ class _EditDetailsScreenState extends State<EditDetailsScreen> {
                                                   (district) => DropdownMenuItem(
                                                     value: district,
                                                     child: Text(
-                                                      TranslationService.translate(context, district), 
+                                                      TranslationService.translate(context, district),
                                                       style: context.regular14(color: ColorManager.blackMedium),
                                                     ),
                                                   ),
@@ -1722,51 +1881,51 @@ class _EditDetailsScreenState extends State<EditDetailsScreen> {
                                   ),
                                 ),
                                 SizedBox(height: context.verticalSize(30)),
-                                Align(
-                                  alignment: Alignment.centerLeft,
-                                  child: Text(
-                                    l10n.addSpecialNote,
-                                    style: context.semiBold14(color: ColorManager.blackMedium),
-                                  ),
-                                ),
-                                SizedBox(height: context.verticalSize(8)),
-                                CustomTextField(
-                                  radius: 30,
-                                  height: context.verticalSize(40),
-                                  controller: acc.noteController,
-                                  inputType: TextInputType.emailAddress,
-                                  hintText: l10n.note,
-                                  validator: (value) {},
-                                ),
-                                SizedBox(height: context.verticalSize(30)),
                                 CenterTextIconButton(
                                   onPress: () async {
+                                    bool isJobDetailsValid = false;
+
+                                    if (filterDetails.job == "Provincial School Teacher") {
+                                      isJobDetailsValid =
+                                          filterDetails.school.isNotEmpty &&
+                                          (filterDetails.scheme == "PRIMARY" || filterDetails.subject.isNotEmpty) &&
+                                          filterDetails.subjectMedium.isNotEmpty;
+                                    } else if (filterDetails.job == "National School Teacher") {
+                                      isJobDetailsValid =
+                                          filterDetails.nationalSchool.isNotEmpty &&
+                                          (filterDetails.scheme == "PRIMARY" || filterDetails.subject.isNotEmpty) &&
+                                          filterDetails.subjectMedium.isNotEmpty;
+                                    } else if (filterDetails.job == "Pirivena Teacher") {
+                                      isJobDetailsValid = filterDetails.pirivenaInstitute.isNotEmpty;
+                                    } else if (filterDetails.job == "Nurse" ||
+                                        filterDetails.job == "Hospital Attendant" ||
+                                        filterDetails.job == "Public Health Inspector" ||
+                                        filterDetails.job == "Public Health Midwife") {
+                                      isJobDetailsValid =
+                                          filterDetails.officeForNurse.isNotEmpty && filterDetails.grade.isNotEmpty;
+                                    } else if (filterDetails.job == "Management Assistant" ||
+                                        filterDetails.job == "Development Officer" ||
+                                        filterDetails.job == "Administrative Officer") {
+                                      isJobDetailsValid =
+                                          filterDetails.officeForMA.isNotEmpty && filterDetails.grade.isNotEmpty;
+                                    } else if (filterDetails.job == "MA (Pradesiya Sabha)") {
+                                      isJobDetailsValid =
+                                          filterDetails.officeForPS.isNotEmpty && filterDetails.grade.isNotEmpty;
+                                    } else if (filterDetails.job == "Police Officer") {
+                                      isJobDetailsValid =
+                                          filterDetails.policeStations.isNotEmpty && filterDetails.grade.isNotEmpty;
+                                    } else {
+                                      isJobDetailsValid =
+                                          filterDetails.gramaNiladhariDivision.isNotEmpty &&
+                                          filterDetails.grade.isNotEmpty;
+                                    }
+
                                     if (informationFormKey.currentState!.validate() &&
-                                        (accProvider.contactController.text.isNotEmpty ||
-                                            accProvider.contactController.text.length > 10 ||
-                                            accProvider.contactController.text.length < 12) &&
-                                        (filterDetails.job == "Provincial School Teacher"
-                                            ? filterDetails.school != ''
-                                            : filterDetails.job == "National School Teacher"
-                                            ? filterDetails.nationalSchool != ''
-                                            : filterDetails.job == "Nurse"
-                                            ? filterDetails.officeForNurse != ''
-                                            : filterDetails.job == "Management Assistant"
-                                            ? filterDetails.officeForMA != ''
-                                            : filterDetails.job == "Police Officer"
-                                            ? filterDetails.policeStations != ''
-                                            : filterDetails.gramaNiladhariDivision != '') &&
-                                        ((filterDetails.job == "Provincial School Teacher" ||
-                                                filterDetails.job == "National School Teacher")
-                                            ? (filterDetails.scheme != "PRIMARY"
-                                                ? filterDetails.subject != ''
-                                                : filterDetails.scheme != '')
-                                            : filterDetails.grade != "") &&
-                                        ((filterDetails.job == "Provincial School Teacher" ||
-                                                filterDetails.job == "National School Teacher")
-                                            ? filterDetails.subjectMedium != ''
-                                            : true) &&
-                                        filterDetails.choice1 != '') {
+                                        accProvider.contactController.text.isNotEmpty &&
+                                        accProvider.contactController.text.length >= 10 &&
+                                        accProvider.contactController.text.length <= 12 &&
+                                        isJobDetailsValid &&
+                                        filterDetails.choice1.isNotEmpty) {
                                       if (hasUnsavedChanges ||
                                           accProvider.appUser?.displayName !=
                                               "${accProvider.firstNameController.text.trim()} ${accProvider.lastNameController.text.trim()}" ||
@@ -1777,11 +1936,10 @@ class _EditDetailsScreenState extends State<EditDetailsScreen> {
                                           accProvider.appUser?.isWhatsappHide != accProvider.isWhatsappVisible ||
                                           accProvider.appUser?.isSchoolHide != accProvider.isSchoolVisible ||
                                           selectedImage != null) {
-                                        print(accProvider.firstNameController.text.isNotEmpty);
                                         final summary = _buildFilterSummary(filterDetails);
 
                                         if (summary == 'No changes selected.') {
-                                          toastErrorMessage("Please select at least one changes before saving.");
+                                          toastErrorMessage("Please select at least one change before saving.");
                                           return;
                                         }
 
@@ -1794,56 +1952,64 @@ class _EditDetailsScreenState extends State<EditDetailsScreen> {
 
                                         if (shouldSave == true) {
                                           await acc.updateAccount(filterDetails);
-                                        } else {
-                                          print('Save action canceled by user.');
                                         }
                                       } else {
-                                        print('No changes to save.');
-                                        toastErrorMessage("Please select at least one changes before saving.");
+                                        toastErrorMessage("Please select at least one change before saving.");
                                       }
                                     }
+
                                     if (acc.contactController.text.isEmpty ||
                                         acc.contactController.text.length < 10 ||
                                         acc.contactController.text.length > 12) {
                                       setState(() {
                                         contactError = 'Incorrect contact number';
                                       });
-                                    } else if ((filterDetails.job == "Provincial School Teacher" &&
-                                            filterDetails.school == '') ||
-                                        (filterDetails.job == "National School Teacher" &&
-                                            filterDetails.nationalSchool == '')) {
+                                    }
+
+                                    if (filterDetails.job == "Provincial School Teacher" &&
+                                            filterDetails.school.isEmpty ||
+                                        filterDetails.job == "National School Teacher" &&
+                                            filterDetails.nationalSchool.isEmpty) {
                                       setState(() {
                                         schoolError = l10n.reqSelectSchool;
                                       });
                                     } else {
                                       setState(() {
-                                        schoolError = '';
+                                        schoolError = null;
                                       });
                                     }
-                                    if (filterDetails.job != "Provincial School Teacher" &&
-                                        filterDetails.job != "National School Teacher" &&
-                                        filterDetails.officeForNurse == '' &&
-                                        filterDetails.officeForMA == '' &&
-                                        filterDetails.policeStations == '' &&
-                                        filterDetails.gramaNiladhariDivision == '') {
-                                      setState(() {
-                                        schoolError = l10n.reqSelectOffice;
-                                      });
+
+                                    if (filterDetails.job == "Pirivena Teacher") {
+                                      if (filterDetails.pirivenaInstitute.isEmpty) {
+                                        setState(() {
+                                          kalapaInstitutionError = TranslationService.translate(
+                                            context,
+                                            "Pirivena Institute is required",
+                                          );
+                                        });
+                                      } else {
+                                        setState(() {
+                                          kalapaInstitutionError = null;
+                                        });
+                                      }
                                     }
-                                    if (filterDetails.scheme != "PRIMARY" &&
-                                        filterDetails.subject == '' &&
-                                        filterDetails.grade == "") {
+
+                                    if ((filterDetails.job == "Provincial School Teacher" ||
+                                            filterDetails.job == "National School Teacher") &&
+                                        filterDetails.scheme != "PRIMARY" &&
+                                        filterDetails.subject.isEmpty) {
                                       setState(() {
                                         subjectError = l10n.reqSelectSubject;
                                       });
                                     } else {
                                       setState(() {
-                                        subjectError = '';
+                                        subjectError = null;
                                       });
                                     }
+
                                     if ((filterDetails.job == "Provincial School Teacher" ||
                                             filterDetails.job == "National School Teacher") &&
-                                        filterDetails.subjectMedium == '') {
+                                        filterDetails.subjectMedium.isEmpty) {
                                       setState(() {
                                         subjectMediumError = l10n.reqSelectMedium;
                                       });
@@ -1852,13 +2018,14 @@ class _EditDetailsScreenState extends State<EditDetailsScreen> {
                                         subjectMediumError = null;
                                       });
                                     }
-                                    if (filterDetails.choice1 == '') {
+
+                                    if (filterDetails.choice1.isEmpty) {
                                       setState(() {
                                         choiceError = l10n.reqSelectChoice;
                                       });
                                     } else {
                                       setState(() {
-                                        choiceError = '';
+                                        choiceError = null;
                                       });
                                     }
                                   },

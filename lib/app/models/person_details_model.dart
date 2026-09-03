@@ -33,6 +33,9 @@ class PersonDetailsModel {
   String? officeForNurse;
   String? institutionTypeForMA;
   String? officeForMA;
+  String? institutionTypeForPS;
+  String? officeForPS;
+  String? pirivenaInstitute;
   String? policeDivisions;
   String? policeStations;
   String? divisionalSecretariat;
@@ -54,6 +57,7 @@ class PersonDetailsModel {
   String? clientName;
   String? amount;
   String? serviceProvider;
+  bool? isActive;
 
   PersonDetailsModel({
     required this.uid,
@@ -86,6 +90,9 @@ class PersonDetailsModel {
     this.officeForNurse,
     this.institutionTypeForMA,
     this.officeForMA,
+    this.institutionTypeForPS,
+    this.officeForPS,
+    this.pirivenaInstitute,
     this.policeDivisions,
     this.policeStations,
     this.divisionalSecretariat,
@@ -106,6 +113,7 @@ class PersonDetailsModel {
     this.clientName,
     this.amount,
     this.serviceProvider,
+    this.isActive,
   });
 
   factory PersonDetailsModel.fromAuthAndFirestore({
@@ -144,6 +152,9 @@ class PersonDetailsModel {
       officeForNurse: firestoreData['officeForNurse'] as String?,
       institutionTypeForMA: firestoreData['institutionTypeForMA'] as String?,
       officeForMA: firestoreData['officeForMA'] as String?,
+      institutionTypeForPS: firestoreData['institutionTypeForPS'] as String?,
+      officeForPS: firestoreData['officeForPS'] as String?,
+      pirivenaInstitute: firestoreData['pirivenaInstitute'] as String?,
       policeDivisions: firestoreData['policeDivisions'] as String?,
       policeStations: firestoreData['policeStations'] as String?,
       divisionalSecretariat: firestoreData['divisionalSecretariat'] as String?,
@@ -166,6 +177,7 @@ class PersonDetailsModel {
       clientName: firestoreData['clientName'] as String?,
       amount: firestoreData['amount'] as String?,
       serviceProvider: firestoreData['serviceProvider'] as String?,
+      isActive: (firestoreData['isActive'] as bool?) ?? true,
     );
   }
 
@@ -201,6 +213,9 @@ class PersonDetailsModel {
       officeForNurse: json['officeForNurse'] as String?,
       institutionTypeForMA: json['institutionTypeForMA'] as String?,
       officeForMA: json['officeForMA'] as String?,
+      institutionTypeForPS: json['institutionTypeForPS'] as String?,
+      officeForPS: json['officeForPS'] as String?,
+      pirivenaInstitute: json['pirivenaInstitute'] as String?,
       policeDivisions: json['policeDivisions'] as String?,
       policeStations: json['policeStations'] as String?,
       divisionalSecretariat: json['divisionalSecretariat'] as String?,
@@ -221,6 +236,7 @@ class PersonDetailsModel {
       clientName: json['clientName'] as String?,
       amount: json['amount'] as String?,
       serviceProvider: json['serviceProvider'] as String?,
+      isActive: json['isActive'] ?? true,
     );
   }
 
@@ -248,6 +264,9 @@ class PersonDetailsModel {
       'officeForNurse': officeForNurse,
       'institutionTypeForMA': institutionTypeForMA,
       'officeForMA': officeForMA,
+      'institutionTypeForPS': institutionTypeForPS,
+      'officeForPS': officeForPS,
+      'pirivenaInstitute': pirivenaInstitute,
       'policeDivisions': policeDivisions,
       'policeStations': policeStations,
       'divisionalSecretariat': divisionalSecretariat,
@@ -266,6 +285,7 @@ class PersonDetailsModel {
       'clientName': clientName,
       'amount': amount,
       'serviceProvider': serviceProvider,
+      'isActive': isActive,
     };
   }
 }

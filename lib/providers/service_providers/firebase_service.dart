@@ -115,12 +115,12 @@ import 'package:app/screens/home/home.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class FirebaseService {
   static final FirebaseMessaging _firebaseMessaging = FirebaseMessaging.instance;
 
-  final FlutterLocalNotificationsPlugin _localNotifications =
-      FlutterLocalNotificationsPlugin();
+  final FlutterLocalNotificationsPlugin _localNotifications = FlutterLocalNotificationsPlugin();
 
   final AndroidNotificationChannel _androidChannel = const AndroidNotificationChannel(
     'transer_notifications',
@@ -140,37 +140,43 @@ class FirebaseService {
     const android = AndroidInitializationSettings('@mipmap/ic_launcher');
     const ios = DarwinInitializationSettings();
 
-    const settings = InitializationSettings(
-      android: android,
-      iOS: ios,
-    );
+    const settings = InitializationSettings(android: android, iOS: ios);
 
     /// Initialize local notifications
     await _localNotifications.initialize(
       settings,
       onDidReceiveNotificationResponse: (NotificationResponse response) {
-        ContextHelper.navigatorKey.currentState?.pushAndRemoveUntil(
-          MaterialPageRoute(
-            builder: (_) => const Home(index: 1),
-          ),
-          (route) => false,
-        );
+        if (FirebaseAuth.instance.currentUser != null) {
+          int homeIndex = 1;
+
+          if (response.payload != null) {
+            try {
+              final payloadData = jsonDecode(response.payload!);
+              final type = payloadData['type'];
+              if (type == 'CHAT_MESSAGE' || type == 'GROUP_CHAT_MESSAGE') {
+                homeIndex = 2;
+              }
+            } catch (e) {
+              print("Error parsing local notification payload: $e");
+            }
+          }
+
+          ContextHelper.navigatorKey.currentState?.pushAndRemoveUntil(
+            MaterialPageRoute(builder: (_) => Home(index: homeIndex)),
+            (route) => false,
+          );
+        }
       },
     );
 
     if (Platform.isAndroid) {
-      final platform = _localNotifications
-          .resolvePlatformSpecificImplementation<
-              AndroidFlutterLocalNotificationsPlugin>();
+      final platform =
+          _localNotifications.resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>();
       await platform?.createNotificationChannel(_androidChannel);
     }
 
     // Show notifications in foreground (iOS)
-    await _firebaseMessaging.setForegroundNotificationPresentationOptions(
-      alert: false,
-  badge: false,
-  sound: false,
-    );
+    await _firebaseMessaging.setForegroundNotificationPresentationOptions(alert: false, badge: false, sound: false);
 
     // Foreground notification
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
@@ -196,12 +202,19 @@ class FirebaseService {
 
     // Background / tapped notification
     FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
-      ContextHelper.navigatorKey.currentState?.pushAndRemoveUntil(
-        MaterialPageRoute(
-          builder: (_) => const Home(index: 1),
-        ),
-        (route) => false,
-      );
+      if (FirebaseAuth.instance.currentUser != null) {
+        int homeIndex = 1;
+
+        final type = message.data['type'];
+        if (type == 'CHAT_MESSAGE' || type == 'GROUP_CHAT_MESSAGE') {
+          homeIndex = 2;
+        }
+
+        ContextHelper.navigatorKey.currentState?.pushAndRemoveUntil(
+          MaterialPageRoute(builder: (_) => Home(index: homeIndex)),
+          (route) => false,
+        );
+      }
     });
 
     // Register background handler
@@ -231,7 +244,6 @@ class FirebaseService {
       final token = await _firebaseMessaging.getToken();
       debugPrint('FCM TOKEN: $token');
       return token;
-
     } catch (e) {
       debugPrint('Error getting FCM token: $e');
       return null;

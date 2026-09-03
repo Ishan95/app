@@ -103,12 +103,17 @@ class _PersonNotificationCardState extends State<PersonNotificationCard> {
                                 (widget.personDetails.job == "Provincial School Teacher" ||
                                         widget.personDetails.job == "National School Teacher")
                                     ? TranslationService.translate(context, widget.personDetails.scheme)
-                                    : widget.personDetails.job == "Nurse"
+                                    : (widget.personDetails.job == "Nurse" ||
+                                        widget.personDetails.job == "Hospital Attendant" ||
+                                        widget.personDetails.job == "Public Health Inspector" ||
+                                        widget.personDetails.job == "Public Health Midwife")
                                     ? TranslationService.translate(
                                       context,
                                       widget.personDetails.institutionTypeForNurse?.toShortInstitutionType(),
                                     )
-                                    : widget.personDetails.job == "Management Assistant"
+                                    : (widget.personDetails.job == "Management Assistant" ||
+                                        widget.personDetails.job == "Development Officer" ||
+                                        widget.personDetails.job == "Administrative Officer")
                                     ? TranslationService.translate(
                                       context,
                                       widget.personDetails.institutionTypeForMA?.toShortInstitutionType(),
@@ -196,19 +201,38 @@ class _PersonNotificationCardState extends State<PersonNotificationCard> {
                                             '${widget.personDetails.school?.substring(0, 25)}...',
                                           )
                                           : "${TranslationService.translate(context, widget.personDetails.school) ?? '*****************'}    "
-                                      : widget.personDetails.job == "Nurse"
+                                      : (widget.personDetails.job == "Nurse" ||
+                                          widget.personDetails.job == "Hospital Attendant" ||
+                                          widget.personDetails.job == "Public Health Inspector" ||
+                                          widget.personDetails.job == "Public Health Midwife")
                                       ? (widget.personDetails.officeForNurse?.length ?? 0) > 25
                                           ? TranslationService.translate(
                                             context,
                                             '${widget.personDetails.officeForNurse?.substring(0, 25)}...',
                                           )
                                           : "${TranslationService.translate(context, widget.personDetails.officeForNurse) ?? '*****************'}    "
-                                      : (widget.personDetails.officeForMA?.length ?? 0) > 25
+                                      : (widget.personDetails.job == "Management Assistant" ||
+                                          widget.personDetails.job == "Development Officer" ||
+                                          widget.personDetails.job == "Administrative Officer")
+                                      ? (widget.personDetails.officeForMA?.length ?? 0) > 25
+                                          ? TranslationService.translate(
+                                            context,
+                                            '${widget.personDetails.officeForMA?.substring(0, 25)}...',
+                                          )
+                                          : "${TranslationService.translate(context, widget.personDetails.officeForMA) ?? '*****************'}    "
+                                      : widget.personDetails.job == "Police Officer"
+                                      ? (widget.personDetails.policeStations?.length ?? 0) > 25
+                                          ? TranslationService.translate(
+                                            context,
+                                            '${widget.personDetails.policeStations?.substring(0, 25)}...',
+                                          )
+                                          : "${TranslationService.translate(context, widget.personDetails.policeStations) ?? '*****************'}    "
+                                      : (widget.personDetails.gramaNiladhariDivision?.length ?? 0) > 25
                                       ? TranslationService.translate(
                                         context,
-                                        '${widget.personDetails.officeForMA?.substring(0, 25)}...',
+                                        '${widget.personDetails.gramaNiladhariDivision?.substring(0, 25)}...',
                                       )
-                                      : "${TranslationService.translate(context, widget.personDetails.officeForMA) ?? '*****************'}    ",
+                                      : "${TranslationService.translate(context, widget.personDetails.gramaNiladhariDivision) ?? '*****************'}    ",
                                   style: context.semiBold14(color: ColorManager.blackMedium),
                                   overflow: TextOverflow.visible,
                                 ),

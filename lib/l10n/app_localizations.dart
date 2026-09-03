@@ -598,11 +598,47 @@ abstract class AppLocalizations {
   /// **'Select your school'**
   String get reqSelectSchool;
 
+  /// No description provided for @reqProvince.
+  ///
+  /// In en, this message translates to:
+  /// **'Select your province'**
+  String get reqProvince;
+
+  /// No description provided for @reqDistrict.
+  ///
+  /// In en, this message translates to:
+  /// **'Select your district'**
+  String get reqDistrict;
+
+  /// No description provided for @reqKalapa.
+  ///
+  /// In en, this message translates to:
+  /// **'Select your kalapa/institution'**
+  String get reqKalapa;
+
+  /// No description provided for @reqKottasa.
+  ///
+  /// In en, this message translates to:
+  /// **'Select your kottasa/office/division'**
+  String get reqKottasa;
+
+  /// No description provided for @reqJob.
+  ///
+  /// In en, this message translates to:
+  /// **'Please select a job category'**
+  String get reqJob;
+
   /// No description provided for @reqSelectOffice.
   ///
   /// In en, this message translates to:
   /// **'Select your office'**
   String get reqSelectOffice;
+
+  /// No description provided for @reqScheme.
+  ///
+  /// In en, this message translates to:
+  /// **'Select your scheme'**
+  String get reqScheme;
 
   /// No description provided for @reqSelectSubject.
   ///
@@ -1330,6 +1366,12 @@ abstract class AppLocalizations {
   /// **'Welcome'**
   String get welcome;
 
+  /// No description provided for @or.
+  ///
+  /// In en, this message translates to:
+  /// **'Or'**
+  String get or;
+
   /// No description provided for @loginBelow.
   ///
   /// In en, this message translates to:
@@ -1354,6 +1396,12 @@ abstract class AppLocalizations {
   /// **'Log in'**
   String get logIn;
 
+  /// No description provided for @continueWithGoogle.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue with Google'**
+  String get continueWithGoogle;
+
   /// No description provided for @cantLogInOrCreate.
   ///
   /// In en, this message translates to:
@@ -1371,6 +1419,132 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Hello, I need assistance with my account.'**
   String get whatsappSupportMessage;
+
+  /// No description provided for @transferCycles.
+  ///
+  /// In en, this message translates to:
+  /// **'Transfer Cycles'**
+  String get transferCycles;
+
+  /// No description provided for @firstChoiceTab.
+  ///
+  /// In en, this message translates to:
+  /// **'1st Choice'**
+  String get firstChoiceTab;
+
+  /// No description provided for @secondChoiceTab.
+  ///
+  /// In en, this message translates to:
+  /// **'2nd Choice'**
+  String get secondChoiceTab;
+
+  /// No description provided for @thirdChoiceTab.
+  ///
+  /// In en, this message translates to:
+  /// **'3rd Choice'**
+  String get thirdChoiceTab;
+
+  /// No description provided for @twoPersonTab.
+  ///
+  /// In en, this message translates to:
+  /// **'2-Person'**
+  String get twoPersonTab;
+
+  /// No description provided for @threePersonTab.
+  ///
+  /// In en, this message translates to:
+  /// **'3-Person'**
+  String get threePersonTab;
+
+  /// No description provided for @fourPersonTab.
+  ///
+  /// In en, this message translates to:
+  /// **'4-Person'**
+  String get fourPersonTab;
+
+  /// No description provided for @noMatchesFound.
+  ///
+  /// In en, this message translates to:
+  /// **'No matches found.'**
+  String get noMatchesFound;
+
+  /// No description provided for @twoPersonCycle.
+  ///
+  /// In en, this message translates to:
+  /// **'2-Person Cycle'**
+  String get twoPersonCycle;
+
+  /// No description provided for @threePersonCycle.
+  ///
+  /// In en, this message translates to:
+  /// **'3-Person Cycle'**
+  String get threePersonCycle;
+
+  /// No description provided for @fourPersonCycle.
+  ///
+  /// In en, this message translates to:
+  /// **'4-Person Cycle'**
+  String get fourPersonCycle;
+
+  /// No description provided for @viewCycleFlow.
+  ///
+  /// In en, this message translates to:
+  /// **'View Cycle Flow'**
+  String get viewCycleFlow;
+
+  /// No description provided for @cycleDetails.
+  ///
+  /// In en, this message translates to:
+  /// **'Cycle Details'**
+  String get cycleDetails;
+
+  /// No description provided for @matchFulfillsChoice.
+  ///
+  /// In en, this message translates to:
+  /// **'This match fulfills your choice:'**
+  String get matchFulfillsChoice;
+
+  /// No description provided for @cycleConfirmationNotice.
+  ///
+  /// In en, this message translates to:
+  /// **'This cycle requires all people to confirm the transfer. If one cancels, the cycle breaks.'**
+  String get cycleConfirmationNotice;
+
+  /// No description provided for @currentPost.
+  ///
+  /// In en, this message translates to:
+  /// **'Current Post:'**
+  String get currentPost;
+
+  /// No description provided for @transfersTo.
+  ///
+  /// In en, this message translates to:
+  /// **'Transfers to:'**
+  String get transfersTo;
+
+  /// No description provided for @cycleCompletesBackTo.
+  ///
+  /// In en, this message translates to:
+  /// **'Cycle completes back to'**
+  String get cycleCompletesBackTo;
+
+  /// No description provided for @findMultiPersonCycles.
+  ///
+  /// In en, this message translates to:
+  /// **'Find Multi-Person Transfer Cycles'**
+  String get findMultiPersonCycles;
+
+  /// No description provided for @cycleGroupChat.
+  ///
+  /// In en, this message translates to:
+  /// **'Cycle Group Chat'**
+  String get cycleGroupChat;
+
+  /// No description provided for @groupMembers.
+  ///
+  /// In en, this message translates to:
+  /// **'Group Members'**
+  String get groupMembers;
 }
 
 class _AppLocalizationsDelegate

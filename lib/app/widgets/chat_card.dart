@@ -8,6 +8,7 @@ class ChatCard extends StatelessWidget {
   final String? profileImage; // Optional profile image
   final VoidCallback onTap; // Required onTap callback
   final bool? isMute;
+  final int unreadCount;
 
   const ChatCard({
     super.key,
@@ -17,6 +18,7 @@ class ChatCard extends StatelessWidget {
     this.profileImage,
     required this.onTap,
     this.isMute,
+    this.unreadCount = 0, // Defaults to 0
   });
 
   @override
@@ -48,24 +50,62 @@ class ChatCard extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(name, style: context.semiBold18(color: ColorManager.blackMedium, fontSize: 16)),
+                    Text(
+                      name,
+                      style: context.semiBold18(color: ColorManager.blackMedium, fontSize: 16),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
                     const SizedBox(height: 3),
                     Text(
                       lastMessage,
-                      style: context.medium16(color: ColorManager.grayText, fontSize: 14),
+                      style: context
+                          .medium16(
+                            color: unreadCount > 0 ? ColorManager.blackMedium : ColorManager.grayText,
+                            fontSize: 14,
+                          )
+                          .copyWith(fontWeight: unreadCount > 0 ? FontWeight.bold : FontWeight.normal),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
                   ],
                 ),
               ),
+              const SizedBox(width: 8),
 
-              /// **Message Time**
+              /// **Message Time, Mute Icon & Unread Badge**
               Column(
                 crossAxisAlignment: CrossAxisAlignment.end,
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  isMute == true ? Icon(Icons.volume_off, color: ColorManager.grayText, size: 20.0) : const SizedBox(),
-                  Text(time, style: context.medium16(color: ColorManager.grayText, fontSize: 14)),
+                  Text(
+                    time,
+                    style: context
+                        .medium16(color: unreadCount > 0 ? Colors.green : ColorManager.grayText, fontSize: 12)
+                        .copyWith(fontWeight: unreadCount > 0 ? FontWeight.bold : FontWeight.normal),
+                  ),
+                  const SizedBox(height: 4),
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      if (isMute == true) Icon(Icons.volume_off, color: ColorManager.grayText, size: 16.0),
+
+                      if (isMute == true && unreadCount > 0) const SizedBox(width: 6),
+
+                      if (unreadCount > 0)
+                        Container(
+                          padding: const EdgeInsets.all(6),
+                          decoration: const BoxDecoration(
+                            color: Colors.green,
+                            shape: BoxShape.circle,
+                          ),
+                          child: Text(
+                            unreadCount > 99 ? '99+' : unreadCount.toString(),
+                            style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold),
+                          ),
+                        ),
+                    ],
+                  ),
                 ],
               ),
             ],

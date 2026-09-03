@@ -27,6 +27,7 @@ class CustomTextField extends StatelessWidget {
     this.suffixIcon,
     this.enabled = true,
     this.minLine = 1,
+    this.readOnly = false,
   });
 
   final bool? obscure;
@@ -51,6 +52,7 @@ class CustomTextField extends StatelessWidget {
   final bool enabled;
   final Widget? suffixIcon;
   final int minLine;
+  final bool readOnly;
 
   @override
   Widget build(BuildContext context) {
@@ -69,6 +71,7 @@ class CustomTextField extends StatelessWidget {
           ),
           child: TextFormField(
             enabled: enabled,
+            readOnly: readOnly,
             onChanged: onChanged,
             keyboardType: inputType ?? TextInputType.multiline,
             obscureText: obscure ?? false,

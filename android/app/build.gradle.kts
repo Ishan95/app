@@ -41,26 +41,35 @@ android {
         versionName = flutter.versionName
     }
 
-    buildTypes {
-        release {
-            signingConfig = signingConfigs.getByName("debug")
+    // buildTypes {
+    //     release {
+    //         signingConfig = signingConfigs.getByName("debug")
+    //     }
+    // }
+
+    signingConfigs {
+        create("release") {
+            val storeFilePath = keystoreProperties["storeFile"] as? String
+
+            if (storeFilePath != null) {
+                storeFile = file(storeFilePath)
+                storePassword = keystoreProperties["storePassword"] as? String
+                keyAlias = keystoreProperties["keyAlias"] as? String
+                keyPassword = keystoreProperties["keyPassword"] as? String
+            } else {
+                logger.info("Release keystore properties not found. Skipping release signing config.")
+            }
         }
     }
 
-//     signingConfigs {
-//     create("release") {
-//         storeFile = file(keystoreProperties["storeFile"] as String)
-//         storePassword = keystoreProperties["storePassword"] as String
-//         keyAlias = keystoreProperties["keyAlias"] as String
-//         keyPassword = keystoreProperties["keyPassword"] as String
-//     }
-// }
-    
-//     buildTypes {
-//     release {
-//         signingConfig = signingConfigs.getByName("release")
-//     }
-// }
+    buildTypes {
+        getByName("release") {
+            signingConfig = signingConfigs.getByName("release")
+        }
+        getByName("debug") {
+            signingConfig = signingConfigs.getByName("debug")
+        }
+    }
 }
 
 dependencies {

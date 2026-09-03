@@ -29,7 +29,10 @@ class StaticDataService {
   // Load root constants (Runs once on Screen Init)
   static Future<void> loadRootData(FilterModel model) async {
     try {
-      final doc = await _db.collection('static_data').doc('app_constants').get(const GetOptions(source: Source.serverAndCache));
+      final doc = await _db
+          .collection('static_data')
+          .doc('app_constants')
+          .get(const GetOptions(source: Source.serverAndCache));
       if (doc.exists) {
         final data = doc.data()!;
         model.category = List<String>.from(data['categories'] ?? []);
@@ -58,6 +61,10 @@ class StaticDataService {
 
   static Future<void> fetchMAInstitutions(FilterModel model, String district) async {
     model.districtInstitutionTypeForMA[district] = await _fetchList('filter_district_inst_ma', district);
+  }
+
+  static Future<void> fetchPradesiyaSabhas(FilterModel model, String district) async {
+    model.districtPradesiyaSabhas[district] = await _fetchList('filter_district_pradesiya_sabhas', district);
   }
 
   static Future<void> fetchPoliceDivisions(FilterModel model, String district) async {
@@ -102,5 +109,9 @@ class StaticDataService {
 
   static Future<void> fetchSubjects(FilterModel model, String scheme) async {
     model.schemeSubjects[scheme] = await _fetchList('filter_scheme_subjects', scheme);
+  }
+
+  static Future<void> fetchPirivenas(FilterModel model, String district) async {
+    model.districtPirivenas[district] = await _fetchList('filter_district_pirivenas', district);
   }
 }

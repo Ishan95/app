@@ -1,30 +1,30 @@
 import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:app/app/models/chat/message.dart';
-import 'package:app/app/themes/text_themes.dart';
-import 'package:app/app/utils/color_manager.dart';
-import 'package:app/providers/account_provider.dart';
+import 'package:app/app/export.dart';
+import 'package:app/app/models/mutual_transfer_match_model.dart';
+import 'package:app/app/models/chat/group_message.dart';
+import 'package:app/providers/chat_provider.dart';
 import 'package:app/providers/filtter_provider.dart';
-import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
-import 'package:provider/provider.dart';
+import 'package:app/providers/account_provider.dart';
 import 'package:app/l10n/app_localizations.dart';
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:intl/intl.dart';
+import 'package:app/app/utils/translation_service.dart';
+import 'group_members_screen.dart';
 
-import '../../../../app/models/chat/contact.dart';
-import '../../../../providers/chat_provider.dart';
+class GroupChatScreen extends StatefulWidget {
+  final MutualTransferMatch match;
 
-class MessageScreen extends StatefulWidget {
-  final Contact? contact;
-
-  const MessageScreen({super.key, required this.contact});
+  const GroupChatScreen({super.key, required this.match});
 
   @override
-  State<MessageScreen> createState() => _MessageScreenState();
+  State<GroupChatScreen> createState() => _GroupChatScreenState();
 }
 
-class _MessageScreenState extends State<MessageScreen> {
+class _GroupChatScreenState extends State<GroupChatScreen> {
   final TextEditingController _messageController = TextEditingController();
-  ScrollController _scrollController = ScrollController();
+  final ScrollController _scrollController = ScrollController();
 
   String? _currentUserId;
   int _currentMessageCount = 0;
@@ -41,23 +41,23 @@ class _MessageScreenState extends State<MessageScreen> {
         _scrollController.jumpTo(_scrollController.position.maxScrollExtent);
       }
 
-      if (_currentUserId != null && widget.contact != null) {
+      if (_currentUserId != null) {
         final chatProvider = Provider.of<ChatProvider>(context, listen: false);
-        final chatRoomId = chatProvider.getChatRoomId(_currentUserId!, widget.contact!.id);
+        final matchId = widget.match.matchId;
 
-        chatProvider.markAsRead(_currentUserId!, chatRoomId);
+        chatProvider.markAsRead(_currentUserId!, matchId);
 
         _metadataSubscription = FirebaseFirestore.instance
             .collection("users_chat_metadata")
             .doc(_currentUserId)
             .collection("chatList")
-            .doc(chatRoomId)
+            .doc(matchId)
             .snapshots()
             .listen((snapshot) {
               if (snapshot.exists) {
                 final unreadCount = snapshot.data()?['unreadCount'] ?? 0;
                 if (unreadCount > 0) {
-                  chatProvider.markAsRead(_currentUserId!, chatRoomId);
+                  chatProvider.markAsRead(_currentUserId!, matchId);
                 }
               }
             });
@@ -73,62 +73,41 @@ class _MessageScreenState extends State<MessageScreen> {
     super.dispose();
   }
 
-  Widget _buildMessageItem(Message message, String currentUserId) {
-    bool isCurrentUser = message.senderId == currentUserId;
+  Widget _buildMessageItem(GroupMessage message, String currentUserId) {
+    bool isMe = message.senderId == currentUserId;
 
     return Align(
-      alignment: isCurrentUser ? Alignment.centerRight : Alignment.centerLeft,
+      alignment: isMe ? Alignment.centerRight : Alignment.centerLeft,
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-        margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+        margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+        constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.75),
         decoration: BoxDecoration(
-          color: isCurrentUser ? ColorManager.kPrimary : ColorManager.whiteddd,
+          color: isMe ? ColorManager.kPrimary : ColorManager.whiteddd,
           borderRadius: BorderRadius.only(
             topLeft: const Radius.circular(16),
             topRight: const Radius.circular(16),
-            bottomLeft: isCurrentUser ? const Radius.circular(16) : const Radius.circular(2),
-            bottomRight: isCurrentUser ? const Radius.circular(2) : const Radius.circular(16),
+            bottomLeft: isMe ? const Radius.circular(16) : const Radius.circular(2),
+            bottomRight: isMe ? const Radius.circular(2) : const Radius.circular(16),
           ),
         ),
         child: Column(
-          crossAxisAlignment: isCurrentUser ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+          crossAxisAlignment: isMe ? CrossAxisAlignment.end : CrossAxisAlignment.start,
           children: [
+            if (!isMe) ...[
+              Text(message.senderName, style: context.semiBold14(color: ColorManager.kPrimary)),
+              const SizedBox(height: 2),
+            ],
             Text(
               message.message,
-              style: context.regular16(color: isCurrentUser ? ColorManager.white : ColorManager.blackMedium),
+              style: context.regular16(color: isMe ? ColorManager.white : ColorManager.blackMedium),
             ),
             const SizedBox(height: 4),
             Text(
               DateFormat('hh:mm a').format(message.time.toDate()),
-              style: context.regular12(color: isCurrentUser ? ColorManager.white75 : ColorManager.grayText),
+              style: context.regular12(color: isMe ? ColorManager.white : ColorManager.grayText),
             ),
           ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildDateHeader(DateTime date, AppLocalizations l10n) {
-    String formattedDate;
-
-    final now = DateTime.now();
-    final yesterday = now.subtract(const Duration(days: 1));
-
-    if (date.year == now.year && date.month == now.month && date.day == now.day) {
-      formattedDate = l10n.today;
-    } else if (date.year == yesterday.year && date.month == yesterday.month && date.day == yesterday.day) {
-      formattedDate = l10n.yesterday;
-    } else {
-      formattedDate = DateFormat('MMMM d, yyyy').format(date);
-    }
-
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 10),
-      child: Center(
-        child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-          decoration: BoxDecoration(color: ColorManager.kPrimaryBlack, borderRadius: BorderRadius.circular(12)),
-          child: Text(formattedDate, style: context.regular12(color: ColorManager.grayText)),
         ),
       ),
     );
@@ -140,21 +119,23 @@ class _MessageScreenState extends State<MessageScreen> {
     final accProvider = Provider.of<AccountProvider>(context, listen: false);
     final l10n = AppLocalizations.of(context)!;
 
-    if (_currentUserId == null || widget.contact == null) {
+    if (_currentUserId == null) {
       return Scaffold(
-        appBar: AppBar(
-          title: Text(l10n.errorPrefix, style: TextStyle(color: ColorManager.blackMedium)),
-          backgroundColor: ColorManager.white,
-          iconTheme: IconThemeData(color: ColorManager.blackMedium),
-        ),
-        body: Center(child: Text(l10n.cannotLoadChat, style: TextStyle(color: ColorManager.blackMedium))),
+        appBar: AppBar(backgroundColor: ColorManager.white),
+        body: Center(child: Text(l10n.cannotLoadChat)),
       );
     }
+
+    String groupName = widget.match.cycle
+        .map((e) => TranslationService.translate(context, e.district ?? l10n.unknown))
+        .join(' ➔ ');
+
+    String subtitle = widget.match.cycle.map((e) => e.firstName ?? l10n.unknown).join(', ');
 
     return Scaffold(
       backgroundColor: ColorManager.white,
       appBar: PreferredSize(
-        preferredSize: const Size.fromHeight(100),
+        preferredSize: const Size.fromHeight(65),
         child: AppBar(
           backgroundColor: ColorManager.white,
           elevation: 0.5,
@@ -162,26 +143,39 @@ class _MessageScreenState extends State<MessageScreen> {
             icon: Icon(Icons.arrow_back, color: ColorManager.blackMedium),
             onPressed: () => Navigator.pop(context),
           ),
-          centerTitle: true,
-          flexibleSpace: SafeArea(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
+          titleSpacing: 0,
+          title: GestureDetector(
+            onTap: () {
+              Navigator.push(context, MaterialPageRoute(builder: (_) => GroupMembersScreen(match: widget.match)));
+            },
+            child: Row(
               children: [
                 CircleAvatar(
-                  radius: 30,
+                  radius: 20,
                   backgroundColor: ColorManager.kPrimary,
-                  child:
-                      widget.contact?.name?.isNotEmpty == true
-                          ? Text(
-                            "${widget.contact!.name?[0].toUpperCase()}",
-                            style: const TextStyle(color: Colors.white, fontSize: 24),
-                          )
-                          : const Icon(Icons.person, color: Colors.white),
+                  child: const Icon(Icons.group, color: Colors.white, size: 24),
                 ),
-                const SizedBox(height: 6),
-                Text(
-                  widget.contact?.name ?? l10n.unknownUser,
-                  style: TextStyle(color: ColorManager.blackMedium, fontSize: 18, fontWeight: FontWeight.bold),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        groupName,
+                        style: context.bold16(color: ColorManager.blackMedium),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        subtitle,
+                        style: context.regular12(color: ColorManager.grayText),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
+                  ),
                 ),
               ],
             ),
@@ -191,8 +185,8 @@ class _MessageScreenState extends State<MessageScreen> {
       body: Column(
         children: [
           Expanded(
-            child: StreamBuilder<List<Message>>(
-              stream: chatProvider.getMessages(_currentUserId!, widget.contact!.id),
+            child: StreamBuilder<List<GroupMessage>>(
+              stream: chatProvider.getGroupMessages(widget.match.matchId),
               builder: (context, snapshot) {
                 if (snapshot.hasError) {
                   return Center(
@@ -214,37 +208,17 @@ class _MessageScreenState extends State<MessageScreen> {
                         curve: Curves.easeOut,
                       );
                     }
-                    final chatRoomId = chatProvider.getChatRoomId(_currentUserId!, widget.contact!.id);
-                    chatProvider.markAsRead(_currentUserId!, chatRoomId);
+                    chatProvider.markAsRead(_currentUserId!, widget.match.matchId);
                   });
                 }
 
                 return ListView.builder(
                   controller: _scrollController,
                   itemCount: snapshot.data!.length,
+                  padding: const EdgeInsets.symmetric(vertical: 16),
                   itemBuilder: (context, index) {
                     final message = snapshot.data![index];
-                    bool showDateHeader = false;
-
-                    if (index == 0) {
-                      showDateHeader = true;
-                    } else {
-                      final previousMessage = snapshot.data![index - 1];
-
-                      DateTime currentDate = message.time.toDate();
-                      DateTime previousDate = previousMessage.time.toDate();
-
-                      showDateHeader =
-                          currentDate.year != previousDate.year ||
-                          currentDate.month != previousDate.month ||
-                          currentDate.day != previousDate.day;
-                    }
-                    return Column(
-                      children: [
-                        if (showDateHeader) _buildDateHeader(message.time.toDate(), l10n),
-                        _buildMessageItem(message, _currentUserId!),
-                      ],
-                    );
+                    return _buildMessageItem(message, _currentUserId!);
                   },
                 );
               },
@@ -262,8 +236,6 @@ class _MessageScreenState extends State<MessageScreen> {
                       child: TextField(
                         controller: _messageController,
                         style: TextStyle(color: ColorManager.blackMedium),
-                        autocorrect: false,
-                        enableSuggestions: false,
                         keyboardType: TextInputType.multiline,
                         maxLines: null,
                         decoration: InputDecoration(
@@ -294,18 +266,24 @@ class _MessageScreenState extends State<MessageScreen> {
   }
 
   void _sendMessage({required ChatProvider chatProvider, required AccountProvider accProvider}) {
-    if (_messageController.text.trim().isNotEmpty &&
-        _currentUserId != null &&
-        widget.contact != null &&
-        accProvider.appUser?.firstName != null) {
-      chatProvider.sendMessage(
-        receiverId: widget.contact!.id,
-        message: _messageController.text.trim(),
-        receiverName: "${widget.contact?.name}",
-        senderName: "${accProvider.appUser!.firstName}",
-        senderId: _currentUserId!,
-      );
-      _messageController.clear();
-    }
+    final text = _messageController.text.trim();
+    if (text.isEmpty || _currentUserId == null) return;
+
+    final filtterProvider = Provider.of<FiltterProvider>(context, listen: false);
+    final senderName = accProvider.appUser?.firstName ?? filtterProvider.appUser?.firstName ?? "User";
+
+    String groupName = widget.match.cycle
+        .map((e) => TranslationService.translate(context, e.district ?? ''))
+        .join(' ➔ ');
+
+    chatProvider.sendGroupMessage(
+      match: widget.match,
+      message: text,
+      senderName: senderName,
+      senderId: _currentUserId!,
+      groupName: groupName,
+    );
+
+    _messageController.clear();
   }
 }

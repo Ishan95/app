@@ -1,4 +1,7 @@
+import 'package:app/app/models/chat/chat_model.dart';
 import 'package:app/providers/auth_provider.dart';
+import 'package:app/providers/chat_provider.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:app/app/export.dart';
@@ -12,6 +15,7 @@ class BottomNavBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final ChatProvider chatProvider = Provider.of<ChatProvider>(context, listen: false);
 
     return Container(
       decoration: BoxDecoration(
@@ -19,125 +23,105 @@ class BottomNavBar extends StatelessWidget {
         borderRadius: const BorderRadius.only(topLeft: Radius.circular(20), topRight: Radius.circular(20)),
         boxShadow: const [BoxShadow(color: Color(0x0A05241A), offset: Offset(3, 3), blurRadius: 10, spreadRadius: 4)],
       ),
-      padding: EdgeInsets.all(12),
-      child: Consumer<AuthenticationProvider>(
-        builder: (context, auth, child) {
-          return Stack(
-            clipBehavior: Clip.none,
-            alignment: Alignment.center,
-            children: [
-              Row(
+      child: SafeArea(
+        top: false,
+        child: Padding(
+          padding: const EdgeInsets.all(12),
+          child: Consumer<AuthenticationProvider>(
+            builder: (context, auth, child) {
+              final String? currentUserId = FirebaseAuth.instance.currentUser?.uid;
+
+              return Stack(
+                clipBehavior: Clip.none,
+                alignment: Alignment.center,
                 children: [
-                  Expanded(
-                    flex: 2,
-                    child: GestureDetector(
-                      onTap: () => onPress(0),
-                      behavior: HitTestBehavior.translucent,
-                      child: Column(
-                        children: [
-                          Icon(Icons.home, color: ColorManager.grayText),
-                          SizedBox(height: context.verticalSize(4)),
-                          Text(
-                            l10n.homeNav,
-                            style: context.regular12(color: ColorManager.grayText),
+                  Row(
+                    children: [
+                      Expanded(
+                        flex: 2,
+                        child: GestureDetector(
+                          onTap: () => onPress(0),
+                          behavior: HitTestBehavior.translucent,
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(Icons.home, color: ColorManager.grayText),
+                              SizedBox(height: context.verticalSize(4)),
+                              Text(l10n.homeNav, style: context.regular12(color: ColorManager.grayText)),
+                              SizedBox(height: context.verticalSize(4)),
+                            ],
                           ),
-                          SizedBox(height: context.verticalSize(4)),
-                        ],
+                        ),
                       ),
-                    ),
-                  ),
-                  Expanded(
-                    flex: 2,
-                    child: GestureDetector(
-                      onTap: () => onPress(1),
-                      behavior: HitTestBehavior.translucent,
-                      child: Column(
-                        children: [
-                          Icon(Icons.notifications, color: ColorManager.grayText),
-                          SizedBox(height: context.verticalSize(4)),
-                          Text(
-                            l10n.notificationsNav,
-                            style: context.regular12(color: ColorManager.grayText),
+                      Expanded(
+                        flex: 2,
+                        child: GestureDetector(
+                          onTap: () => onPress(1),
+                          behavior: HitTestBehavior.translucent,
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(Icons.notifications, color: ColorManager.grayText),
+                              SizedBox(height: context.verticalSize(4)),
+                              Text(l10n.notificationsNav, style: context.regular12(color: ColorManager.grayText)),
+                              SizedBox(height: context.verticalSize(4)),
+                            ],
                           ),
-                          SizedBox(height: context.verticalSize(4)),
-                        ],
+                        ),
                       ),
-                    ),
-                  ),
-                  // Spacer(flex: 1), // Add spacing for the middle button
-                  // Expanded(
-                  //   flex: 2,
-                  //   child: GestureDetector(
-                  //     onTap: () => onPress(2),
-                  //     behavior: HitTestBehavior.translucent,
-                  //     child: Column(
-                  //       children: [
-                  //         // SvgPicture.asset(
-                  //         //   Assets.CarBottomTab,
-                  //         // ),
-                  //         SizedBox(height: context.verticalSize(2)),
-                  //         Text(
-                  //           'Vehicles',
-                  //           style: context.regular12(color: ColorManager.grayText),
-                  //         ),
-                  //       ],
-                  //     ),
-                  //   ),
-                  // ),
-                  Expanded(
-                    flex: 2,
-                    child: GestureDetector(
-                      onTap: () => onPress(2),
-                      behavior: HitTestBehavior.translucent,
-                      child: Column(
-                        children: [
-                          Icon(Icons.chat, color: ColorManager.grayText),
-                          SizedBox(height: context.verticalSize(4)),
-                          Text(
-                            l10n.chatNav,
-                            style: context.regular12(color: ColorManager.grayText),
+                      Expanded(
+                        flex: 2,
+                        child: GestureDetector(
+                          onTap: () => onPress(2),
+                          behavior: HitTestBehavior.translucent,
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              StreamBuilder<List<ChatModel>>(
+                                stream: chatProvider.getChats(currentUserId),
+                                builder: (context, snapshot) {
+                                  int totalUnread = 0;
+                                  if (snapshot.hasData) {
+                                    totalUnread = snapshot.data!.fold(0, (sum, chat) => sum + chat.unreadCount);
+                                  }
+                                  return Badge(
+                                    isLabelVisible: totalUnread > 0,
+                                    label: Text(totalUnread > 99 ? '99+' : totalUnread.toString()),
+                                    backgroundColor: Colors.red,
+                                    child: Icon(Icons.chat, color: ColorManager.grayText),
+                                  );
+                                },
+                              ),
+                              SizedBox(height: context.verticalSize(4)),
+                              Text(l10n.chatNav, style: context.regular12(color: ColorManager.grayText)),
+                              SizedBox(height: context.verticalSize(4)),
+                            ],
                           ),
-                          SizedBox(height: context.verticalSize(4)),
-                        ],
+                        ),
                       ),
-                    ),
-                  ),
-                  Expanded(
-                    flex: 2,
-                    child: GestureDetector(
-                      onTap: () => onPress(3),
-                      behavior: HitTestBehavior.translucent,
-                      child: Column(
-                        children: [
-                          Icon(Icons.person, color: ColorManager.grayText),
-                          SizedBox(height: context.verticalSize(4)),
-                          Text(
-                            l10n.accountNav,
-                            style: context.regular12(color: ColorManager.grayText),
+                      Expanded(
+                        flex: 2,
+                        child: GestureDetector(
+                          onTap: () => onPress(3),
+                          behavior: HitTestBehavior.translucent,
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(Icons.person, color: ColorManager.grayText),
+                              SizedBox(height: context.verticalSize(4)),
+                              Text(l10n.accountNav, style: context.regular12(color: ColorManager.grayText)),
+                              SizedBox(height: context.verticalSize(4)),
+                            ],
                           ),
-                          SizedBox(height: context.verticalSize(4)),
-                        ],
+                        ),
                       ),
-                    ),
+                    ],
                   ),
                 ],
-              ),
-              // Positioned(
-              //   top: -context.verticalSize(
-              //       50), // Adjust to move the icon above the bar
-              //   child: GestureDetector(
-              //     // onTap: () => onPress(2),
-              //     behavior: HitTestBehavior.translucent,
-              //     child: SizedBox(
-              //       width: context.verticalSize(70),
-              //       height: context.verticalSize(70),
-              //       child: SvgPicture.asset(Assets.googleLogoSVG2),
-              //     ),
-              //   ),
-              // ),
-            ],
-          );
-        },
+              );
+            },
+          ),
+        ),
       ),
     );
   }

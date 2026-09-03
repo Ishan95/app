@@ -56,13 +56,13 @@ class AppLocalizationsTa extends AppLocalizations {
   String get hide => 'மறை';
 
   @override
-  String get selectJobCategory => 'உங்கள் வேலை வகையைத் தேர்ந்தெடுக்கவும்';
+  String get selectJobCategory => 'உங்கள் வேலை வகையைத் தேர்ந்தெடுக்கவும் ';
 
   @override
-  String get setupSchoolingDetails => 'உங்கள் பள்ளி விவரங்களை அமைக்கவும்';
+  String get setupSchoolingDetails => 'உங்கள் பள்ளி விவரங்களை அமைக்கவும் ';
 
   @override
-  String get setupOfficeDetails => 'உங்கள் அலுவலக விவரங்களை அமைக்கவும்';
+  String get setupOfficeDetails => 'உங்கள் அலுவலக விவரங்களை அமைக்கவும் ';
 
   @override
   String get setupSubjectDetails => 'உங்கள் பாட விவரங்களை அமைக்கவும்';
@@ -80,7 +80,7 @@ class AppLocalizationsTa extends AppLocalizations {
   String get selectKalapa => 'வலயத்தைத் தேர்ந்தெடுக்கவும்';
 
   @override
-  String get selectInstitutionType => 'நிறுவனத்தின் வகையைத் தேர்ந்தெடுக்கவும்';
+  String get selectInstitutionType => 'நிறுவனத்தின் வகையைத் தேர்ந்தெடுக்கவும் ';
 
   @override
   String get selectKottasa => 'கோட்டத்தைத் தேர்ந்தெடுக்கவும்';
@@ -98,28 +98,28 @@ class AppLocalizationsTa extends AppLocalizations {
   String get selectGrade => 'தரத்தைத் தேர்ந்தெடுக்கவும்';
 
   @override
-  String get selectSubjectMedium => 'பாட ஊடகத்தைத் தேர்ந்தெடுக்கவும்';
+  String get selectSubjectMedium => 'பாட ஊடகத்தைத் தேர்ந்தெடுக்கவும் ';
 
   @override
   String get selectSubject => 'பாடத்தைத் தேர்ந்தெடுக்கவும்';
 
   @override
-  String get selectYourChoice => 'உங்கள் விருப்பத்தைத் தேர்ந்தெடுக்கவும்';
+  String get selectYourChoice => 'உங்கள் விருப்பத்தைத் தேர்ந்தெடுக்கவும் ';
 
   @override
-  String get transferChoice1 => 'பரிமாற்றத்திற்கான முதல் மாவட்ட விருப்பம்';
+  String get transferChoice1 => 'பரிமாற்றத்திற்கான முதல் மாவட்ட விருப்பம் ';
 
   @override
   String get selectChoice1 => '1 வது விருப்பத்தைத் தேர்ந்தெடுக்கவும்';
 
   @override
-  String get transferChoice2 => 'பரிமாற்றத்திற்கான இரண்டாவது மாவட்ட விருப்பம்';
+  String get transferChoice2 => 'பரிமாற்றத்திற்கான இரண்டாவது மாவட்ட விருப்பம் ';
 
   @override
   String get selectChoice2 => '2 வது விருப்பத்தைத் தேர்ந்தெடுக்கவும்';
 
   @override
-  String get transferChoice3 => 'பரிமாற்றத்திற்கான மூன்றாவது மாவட்ட விருப்பம்';
+  String get transferChoice3 => 'பரிமாற்றத்திற்கான மூன்றாவது மாவட்ட விருப்பம் ';
 
   @override
   String get selectChoice3 => '3 வது விருப்பத்தைத் தேர்ந்தெடுக்கவும்';
@@ -265,7 +265,25 @@ class AppLocalizationsTa extends AppLocalizations {
   String get reqSelectSchool => 'பள்ளியைத் தேர்ந்தெடுக்கவும்';
 
   @override
+  String get reqProvince => 'உங்கள் மாகாணத்தைத் தேர்ந்தெடுக்கவும்';
+
+  @override
+  String get reqDistrict => 'உங்கள் மாவட்டத்தைத் தேர்ந்தெடுக்கவும்';
+
+  @override
+  String get reqKalapa => 'உங்கள் வலயம்/நிறுவனத்தின் வகையைத் தேர்ந்தெடுக்கவும்';
+
+  @override
+  String get reqKottasa => 'உங்கள் கோட்டம்/அலுவலகத்தைத் தேர்ந்தெடுக்கவும்';
+
+  @override
+  String get reqJob => 'ஒரு வேலைப் பிரிவைத் தேர்ந்தெடுக்கவும்';
+
+  @override
   String get reqSelectOffice => 'அலுவலகத்தைத் தேர்ந்தெடுக்கவும்';
+
+  @override
+  String get reqScheme => 'உங்கள் திட்டத்தைத் தேர்ந்தெடுக்கவும்';
 
   @override
   String get reqSelectSubject => 'பாடத்தைத் தேர்ந்தெடுக்கவும்';
@@ -647,6 +665,9 @@ class AppLocalizationsTa extends AppLocalizations {
   String get welcome => 'வரவேற்கிறோம்';
 
   @override
+  String get or => 'அல்லது';
+
+  @override
   String get loginBelow => 'கீழே உங்கள் கணக்கில் புகுபதிகை செய்யவும்';
 
   @override
@@ -659,6 +680,9 @@ class AppLocalizationsTa extends AppLocalizations {
   String get logIn => 'புகுபதிகை செய்';
 
   @override
+  String get continueWithGoogle => 'கூகிளுடன் தொடரவும்';
+
+  @override
   String get cantLogInOrCreate =>
       'புகுபதிகை செய்யவோ அல்லது கணக்கை உருவாக்கவோ முடியவில்லையா?    ';
 
@@ -669,4 +693,70 @@ class AppLocalizationsTa extends AppLocalizations {
   @override
   String get whatsappSupportMessage =>
       'வணக்கம், எனது கணக்கு தொடர்பாக எனக்கு உதவி தேவை.';
+
+  @override
+  String get transferCycles => 'பரிமாற்ற சுழற்சிகள்';
+
+  @override
+  String get firstChoiceTab => '1 வது விருப்பம்';
+
+  @override
+  String get secondChoiceTab => '2 வது விருப்பம்';
+
+  @override
+  String get thirdChoiceTab => '3 வது விருப்பம்';
+
+  @override
+  String get twoPersonTab => '2 நபர்கள்';
+
+  @override
+  String get threePersonTab => '3 நபர்கள்';
+
+  @override
+  String get fourPersonTab => '4 நபர்கள்';
+
+  @override
+  String get noMatchesFound => 'பொருத்தங்கள் எதுவும் இல்லை.';
+
+  @override
+  String get twoPersonCycle => '2 நபர் சுழற்சி';
+
+  @override
+  String get threePersonCycle => '3 நபர் சுழற்சி';
+
+  @override
+  String get fourPersonCycle => '4 நபர் சுழற்சி';
+
+  @override
+  String get viewCycleFlow => 'சுழற்சி ஓட்டத்தைக் காண்க';
+
+  @override
+  String get cycleDetails => 'சுழற்சி விவரங்கள்';
+
+  @override
+  String get matchFulfillsChoice =>
+      'இந்த பொருத்தம் உங்கள் விருப்பத்தை பூர்த்தி செய்கிறது:';
+
+  @override
+  String get cycleConfirmationNotice =>
+      'இந்தப் பரிமாற்றத்தை உறுதிப்படுத்த அனைவரும் தேவை. ஒருவர் ரத்துசெய்தால் சுழற்சி உடையும்.';
+
+  @override
+  String get currentPost => 'தற்போதைய பதவி:';
+
+  @override
+  String get transfersTo => 'பரிமாற்றம்:';
+
+  @override
+  String get cycleCompletesBackTo => 'சுழற்சி மீண்டும் நிறைவடைகிறது';
+
+  @override
+  String get findMultiPersonCycles =>
+      'பல நபர் பரிமாற்ற சுழற்சிகளைக் கண்டறியவும்';
+
+  @override
+  String get cycleGroupChat => 'சைக்கிள் குழு அரட்டை';
+
+  @override
+  String get groupMembers => 'குழு உறுப்பினர்கள்';
 }

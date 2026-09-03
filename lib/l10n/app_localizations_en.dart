@@ -264,7 +264,25 @@ class AppLocalizationsEn extends AppLocalizations {
   String get reqSelectSchool => 'Select your school';
 
   @override
+  String get reqProvince => 'Select your province';
+
+  @override
+  String get reqDistrict => 'Select your district';
+
+  @override
+  String get reqKalapa => 'Select your kalapa/institution';
+
+  @override
+  String get reqKottasa => 'Select your kottasa/office/division';
+
+  @override
+  String get reqJob => 'Please select a job category';
+
+  @override
   String get reqSelectOffice => 'Select your office';
+
+  @override
+  String get reqScheme => 'Select your scheme';
 
   @override
   String get reqSelectSubject => 'Select your subject';
@@ -641,6 +659,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get welcome => 'Welcome';
 
   @override
+  String get or => 'Or';
+
+  @override
   String get loginBelow => 'Log in to your account below';
 
   @override
@@ -653,6 +674,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get logIn => 'Log in';
 
   @override
+  String get continueWithGoogle => 'Continue with Google';
+
+  @override
   String get cantLogInOrCreate => 'Can\'t Log In or Create an Account?    ';
 
   @override
@@ -661,4 +685,68 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get whatsappSupportMessage =>
       'Hello, I need assistance with my account.';
+
+  @override
+  String get transferCycles => 'Transfer Cycles';
+
+  @override
+  String get firstChoiceTab => '1st Choice';
+
+  @override
+  String get secondChoiceTab => '2nd Choice';
+
+  @override
+  String get thirdChoiceTab => '3rd Choice';
+
+  @override
+  String get twoPersonTab => '2-Person';
+
+  @override
+  String get threePersonTab => '3-Person';
+
+  @override
+  String get fourPersonTab => '4-Person';
+
+  @override
+  String get noMatchesFound => 'No matches found.';
+
+  @override
+  String get twoPersonCycle => '2-Person Cycle';
+
+  @override
+  String get threePersonCycle => '3-Person Cycle';
+
+  @override
+  String get fourPersonCycle => '4-Person Cycle';
+
+  @override
+  String get viewCycleFlow => 'View Cycle Flow';
+
+  @override
+  String get cycleDetails => 'Cycle Details';
+
+  @override
+  String get matchFulfillsChoice => 'This match fulfills your choice:';
+
+  @override
+  String get cycleConfirmationNotice =>
+      'This cycle requires all people to confirm the transfer. If one cancels, the cycle breaks.';
+
+  @override
+  String get currentPost => 'Current Post:';
+
+  @override
+  String get transfersTo => 'Transfers to:';
+
+  @override
+  String get cycleCompletesBackTo => 'Cycle completes back to';
+
+  @override
+  String get findMultiPersonCycles => 'Find Multi-Person Transfer Cycles';
+
+  @override
+  String get cycleGroupChat => 'Cycle Group Chat';
+
+  @override
+  String get groupMembers => 'Group Members';
 }

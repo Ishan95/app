@@ -28,7 +28,7 @@ class AppLocalizationsSi extends AppLocalizations {
   String get email => 'විද්‍යුත් තැපෑල';
 
   @override
-  String get emailAddress => 'විද්‍යුත් තැපැල් ලිපිනය';
+  String get emailAddress => 'විද්‍යුත් තැපැල් ලිපිනය ';
 
   @override
   String get emailNotice =>
@@ -41,13 +41,13 @@ class AppLocalizationsSi extends AppLocalizations {
   String get birthdate => 'උපන්දිනය';
 
   @override
-  String get idCardNumber => 'ජාතික හැඳුනුම්පත් අංකය';
+  String get idCardNumber => 'ජාතික හැඳුනුම්පත් අංකය ';
 
   @override
-  String get contactNumber => 'සම්බන්ධ කරගත හැකි අංකය';
+  String get contactNumber => 'සම්බන්ධ කරගත හැකි අංකය ';
 
   @override
-  String get whatsappOptional => 'වට්ස්ඇප් අංකය (විකල්ප)';
+  String get whatsappOptional => 'වට්ස්ඇප් අංකය (විකල්ප) ';
 
   @override
   String get whatsappNumber => 'වට්ස්ඇප් අංකය';
@@ -56,19 +56,19 @@ class AppLocalizationsSi extends AppLocalizations {
   String get hide => 'සඟවන්න';
 
   @override
-  String get selectJobCategory => 'ඔබේ රැකියා කාණ්ඩය තෝරන්න';
+  String get selectJobCategory => 'ඔබේ රැකියා කාණ්ඩය තෝරන්න ';
 
   @override
-  String get setupSchoolingDetails => 'ඔබගේ පාසල් විස්තර සකසන්න';
+  String get setupSchoolingDetails => 'ඔබගේ පාසල් විස්තර සකසන්න ';
 
   @override
-  String get setupOfficeDetails => 'ඔබගේ කාර්යාල විස්තර සකසන්න';
+  String get setupOfficeDetails => 'ඔබගේ කාර්යාල විස්තර සකසන්න ';
 
   @override
-  String get setupSubjectDetails => 'ඔබගේ විෂය විස්තර සකසන්න';
+  String get setupSubjectDetails => 'ඔබගේ විෂය විස්තර සකසන්න ';
 
   @override
-  String get setupGradeDetails => 'ඔබගේ ශ්‍රේණි විස්තර සකසන්න';
+  String get setupGradeDetails => 'ඔබගේ ශ්‍රේණි විස්තර සකසන්න ';
 
   @override
   String get selectProvince => 'පළාත තෝරන්න';
@@ -80,7 +80,7 @@ class AppLocalizationsSi extends AppLocalizations {
   String get selectKalapa => 'කලාපය තෝරන්න';
 
   @override
-  String get selectInstitutionType => 'ආයතන වර්ගය තෝරන්න';
+  String get selectInstitutionType => 'ආයතන වර්ගය තෝරන්න ';
 
   @override
   String get selectKottasa => 'කොට්ඨාසය තෝරන්න';
@@ -107,25 +107,25 @@ class AppLocalizationsSi extends AppLocalizations {
   String get selectYourChoice => 'ඔබේ තේරීම තෝරන්න';
 
   @override
-  String get transferChoice1 => 'ඔබගේ මාරුවීමේ පළමු තේරීමේ දිස්ත්‍රික්කය';
+  String get transferChoice1 => 'ඔබගේ මාරුවීමේ පළමු තේරීමේ දිස්ත්‍රික්කය ';
 
   @override
   String get selectChoice1 => '1 වන තේරීම තෝරන්න';
 
   @override
-  String get transferChoice2 => 'ඔබගේ මාරුවීමේ දෙවන තේරීමේ දිස්ත්‍රික්කය';
+  String get transferChoice2 => 'ඔබගේ මාරුවීමේ දෙවන තේරීමේ දිස්ත්‍රික්කය ';
 
   @override
   String get selectChoice2 => '2 වන තේරීම තෝරන්න';
 
   @override
-  String get transferChoice3 => 'ඔබගේ මාරුවීමේ තුන්වන තේරීමේ දිස්ත්‍රික්කය';
+  String get transferChoice3 => 'ඔබගේ මාරුවීමේ තුන්වන තේරීමේ දිස්ත්‍රික්කය ';
 
   @override
   String get selectChoice3 => '3 වන තේරීම තෝරන්න';
 
   @override
-  String get addSpecialNote => 'විශේෂ සටහනක් එක් කරන්න';
+  String get addSpecialNote => 'විශේෂ සටහනක් එක් කරන්න ';
 
   @override
   String get note => 'සටහන';
@@ -134,7 +134,7 @@ class AppLocalizationsSi extends AppLocalizations {
   String get password => 'මුරපදය';
 
   @override
-  String get reEnterPassword => 'මුරපදය නැවත ඇතුළත් කරන්න';
+  String get reEnterPassword => 'මුරපදය නැවත ඇතුළත් කරන්න ';
 
   @override
   String get cancel => 'අවලංගු කරන්න';
@@ -265,7 +265,25 @@ class AppLocalizationsSi extends AppLocalizations {
   String get reqSelectSchool => 'ඔබේ පාසල තෝරන්න';
 
   @override
+  String get reqProvince => 'ඔබේ පළාත තෝරන්න';
+
+  @override
+  String get reqDistrict => 'ඔබේ දිස්ත්‍රික්කය තෝරන්න';
+
+  @override
+  String get reqKalapa => 'ඔබේ කලාපය/ආයතන වර්ගය තෝරන්න';
+
+  @override
+  String get reqKottasa => 'ඔබේ කොට්ඨාසය/කාර්යාලය තෝරන්න';
+
+  @override
+  String get reqJob => 'රැකියා කාණ්ඩයක් තෝරන්න.';
+
+  @override
   String get reqSelectOffice => 'ඔබේ කාර්යාලය තෝරන්න';
+
+  @override
+  String get reqScheme => 'ඔබේ ක්‍රමය තෝරන්න';
 
   @override
   String get reqSelectSubject => 'ඔබේ විෂය තෝරන්න';
@@ -641,6 +659,9 @@ class AppLocalizationsSi extends AppLocalizations {
   String get welcome => 'ආයුබෝවන්';
 
   @override
+  String get or => 'හෝ';
+
+  @override
   String get loginBelow => 'පහතින් ඔබගේ ගිණුමට පිවිසෙන්න';
 
   @override
@@ -653,6 +674,9 @@ class AppLocalizationsSi extends AppLocalizations {
   String get logIn => 'ගිණුමට පිවිසෙන්න';
 
   @override
+  String get continueWithGoogle => 'Google මගින් පිවිසෙන්න';
+
+  @override
   String get cantLogInOrCreate =>
       'ගිණුමට පිවිසීමට හෝ ගිණුමක් සෑදීමට නොහැකිද?    ';
 
@@ -663,4 +687,68 @@ class AppLocalizationsSi extends AppLocalizations {
   @override
   String get whatsappSupportMessage =>
       'ආයුබෝවන්, මගේ ගිණුම සම්බන්ධයෙන් මට සහාය අවශ්‍යයි.';
+
+  @override
+  String get transferCycles => 'මාරුවීම් චක්‍ර';
+
+  @override
+  String get firstChoiceTab => '1 වන තේරීම';
+
+  @override
+  String get secondChoiceTab => '2 වන තේරීම';
+
+  @override
+  String get thirdChoiceTab => '3 වන තේරීම';
+
+  @override
+  String get twoPersonTab => 'පුද්ගලයන් 2';
+
+  @override
+  String get threePersonTab => 'පුද්ගලයන් 3';
+
+  @override
+  String get fourPersonTab => 'පුද්ගලයන් 4';
+
+  @override
+  String get noMatchesFound => 'ගැලපීම් හමු නොවීය.';
+
+  @override
+  String get twoPersonCycle => 'පුද්ගලයන් 2 කගේ චක්‍රයක්';
+
+  @override
+  String get threePersonCycle => 'පුද්ගලයන් 3 කගේ චක්‍රයක්';
+
+  @override
+  String get fourPersonCycle => 'පුද්ගලයන් 4 කගේ චක්‍රයක්';
+
+  @override
+  String get viewCycleFlow => 'චක්‍රයේ ගලායාම බලන්න';
+
+  @override
+  String get cycleDetails => 'චක්‍රයේ විස්තර';
+
+  @override
+  String get matchFulfillsChoice => 'මෙම ගැලපීම ඔබගේ තේරීම ඉටු කරයි:';
+
+  @override
+  String get cycleConfirmationNotice =>
+      'මෙම චක්‍රය සඳහා සියලු දෙනාම මාරුවීම තහවුරු කිරීම අවශ්‍ය වේ. එක් අයෙකු අවලංගු කළහොත් චක්‍රය බිඳ වැටේ.';
+
+  @override
+  String get currentPost => 'වත්මන් ස්ථානය:';
+
+  @override
+  String get transfersTo => 'මාරුවන ස්ථානය:';
+
+  @override
+  String get cycleCompletesBackTo => 'චක්‍රය නැවත සම්පූර්ණ වන්නේ';
+
+  @override
+  String get findMultiPersonCycles => 'බහු-පුද්ගල මාරුවීම් චක්‍ර සොයන්න';
+
+  @override
+  String get cycleGroupChat => 'චක්‍රයේ කණ්ඩායම් සංවාද';
+
+  @override
+  String get groupMembers => 'කණ්ඩායම් සාමාජිකයන්';
 }

@@ -3,6 +3,7 @@ import 'package:app/app/models/person_details_model.dart';
 import 'package:app/providers/account_provider.dart';
 import 'package:app/providers/filtter_provider.dart';
 import 'package:app/screens/home/filter_screen.dart';
+import 'package:app/screens/home/matching_screen.dart';
 import 'package:app/screens/notification/widget/person_card.dart';
 import 'package:firebase_auth/firebase_auth.dart' as firebase_auth;
 import 'package:flutter/material.dart';
@@ -23,6 +24,12 @@ class _HomeScreenState extends State<HomeScreen> {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       final filterProvider = Provider.of<FiltterProvider>(context, listen: false);
+      final accountProvider = Provider.of<AccountProvider>(context, listen: false);
+
+      if (accountProvider.appUser == null) {
+        await accountProvider.refreshCurrentUser();
+      }
+
       await filterProvider.getAllUserDetails();
       await filterProvider.reapplySavedFilters();
       if (mounted) {
@@ -39,6 +46,14 @@ class _HomeScreenState extends State<HomeScreen> {
       padding: context.padding(horizontal: 15),
       child: Consumer2<AccountProvider, FiltterProvider>(
         builder: (context, acc, filter, child) {
+          if (filter.isLoading || acc.isLoading) {
+            return SizedBox(
+              width: MediaQuery.of(context).size.width,
+              height: MediaQuery.of(context).size.height,
+              child: Center(child: SpinKitFadingCircle(color: ColorManager.kPrimary, size: 40)),
+            );
+          }
+
           final currentUserJob = acc.appUser?.job;
 
           final displayedUsers =
@@ -46,26 +61,29 @@ class _HomeScreenState extends State<HomeScreen> {
                 if (currentUserJob == null || currentUserJob.isEmpty) {
                   return false;
                 }
+                if (user.isActive == false) {
+                  return false;
+                }
                 return user.job == currentUserJob;
               }).toList();
 
-          if (acc.appUser?.isEnable == false) {
-            return Center(
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      l10n.accountDisabledMsg,
-                      style: const TextStyle(color: Colors.red),
-                      textAlign: TextAlign.center,
-                    ),
-                  ],
-                ),
-              ),
-            );
-          }
+          // if (acc.appUser?.isEnable == false) {
+          //   return Center(
+          //     child: Padding(
+          //       padding: const EdgeInsets.all(16.0),
+          //       child: Column(
+          //         mainAxisAlignment: MainAxisAlignment.center,
+          //         children: [
+          //           Text(
+          //             l10n.accountDisabledMsg,
+          //             style: const TextStyle(color: Colors.red),
+          //             textAlign: TextAlign.center,
+          //           ),
+          //         ],
+          //       ),
+          //     ),
+          //   );
+          // }
           if (filter.isLoading) {
             return SizedBox(
               width: MediaQuery.of(context).size.width,
@@ -123,7 +141,26 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                   ],
                 ),
-                SizedBox(height: context.verticalSize(30)),
+
+                SizedBox(height: context.verticalSize(15)),
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton.icon(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: ColorManager.kPrimary.withOpacity(0.1),
+                      foregroundColor: ColorManager.kPrimary,
+                      elevation: 0,
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                    ),
+                    onPressed: () {
+                      Navigator.push(context, MaterialPageRoute(builder: (context) => const MatchingScreen()));
+                    },
+                    icon: const Icon(Icons.hub),
+                    label: Text(l10n.findMultiPersonCycles, style: context.semiBold14(color: ColorManager.kPrimary)),
+                  ),
+                ),
+                SizedBox(height: context.verticalSize(15)),
+
                 displayedUsers.isEmpty
                     ? Expanded(
                       child: Center(
@@ -181,13 +218,14 @@ class _HomeScreenState extends State<HomeScreen> {
                                 choice2: user.choice2 ?? '--',
                                 choice3: user.choice3 ?? '--',
                                 note: user.note ?? '--',
+                                isActive: user.isActive ?? true,
                               ),
                             ),
                           );
                         },
                       ),
                     ),
-                SizedBox(height: context.verticalSize(100)),
+                // SizedBox(height: context.verticalSize(100)),
               ],
             );
           }

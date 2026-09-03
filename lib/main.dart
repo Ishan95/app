@@ -12,6 +12,7 @@ import 'package:app/providers/auth_provider.dart';
 import 'package:app/providers/chat_provider.dart';
 import 'package:app/providers/filtter_provider.dart';
 import 'package:app/providers/locale_provider.dart';
+import 'package:app/providers/matching_provider.dart';
 import 'package:app/providers/service_providers/firebase_service.dart';
 import 'package:app/screens/home/home.dart';
 import 'package:app/screens/onboarding/splash_screen.dart';
@@ -24,7 +25,8 @@ import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:app/l10n/app_localizations.dart';
 import 'package:app/providers/service_providers/onesignal_service.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart'; // Added import
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 RemoteMessage? _initialMessage;
 
@@ -65,6 +67,7 @@ void main() async {
           ChangeNotifierProvider(create: (_) => FiltterProvider()),
           ChangeNotifierProvider(create: (_) => ChatProvider()),
           ChangeNotifierProvider(create: (_) => LocaleProvider()),
+          ChangeNotifierProvider(create: (_) => MatchingProvider()),
         ],
         child: const MyApp(),
       ),
@@ -87,10 +90,12 @@ class _MyAppState extends State<MyApp> {
     // Handle app opened from terminated notification
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (_initialMessage != null) {
-        ContextHelper.navigatorKey.currentState?.pushAndRemoveUntil(
-          MaterialPageRoute(builder: (_) => const Home(index: 1)),
-          (route) => false,
-        );
+        if (FirebaseAuth.instance.currentUser != null) {
+          ContextHelper.navigatorKey.currentState?.pushAndRemoveUntil(
+            MaterialPageRoute(builder: (_) => const Home(index: 1)),
+            (route) => false,
+          );
+        }
         _initialMessage = null;
       }
     });
