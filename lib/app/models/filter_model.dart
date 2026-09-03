@@ -14,6 +14,7 @@ class FilterModel {
   String officeForMA;
   String institutionTypeForPS;
   String officeForPS;
+  String pirivenaInstitute;
   String policeDivisions;
   String policeStations;
   String divisionalSecretariat;
@@ -43,6 +44,7 @@ class FilterModel {
   Map<String, List<String>> districtInstitutionTypeForMA;
   Map<String, List<String>> institutionTypeOfficesForMA;
   Map<String, List<String>> districtPradesiyaSabhas;
+  Map<String, List<String>> districtPirivenas;
   Map<String, List<String>> districtPoliceDivisions;
   Map<String, List<String>> policeDivisionStations;
   Map<String, List<String>> districtDsDivisions;
@@ -65,6 +67,7 @@ class FilterModel {
     this.officeForMA = '',
     this.institutionTypeForPS = '',
     this.officeForPS = '',
+    this.pirivenaInstitute = '',
     this.policeDivisions = '',
     this.policeStations = '',
     this.divisionalSecretariat = '',
@@ -94,6 +97,7 @@ class FilterModel {
     Map<String, List<String>>? districtInstitutionTypeForMA,
     Map<String, List<String>>? institutionTypeOfficesForMA,
     Map<String, List<String>>? districtPradesiyaSabhas,
+    Map<String, List<String>>? districtPirivenas,
     Map<String, List<String>>? districtPoliceDivisions,
     Map<String, List<String>>? policeDivisionStations,
     Map<String, List<String>>? districtDsDivisions,
@@ -110,6 +114,7 @@ class FilterModel {
        districtInstitutionTypeForMA = districtInstitutionTypeForMA ?? {},
        institutionTypeOfficesForMA = institutionTypeOfficesForMA ?? {},
        districtPradesiyaSabhas = districtPradesiyaSabhas ?? {},
+       districtPirivenas = districtPirivenas ?? {},
        districtPoliceDivisions = districtPoliceDivisions ?? {},
        policeDivisionStations = policeDivisionStations ?? {},
        districtDsDivisions = districtDsDivisions ?? {},
@@ -134,6 +139,7 @@ class FilterModel {
       officeForMA: this.officeForMA,
       institutionTypeForPS: this.institutionTypeForPS,
       officeForPS: this.officeForPS,
+      pirivenaInstitute: this.pirivenaInstitute,
       policeDivisions: this.policeDivisions,
       policeStations: this.policeStations,
       divisionalSecretariat: this.divisionalSecretariat,
@@ -163,6 +169,7 @@ class FilterModel {
       districtInstitutionTypeForMA: Map<String, List<String>>.from(this.districtInstitutionTypeForMA),
       institutionTypeOfficesForMA: Map<String, List<String>>.from(this.institutionTypeOfficesForMA),
       districtPradesiyaSabhas: Map<String, List<String>>.from(this.districtPradesiyaSabhas),
+      districtPirivenas: Map<String, List<String>>.from(this.districtPirivenas),
       districtPoliceDivisions: Map<String, List<String>>.from(this.districtPoliceDivisions),
       policeDivisionStations: Map<String, List<String>>.from(this.policeDivisionStations),
       districtDsDivisions: Map<String, List<String>>.from(this.districtDsDivisions),
@@ -188,6 +195,7 @@ class FilterModel {
         officeForMA == other.officeForMA &&
         institutionTypeForPS == other.institutionTypeForPS &&
         officeForPS == other.officeForPS &&
+        pirivenaInstitute == other.pirivenaInstitute &&
         policeDivisions == other.policeDivisions &&
         policeStations == other.policeStations &&
         divisionalSecretariat == other.divisionalSecretariat &&

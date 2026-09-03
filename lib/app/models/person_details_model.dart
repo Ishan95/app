@@ -35,6 +35,7 @@ class PersonDetailsModel {
   String? officeForMA;
   String? institutionTypeForPS;
   String? officeForPS;
+  String? pirivenaInstitute;
   String? policeDivisions;
   String? policeStations;
   String? divisionalSecretariat;
@@ -91,6 +92,7 @@ class PersonDetailsModel {
     this.officeForMA,
     this.institutionTypeForPS,
     this.officeForPS,
+    this.pirivenaInstitute,
     this.policeDivisions,
     this.policeStations,
     this.divisionalSecretariat,
@@ -152,6 +154,7 @@ class PersonDetailsModel {
       officeForMA: firestoreData['officeForMA'] as String?,
       institutionTypeForPS: firestoreData['institutionTypeForPS'] as String?,
       officeForPS: firestoreData['officeForPS'] as String?,
+      pirivenaInstitute: firestoreData['pirivenaInstitute'] as String?,
       policeDivisions: firestoreData['policeDivisions'] as String?,
       policeStations: firestoreData['policeStations'] as String?,
       divisionalSecretariat: firestoreData['divisionalSecretariat'] as String?,
@@ -212,6 +215,7 @@ class PersonDetailsModel {
       officeForMA: json['officeForMA'] as String?,
       institutionTypeForPS: json['institutionTypeForPS'] as String?,
       officeForPS: json['officeForPS'] as String?,
+      pirivenaInstitute: json['pirivenaInstitute'] as String?,
       policeDivisions: json['policeDivisions'] as String?,
       policeStations: json['policeStations'] as String?,
       divisionalSecretariat: json['divisionalSecretariat'] as String?,
@@ -262,6 +266,7 @@ class PersonDetailsModel {
       'officeForMA': officeForMA,
       'institutionTypeForPS': institutionTypeForPS,
       'officeForPS': officeForPS,
+      'pirivenaInstitute': pirivenaInstitute,
       'policeDivisions': policeDivisions,
       'policeStations': policeStations,
       'divisionalSecretariat': divisionalSecretariat,

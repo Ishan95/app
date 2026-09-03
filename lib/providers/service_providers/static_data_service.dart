@@ -110,4 +110,8 @@ class StaticDataService {
   static Future<void> fetchSubjects(FilterModel model, String scheme) async {
     model.schemeSubjects[scheme] = await _fetchList('filter_scheme_subjects', scheme);
   }
+
+  static Future<void> fetchPirivenas(FilterModel model, String district) async {
+    model.districtPirivenas[district] = await _fetchList('filter_district_pirivenas', district);
+  }
 }

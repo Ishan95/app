@@ -760,6 +760,7 @@ class _GetDetailsScreenState extends State<GetDetailsScreen> {
                                           filterDetails.school = '';
                                           filterDetails.kottasaForNationalScl = '';
                                           filterDetails.nationalSchool = '';
+                                          filterDetails.pirivenaInstitute = '';
                                           filterDetails.institutionTypeForNurse = '';
                                           filterDetails.officeForNurse = '';
                                           filterDetails.institutionTypeForMA = '';
@@ -799,7 +800,8 @@ class _GetDetailsScreenState extends State<GetDetailsScreen> {
                                         fit: BoxFit.scaleDown,
                                         child: Text(
                                           (filterDetails.job == "Provincial School Teacher" ||
-                                                  filterDetails.job == "National School Teacher")
+                                                  filterDetails.job == "National School Teacher" ||
+                                                  filterDetails.job == "Pirivena Teacher")
                                               ? l10n.setupSchoolingDetails
                                               : l10n.setupOfficeDetails,
                                           style: context.semiBold14(color: ColorManager.blackMedium),
@@ -883,6 +885,7 @@ class _GetDetailsScreenState extends State<GetDetailsScreen> {
                                         filterDetails.school = '';
                                         filterDetails.kottasaForNationalScl = '';
                                         filterDetails.nationalSchool = '';
+                                        filterDetails.pirivenaInstitute = '';
                                         filterDetails.institutionTypeForNurse = '';
                                         filterDetails.officeForNurse = '';
                                         filterDetails.institutionTypeForMA = '';
@@ -969,6 +972,7 @@ class _GetDetailsScreenState extends State<GetDetailsScreen> {
                                             filterDetails.school = '';
                                             filterDetails.kottasaForNationalScl = '';
                                             filterDetails.nationalSchool = '';
+                                            filterDetails.pirivenaInstitute = '';
                                             filterDetails.institutionTypeForNurse = '';
                                             filterDetails.officeForNurse = '';
                                             filterDetails.institutionTypeForMA = '';
@@ -985,6 +989,8 @@ class _GetDetailsScreenState extends State<GetDetailsScreen> {
                                             if (filterDetails.job == "Provincial School Teacher" ||
                                                 filterDetails.job == "National School Teacher") {
                                               await StaticDataService.fetchKalapas(filterDetails, value);
+                                            } else if (filterDetails.job == "Pirivena Teacher") {
+                                              await StaticDataService.fetchPirivenas(filterDetails, value);
                                             } else if (filterDetails.job == "Nurse" ||
                                                 filterDetails.job == "Hospital Attendant") {
                                               await StaticDataService.fetchNurseInstitutions(filterDetails, value);
@@ -1056,6 +1062,10 @@ class _GetDetailsScreenState extends State<GetDetailsScreen> {
                                                 ? filterDetails.kalapa.isNotEmpty
                                                     ? filterDetails.kalapa
                                                     : null
+                                                : filterDetails.job == "Pirivena Teacher"
+                                                ? filterDetails.pirivenaInstitute.isNotEmpty
+                                                    ? filterDetails.pirivenaInstitute
+                                                    : null
                                                 : (filterDetails.job == "Nurse" ||
                                                     filterDetails.job == "Hospital Attendant")
                                                 ? filterDetails.institutionTypeForNurse.isNotEmpty
@@ -1067,8 +1077,7 @@ class _GetDetailsScreenState extends State<GetDetailsScreen> {
                                                 ? filterDetails.institutionTypeForMA.isNotEmpty
                                                     ? filterDetails.institutionTypeForMA
                                                     : null
-                                                : filterDetails.job ==
-                                                    "MA (Pradesiya Sabha)"
+                                                : filterDetails.job == "MA (Pradesiya Sabha)"
                                                 ? filterDetails.institutionTypeForPS.isNotEmpty
                                                     ? filterDetails.institutionTypeForPS
                                                     : null
@@ -1085,6 +1094,8 @@ class _GetDetailsScreenState extends State<GetDetailsScreen> {
                                           (filterDetails.job == "Provincial School Teacher" ||
                                                   filterDetails.job == "National School Teacher")
                                               ? l10n.selectKalapa
+                                              : filterDetails.job == "Pirivena Teacher"
+                                              ? TranslationService.translate(context, "Select Pirivena Institute")
                                               : l10n.selectInstitutionType,
                                           style: context.regular14(color: ColorManager.disabledText),
                                         ),
@@ -1100,6 +1111,20 @@ class _GetDetailsScreenState extends State<GetDetailsScreen> {
                                                             value: kalapa,
                                                             child: Text(
                                                               TranslationService.translate(context, kalapa),
+                                                              style: context.regular14(color: ColorManager.blackMedium),
+                                                            ),
+                                                          ),
+                                                        )
+                                                    : filterDetails.job == "Pirivena Teacher"
+                                                    ? (filterDetails.district.isNotEmpty
+                                                            ? filterDetails.districtPirivenas[filterDetails.district] ??
+                                                                []
+                                                            : <String>[])
+                                                        .map(
+                                                          (institute) => DropdownMenuItem(
+                                                            value: institute,
+                                                            child: Text(
+                                                              TranslationService.translate(context, institute),
                                                               style: context.regular14(color: ColorManager.blackMedium),
                                                             ),
                                                           ),
@@ -1138,8 +1163,7 @@ class _GetDetailsScreenState extends State<GetDetailsScreen> {
                                                             ),
                                                           ),
                                                         )
-                                                    : filterDetails.job ==
-                                                        "MA (Pradesiya Sabha)"
+                                                    : filterDetails.job == "MA (Pradesiya Sabha)"
                                                     ? ["Pradesiya Sabha"].map(
                                                       (institute) => DropdownMenuItem(
                                                         value: institute,
@@ -1184,6 +1208,8 @@ class _GetDetailsScreenState extends State<GetDetailsScreen> {
                                             (filterDetails.job == "Provincial School Teacher" ||
                                                     filterDetails.job == "National School Teacher")
                                                 ? filterDetails.kalapa = value ?? ''
+                                                : filterDetails.job == "Pirivena Teacher"
+                                                ? filterDetails.pirivenaInstitute = value ?? ''
                                                 : (filterDetails.job == "Nurse" ||
                                                     filterDetails.job == "Hospital Attendant")
                                                 ? filterDetails.institutionTypeForNurse = value ?? ''
@@ -1191,8 +1217,7 @@ class _GetDetailsScreenState extends State<GetDetailsScreen> {
                                                     filterDetails.job == "Development Officer" ||
                                                     filterDetails.job == "Administrative Officer")
                                                 ? filterDetails.institutionTypeForMA = value ?? ''
-                                                : filterDetails.job ==
-                                                    "MA (Pradesiya Sabha)"
+                                                : filterDetails.job == "MA (Pradesiya Sabha)"
                                                 ? filterDetails.institutionTypeForPS = value ?? ''
                                                 : filterDetails.job == "Police Officer"
                                                 ? filterDetails.policeDivisions = value ?? ''
@@ -1215,7 +1240,9 @@ class _GetDetailsScreenState extends State<GetDetailsScreen> {
                                             filterDetails.gramaNiladhariDivision = '';
                                           });
 
-                                          if (value != null && value.isNotEmpty) {
+                                          if (value != null &&
+                                              value.isNotEmpty &&
+                                              filterDetails.job != "Pirivena Teacher") {
                                             setState(() => _isKottasaOfficeLoading = true);
                                             if (filterDetails.job == "Provincial School Teacher") {
                                               await StaticDataService.fetchKottasas(filterDetails, value);
@@ -1239,7 +1266,7 @@ class _GetDetailsScreenState extends State<GetDetailsScreen> {
                                         dropdownColor: ColorManager.kPrimaryBlack,
                                         underline: const SizedBox(),
                                         icon:
-                                            _isKottasaOfficeLoading
+                                            _isKalapaInstLoading
                                                 ? SizedBox(
                                                   width: 24,
                                                   height: 24,
@@ -1265,7 +1292,8 @@ class _GetDetailsScreenState extends State<GetDetailsScreen> {
                                 SizedBox(
                                   height: context.verticalSize(
                                     ((filterDetails.job != "Public Health Inspector" &&
-                                                filterDetails.job != "Public Health Midwife") &&
+                                                filterDetails.job != "Public Health Midwife" &&
+                                                filterDetails.job != "Pirivena Teacher") &&
                                             (filterDetails.kalapa.isNotEmpty ||
                                                 filterDetails.institutionTypeForNurse.isNotEmpty ||
                                                 filterDetails.institutionTypeForMA.isNotEmpty ||
@@ -1319,8 +1347,7 @@ class _GetDetailsScreenState extends State<GetDetailsScreen> {
                                                 ? filterDetails.officeForMA.isNotEmpty
                                                     ? filterDetails.officeForMA
                                                     : null
-                                                : filterDetails.job ==
-                                                    "MA (Pradesiya Sabha)"
+                                                : filterDetails.job == "MA (Pradesiya Sabha)"
                                                 ? filterDetails.officeForPS.isNotEmpty
                                                     ? filterDetails.officeForPS
                                                     : null
@@ -1404,8 +1431,7 @@ class _GetDetailsScreenState extends State<GetDetailsScreen> {
                                                             ),
                                                           ),
                                                         )
-                                                    : filterDetails.job ==
-                                                        "MA (Pradesiya Sabha)"
+                                                    : filterDetails.job == "MA (Pradesiya Sabha)"
                                                     ? (filterDetails.institutionTypeForPS.isNotEmpty
                                                             ? filterDetails.districtPradesiyaSabhas[filterDetails
                                                                     .district] ??
@@ -1465,8 +1491,7 @@ class _GetDetailsScreenState extends State<GetDetailsScreen> {
                                                     filterDetails.job == "Development Officer" ||
                                                     filterDetails.job == "Administrative Officer")
                                                 ? filterDetails.officeForMA = value ?? ''
-                                                : filterDetails.job ==
-                                                    "MA (Pradesiya Sabha)"
+                                                : filterDetails.job == "MA (Pradesiya Sabha)"
                                                 ? filterDetails.officeForPS = value ?? ''
                                                 : filterDetails.job == "Police Officer"
                                                 ? filterDetails.policeStations = value ?? ''
@@ -1479,6 +1504,7 @@ class _GetDetailsScreenState extends State<GetDetailsScreen> {
 
                                             filterDetails.school = '';
                                             filterDetails.nationalSchool = '';
+                                            _isKottasaOfficeLoading = false;
                                           });
 
                                           if (value != null && value.isNotEmpty) {
@@ -1494,7 +1520,7 @@ class _GetDetailsScreenState extends State<GetDetailsScreen> {
                                         dropdownColor: ColorManager.kPrimaryBlack,
                                         underline: const SizedBox(),
                                         icon:
-                                            _isSchoolLoading
+                                            _isKottasaOfficeLoading
                                                 ? SizedBox(
                                                   width: 24,
                                                   height: 24,
@@ -2146,6 +2172,17 @@ class _GetDetailsScreenState extends State<GetDetailsScreen> {
                                         }
                                         if (filterDetails.gramaNiladhariDivision.isEmpty) {
                                           setState(() => kottasaOfficeError = l10n.reqSelectOffice);
+                                          isValid = false;
+                                        }
+                                      } else if (filterDetails.job == "Pirivena Teacher") {
+                                        if (filterDetails.pirivenaInstitute.isEmpty) {
+                                          setState(
+                                            () =>
+                                                kalapaInstitutionError = TranslationService.translate(
+                                                  context,
+                                                  "Pirivena Institute is required",
+                                                ),
+                                          );
                                           isValid = false;
                                         }
                                       }

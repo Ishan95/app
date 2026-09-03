@@ -185,6 +185,7 @@ class AuthenticationProvider extends ChangeNotifier {
           'officeForMA': filterDetails.officeForMA,
           'institutionTypeForPS': filterDetails.institutionTypeForPS,
           'officeForPS': filterDetails.officeForPS,
+          'pirivenaInstitute': filterDetails.pirivenaInstitute,
           'policeDivisions': filterDetails.policeDivisions,
           'policeStations': filterDetails.policeStations,
           'divisionalSecretariat': filterDetails.divisionalSecretariat,

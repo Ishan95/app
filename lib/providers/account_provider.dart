@@ -279,6 +279,10 @@ class AccountProvider extends ChangeNotifier {
         updatedData['officeForPS'] = editDetails.officeForPS;
       }
 
+      if (editDetails.pirivenaInstitute != "" && _appUser!.pirivenaInstitute != editDetails.pirivenaInstitute) {
+        updatedData['pirivenaInstitute'] = editDetails.pirivenaInstitute;
+      }
+
       if (editDetails.policeDivisions != "" && _appUser!.policeDivisions != editDetails.policeDivisions) {
         updatedData['policeDivisions'] = editDetails.policeDivisions;
       }
