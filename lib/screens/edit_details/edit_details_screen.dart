@@ -19,6 +19,8 @@ import 'package:provider/provider.dart';
 import 'package:app/l10n/app_localizations.dart';
 import 'package:app/app/utils/translation_service.dart';
 import 'package:app/app/widgets/language_selector.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:app/providers/auth_provider.dart';
 
 class EditDetailsScreen extends StatefulWidget {
   const EditDetailsScreen({super.key});
@@ -1951,7 +1953,26 @@ class _EditDetailsScreenState extends State<EditDetailsScreen> {
                                         );
 
                                         if (shouldSave == true) {
+                                          bool triggersMatching = !_initialFilterDetails.isEqual(filterDetails);
+
+                                          final authProvider = Provider.of<AuthenticationProvider>(
+                                            context,
+                                            listen: false,
+                                          );
+                                          final String? uid = acc.appUser?.uid;
+
                                           await acc.updateAccount(filterDetails);
+
+                                          if (triggersMatching && uid != null) {
+                                            final updatedDoc =
+                                                await FirebaseFirestore.instance.collection('users').doc(uid).get();
+                                            if (updatedDoc.exists && updatedDoc.data() != null) {
+                                              await authProvider.notifyMatches(
+                                                updatedDoc.data() as Map<String, dynamic>,
+                                                uid,
+                                              );
+                                            }
+                                          }
                                         }
                                       } else {
                                         toastErrorMessage("Please select at least one change before saving.");
