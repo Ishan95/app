@@ -78,6 +78,7 @@ class ColorManager {
   ];
 
   static Color black = HexColor.fromHex('#1C1E21');
+  static Color black2 = HexColor.fromHex('#000000');
   static Color blackMedium = HexColor.fromHex('#1C1E21');
   static Color blackTransparent60 = Color.fromRGBO(28, 30, 33, 0.6);
   static Color lightBlack = HexColor.fromHex('#1C1E2199');

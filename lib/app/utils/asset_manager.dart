@@ -14,6 +14,6 @@ class Assets {
   static const String appIcon = '$IMAGE_PATH/app_icon.png';
   static const String appIcon2 = '$IMAGE_PATH/app_icon2.jpeg';
   static const String splashScreen = '$IMAGE_PATH/splash_screen.jpeg';
-  static const String splashVideo = '$VIDEO_PATH/splash_animation.mp4';
+  static const String splashScreenVideo = '$VIDEO_PATH/splash_screen_video.mp4';
 
 }
