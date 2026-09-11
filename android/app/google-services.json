@@ -14,6 +14,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "609068416384-6shifpntn4p74635ahfnce99on5edj9k.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "lk.transfer.multiservice",
+            "certificate_hash": "5a5a43d5f79e992d16a936f25d999566fb6d1ad3"
+          }
+        },
+        {
           "client_id": "609068416384-981fe9cereum38rt795ldvk264sdhinp.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {

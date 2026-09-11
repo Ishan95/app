@@ -405,15 +405,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   },
                 ),
                 _buildDivider(),
-                _buildListTile(
-                  context,
-                  titleStyle: context.semiBold14(color: ColorManager.blackMedium),
-                  title: l10n.changePassword,
-                  onTap: () {
-                    Navigator.push(context, MaterialPageRoute(builder: (context) => const ChangePasswordScreen()));
-                  },
-                ),
-                _buildDivider(),
+                // _buildListTile(
+                //   context,
+                //   titleStyle: context.semiBold14(color: ColorManager.blackMedium),
+                //   title: l10n.changePassword,
+                //   onTap: () {
+                //     Navigator.push(context, MaterialPageRoute(builder: (context) => const ChangePasswordScreen()));
+                //   },
+                // ),
+                // _buildDivider(),
                 _buildListTile(
                   context,
                   titleStyle: context.semiBold14(color: ColorManager.blackMedium),
