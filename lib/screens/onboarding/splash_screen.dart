@@ -7,7 +7,7 @@ import 'package:app/l10n/app_localizations.dart';
 import 'package:app/providers/auth_provider.dart';
 import 'package:app/screens/home/home.dart';
 import 'package:app/screens/onboarding/login_screen.dart';
-import 'package:cloud_firestore/cloud_firestore.dart'; // Added Firestore import
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_remote_config/firebase_remote_config.dart';
 import 'package:flutter/material.dart';
@@ -38,6 +38,25 @@ class _SplashScreenState extends State<SplashScreen> {
     _initializeFirebaseAndCheckForUpdates();
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       final prefs = await SharedPreferences.getInstance();
+
+      final keysToRemove = [
+        'province',
+        'district',
+        'kalapa',
+        'school',
+        'scheme',
+        'subject',
+        'grade',
+        'selectedName',
+        'locationViaFilter',
+        'schoolViaFilter',
+        'subjectViaFilter',
+        'gradeViaFilter',
+      ];
+      for (String key in keysToRemove) {
+        await prefs.remove(key);
+      }
+
       final userID = prefs.getString('userId');
       if (userID != null) {
       } else {

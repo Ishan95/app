@@ -5,6 +5,7 @@ import 'package:app/app/utils/custom_toast.dart';
 import 'package:app/providers/account_provider.dart';
 import 'package:app/providers/filtter_provider.dart';
 import 'package:app/providers/service_providers/static_data_service.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -48,7 +49,7 @@ class _FilterScreenState extends State<FilterScreen> {
 
     _focusNode.addListener(() {
       setState(() {
-        showList = _focusNode.hasFocus;
+        showList = _focusNode.hasFocus && _controller.text.trim().length >= 3;
       });
     });
   }
@@ -85,6 +86,10 @@ class _FilterScreenState extends State<FilterScreen> {
       await StaticDataService.fetchDistricts(filter, filter.province);
     }
 
+    if (filter.scheme.isNotEmpty && filter.scheme != "PRIMARY") {
+      await _fetchSubjects(filter.scheme, filter);
+    }
+
     Provider.of<FiltterProvider>(context, listen: false).filterDetails = filter;
     originalFilterDetails = filter.copy();
 
@@ -92,12 +97,16 @@ class _FilterScreenState extends State<FilterScreen> {
     final job = accProvider.appUser?.job ?? '';
 
     Set<String> extractedNames = {};
+
     for (var user in filtterProvider.allUsersData) {
       if (job == "Provincial School Teacher" && user.school != null && user.school!.isNotEmpty) {
         extractedNames.add(user.school!);
       } else if (job == "National School Teacher" && user.nationalSchool != null && user.nationalSchool!.isNotEmpty) {
         extractedNames.add(user.nationalSchool!);
-      } else if ((job == "Nurse" || job == "Public Health Inspector" || job == "Public Health Midwife") &&
+      } else if ((job == "Nurse" ||
+              job == "Hospital Attendant" ||
+              job == "Public Health Inspector" ||
+              job == "Public Health Midwife") &&
           user.officeForNurse != null &&
           user.officeForNurse!.isNotEmpty) {
         extractedNames.add(user.officeForNurse!);
@@ -105,29 +114,120 @@ class _FilterScreenState extends State<FilterScreen> {
           user.officeForMA != null &&
           user.officeForMA!.isNotEmpty) {
         extractedNames.add(user.officeForMA!);
+      } else if (job == "MA (Pradesiya Sabha)" && user.officeForPS != null && user.officeForPS!.isNotEmpty) {
+        extractedNames.add(user.officeForPS!);
       } else if (job == "Police Officer" && user.policeStations != null && user.policeStations!.isNotEmpty) {
         extractedNames.add(user.policeStations!);
       } else if (job == "Grama Niladari" &&
           user.gramaNiladhariDivision != null &&
           user.gramaNiladhariDivision!.isNotEmpty) {
         extractedNames.add(user.gramaNiladhariDivision!);
+      } else if (job == "Pirivena Teacher" && user.pirivenaInstitute != null && user.pirivenaInstitute!.isNotEmpty) {
+        extractedNames.add(user.pirivenaInstitute!);
       }
     }
 
     if (mounted) {
       setState(() {
         allNames = extractedNames.toList()..sort();
-        filteredNames = List.from(allNames);
+        filteredNames = [];
+        if (_controller.text.trim().length >= 3) {
+          _filterNames(_controller.text);
+        }
+      });
+    }
+
+    _fetchAllMasterDataForJob(extractedNames);
+  }
+
+  Future<void> _fetchSubjects(String scheme, FilterModel filterModel) async {
+    if (scheme.isEmpty) return;
+    try {
+      final doc = await FirebaseFirestore.instance.collection('filter_scheme_subjects').doc(scheme).get();
+      if (doc.exists) {
+        final data = doc.data() as Map<String, dynamic>;
+        if (data.containsKey('items') && data['items'] is List) {
+          final List<String> subjects = (data['items'] as List).map((e) => e.toString().trim()).toList();
+
+          if (mounted) {
+            setState(() {
+              filterModel.schemeSubjects[scheme] = subjects;
+            });
+          }
+        }
+      }
+    } catch (e) {
+      print("Error fetching subjects for $scheme: $e");
+    }
+  }
+
+  Future<void> _fetchAllMasterDataForJob(Set<String> currentNames) async {
+    final job = accProvider.appUser?.job ?? '';
+    Set<String> masterList = Set.from(currentNames);
+
+    try {
+      final firestore = FirebaseFirestore.instance;
+      QuerySnapshot? snapshot;
+      String collectionName = '';
+
+      if (job == "Provincial School Teacher") {
+        collectionName = 'filter_kottasa_schools';
+      } else if (job == "National School Teacher") {
+        collectionName = 'filter_kottasa_schools_national';
+      } else if (job == "Nurse" ||
+          job == "Hospital Attendant" ||
+          job == "Public Health Inspector" ||
+          job == "Public Health Midwife") {
+        collectionName = 'filter_inst_offices_nurse';
+      } else if (job == "Management Assistant" || job == "Development Officer" || job == "Administrative Officer") {
+        collectionName = 'filter_inst_offices_ma';
+      } else if (job == "MA (Pradesiya Sabha)") {
+        collectionName = 'filter_district_pradesiya_sabhas';
+      } else if (job == "Police Officer") {
+        collectionName = 'filter_police_div_stations';
+      } else if (job == "Grama Niladari") {
+        collectionName = 'filter_ds_div_gn_divs';
+      } else if (job == "Pirivena Teacher") {
+        collectionName = 'filter_district_pirivenas';
+      }
+
+      if (collectionName.isNotEmpty) {
+        snapshot = await firestore.collection(collectionName).get();
+        if (snapshot.docs.isNotEmpty) {
+          for (var doc in snapshot.docs) {
+            final data = doc.data() as Map<String, dynamic>;
+            if (data.containsKey('items') && data['items'] is List) {
+              final itemsList = data['items'] as List;
+              for (var item in itemsList) {
+                if (item != null && item.toString().trim().isNotEmpty) {
+                  masterList.add(item.toString().trim());
+                }
+              }
+            }
+          }
+        }
+      }
+    } catch (e) {
+      print("Error fetching master data from Firestore: $e");
+    }
+
+    if (mounted) {
+      setState(() {
+        allNames = masterList.toList()..sort();
+        if (_controller.text.trim().length >= 3) {
+          _filterNames(_controller.text);
+        }
       });
     }
   }
 
   void _filterNames(String query) {
     setState(() {
-      if (query.isEmpty) {
-        filteredNames = allNames;
+      final trimmedQuery = query.trim();
+      if (trimmedQuery.length < 3) {
+        filteredNames = [];
       } else {
-        filteredNames = allNames.where((name) => name.toLowerCase().contains(query.toLowerCase())).toList();
+        filteredNames = allNames.where((name) => name.toLowerCase().contains(trimmedQuery.toLowerCase())).toList();
       }
     });
   }
@@ -232,7 +332,7 @@ class _FilterScreenState extends State<FilterScreen> {
       originalSubjectFilter = subjectFilter;
       originalgradeFilter = gradeFilter;
       _controller.clear();
-      filteredNames = allNames;
+      filteredNames = [];
     });
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove('province');
@@ -502,7 +602,7 @@ class _FilterScreenState extends State<FilterScreen> {
                             Focus(
                               onFocusChange: (hasFocus) {
                                 setState(() {
-                                  showList = hasFocus;
+                                  showList = hasFocus && _controller.text.trim().length >= 3;
                                 });
                               },
                               child: TextField(
@@ -526,10 +626,11 @@ class _FilterScreenState extends State<FilterScreen> {
                                 onChanged: (query) {
                                   _filterNames(query);
                                   setState(() {
-                                    showList = true;
+                                    showList = query.trim().length >= 3;
                                   });
                                 },
                                 readOnly: false,
+                                autocorrect: false,
                               ),
                             ),
                             const SizedBox(height: 8),
@@ -555,18 +656,21 @@ class _FilterScreenState extends State<FilterScreen> {
                                           itemCount: filteredNames.length,
                                           itemBuilder: (context, index) {
                                             final name = filteredNames[index];
-                                            return ListTile(
-                                              title: Text(
-                                                TranslationService.translate(context, name), // LOCALIZED
-                                                style: context.regular14(color: ColorManager.blackMedium),
+                                            return Material(
+                                              color: Colors.transparent,
+                                              child: ListTile(
+                                                title: Text(
+                                                  TranslationService.translate(context, name),
+                                                  style: context.regular14(color: ColorManager.blackMedium),
+                                                ),
+                                                onTap: () {
+                                                  setState(() {
+                                                    selectedName = name;
+                                                    _controller.text = name;
+                                                    _hideList();
+                                                  });
+                                                },
                                               ),
-                                              onTap: () {
-                                                setState(() {
-                                                  selectedName = name;
-                                                  _controller.text = name;
-                                                  _hideList();
-                                                });
-                                              },
                                             );
                                           },
                                         ),
@@ -665,10 +769,13 @@ class _FilterScreenState extends State<FilterScreen> {
                                       filter.filterDetails.grade = value ?? '';
                                     }
                                   });
-                                  if ((filter.filterDetails.job == "Provincial School Teacher" ||
-                                          filter.filterDetails.job == "National School Teacher") &&
-                                      value != null) {
+                                  if ((accProvider.appUser?.job == "Provincial School Teacher" ||
+                                          accProvider.appUser?.job == "National School Teacher") &&
+                                      value != null &&
+                                      value != "PRIMARY") {
                                     await StaticDataService.fetchSubjects(filter.filterDetails, value);
+                                    await _fetchSubjects(value, filter.filterDetails);
+
                                     setState(() {});
                                   }
                                 },
