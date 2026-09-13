@@ -11,6 +11,7 @@ import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:app/l10n/app_localizations.dart';
 import 'package:app/app/utils/translation_service.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 
 class FilterScreen extends StatefulWidget {
   const FilterScreen({super.key});
@@ -31,6 +32,11 @@ class _FilterScreenState extends State<FilterScreen> {
   bool originalSchoolFilter = false;
   bool originalSubjectFilter = false;
   bool originalgradeFilter = false;
+
+  bool _isLoading = true;
+
+  bool _isDistrictLoading = false;
+  bool _isSubjectLoading = false;
 
   FilterModel originalFilterDetails = FilterModel();
 
@@ -55,89 +61,99 @@ class _FilterScreenState extends State<FilterScreen> {
   }
 
   Future<void> _loadFilterData() async {
-    final prefs = await SharedPreferences.getInstance();
+    try {
+      final prefs = await SharedPreferences.getInstance();
 
-    final filter = FilterModel(
-      province: prefs.getString('province') ?? '',
-      district: prefs.getString('district') ?? '',
-      kalapa: prefs.getString('kalapa') ?? '',
-      school: prefs.getString('school') ?? '',
-      scheme: prefs.getString('scheme') ?? '',
-      subject: prefs.getString('subject') ?? '',
-      grade: prefs.getString('grade') ?? '',
-    );
+      final filter = FilterModel(
+        province: prefs.getString('province') ?? '',
+        district: prefs.getString('district') ?? '',
+        kalapa: prefs.getString('kalapa') ?? '',
+        school: prefs.getString('school') ?? '',
+        scheme: prefs.getString('scheme') ?? '',
+        subject: prefs.getString('subject') ?? '',
+        grade: prefs.getString('grade') ?? '',
+      );
 
-    locationFilter = prefs.getString('locationViaFilter') == "true";
-    schoolFilter = prefs.getString('schoolViaFilter') == "true";
-    subjectFilter = prefs.getString('subjectViaFilter') == "true";
-    gradeFilter = prefs.getString('gradeViaFilter') == "true";
+      locationFilter = prefs.getString('locationViaFilter') == "true";
+      schoolFilter = prefs.getString('schoolViaFilter') == "true";
+      subjectFilter = prefs.getString('subjectViaFilter') == "true";
+      gradeFilter = prefs.getString('gradeViaFilter') == "true";
 
-    selectedName = prefs.getString('selectedName');
-    _controller.text = selectedName ?? '';
-    originalSelectedName = selectedName;
+      selectedName = prefs.getString('selectedName');
+      _controller.text = selectedName ?? '';
+      originalSelectedName = selectedName;
 
-    originalLocationFilter = locationFilter;
-    originalSchoolFilter = schoolFilter;
-    originalSubjectFilter = subjectFilter;
-    originalgradeFilter = gradeFilter;
+      originalLocationFilter = locationFilter;
+      originalSchoolFilter = schoolFilter;
+      originalSubjectFilter = subjectFilter;
+      originalgradeFilter = gradeFilter;
 
-    await StaticDataService.loadRootData(filter);
-    if (filter.province.isNotEmpty) {
-      await StaticDataService.fetchDistricts(filter, filter.province);
-    }
+      await StaticDataService.loadRootData(filter);
+      if (filter.province.isNotEmpty) {
+        await StaticDataService.fetchDistricts(filter, filter.province);
+      }
 
-    if (filter.scheme.isNotEmpty && filter.scheme != "PRIMARY") {
-      await _fetchSubjects(filter.scheme, filter);
-    }
+      if (filter.scheme.isNotEmpty && filter.scheme != "PRIMARY") {
+        await _fetchSubjects(filter.scheme, filter);
+      }
 
-    Provider.of<FiltterProvider>(context, listen: false).filterDetails = filter;
-    originalFilterDetails = filter.copy();
+      Provider.of<FiltterProvider>(context, listen: false).filterDetails = filter;
+      originalFilterDetails = filter.copy();
 
-    final filtterProvider = Provider.of<FiltterProvider>(context, listen: false);
-    final job = accProvider.appUser?.job ?? '';
+      final filtterProvider = Provider.of<FiltterProvider>(context, listen: false);
+      final job = accProvider.appUser?.job ?? '';
 
-    Set<String> extractedNames = {};
+      Set<String> extractedNames = {};
 
-    for (var user in filtterProvider.allUsersData) {
-      if (job == "Provincial School Teacher" && user.school != null && user.school!.isNotEmpty) {
-        extractedNames.add(user.school!);
-      } else if (job == "National School Teacher" && user.nationalSchool != null && user.nationalSchool!.isNotEmpty) {
-        extractedNames.add(user.nationalSchool!);
-      } else if ((job == "Nurse" ||
-              job == "Hospital Attendant" ||
-              job == "Public Health Inspector" ||
-              job == "Public Health Midwife") &&
-          user.officeForNurse != null &&
-          user.officeForNurse!.isNotEmpty) {
-        extractedNames.add(user.officeForNurse!);
-      } else if ((job == "Management Assistant" || job == "Development Officer" || job == "Administrative Officer") &&
-          user.officeForMA != null &&
-          user.officeForMA!.isNotEmpty) {
-        extractedNames.add(user.officeForMA!);
-      } else if (job == "MA (Pradesiya Sabha)" && user.officeForPS != null && user.officeForPS!.isNotEmpty) {
-        extractedNames.add(user.officeForPS!);
-      } else if (job == "Police Officer" && user.policeStations != null && user.policeStations!.isNotEmpty) {
-        extractedNames.add(user.policeStations!);
-      } else if (job == "Grama Niladari" &&
-          user.gramaNiladhariDivision != null &&
-          user.gramaNiladhariDivision!.isNotEmpty) {
-        extractedNames.add(user.gramaNiladhariDivision!);
-      } else if (job == "Pirivena Teacher" && user.pirivenaInstitute != null && user.pirivenaInstitute!.isNotEmpty) {
-        extractedNames.add(user.pirivenaInstitute!);
+      for (var user in filtterProvider.allUsersData) {
+        if (job == "Provincial School Teacher" && user.school != null && user.school!.isNotEmpty) {
+          extractedNames.add(user.school!);
+        } else if (job == "National School Teacher" && user.nationalSchool != null && user.nationalSchool!.isNotEmpty) {
+          extractedNames.add(user.nationalSchool!);
+        } else if ((job == "Nurse" ||
+                job == "Hospital Attendant" ||
+                job == "Public Health Inspector" ||
+                job == "Public Health Midwife") &&
+            user.officeForNurse != null &&
+            user.officeForNurse!.isNotEmpty) {
+          extractedNames.add(user.officeForNurse!);
+        } else if ((job == "Management Assistant" || job == "Development Officer" || job == "Administrative Officer") &&
+            user.officeForMA != null &&
+            user.officeForMA!.isNotEmpty) {
+          extractedNames.add(user.officeForMA!);
+        } else if (job == "MA (Pradesiya Sabha)" && user.officeForPS != null && user.officeForPS!.isNotEmpty) {
+          extractedNames.add(user.officeForPS!);
+        } else if (job == "Police Officer" && user.policeStations != null && user.policeStations!.isNotEmpty) {
+          extractedNames.add(user.policeStations!);
+        } else if (job == "Grama Niladari" &&
+            user.gramaNiladhariDivision != null &&
+            user.gramaNiladhariDivision!.isNotEmpty) {
+          extractedNames.add(user.gramaNiladhariDivision!);
+        } else if (job == "Pirivena Teacher" && user.pirivenaInstitute != null && user.pirivenaInstitute!.isNotEmpty) {
+          extractedNames.add(user.pirivenaInstitute!);
+        }
+      }
+
+      if (mounted) {
+        setState(() {
+          allNames = extractedNames.toList()..sort();
+          filteredNames = [];
+          if (_controller.text.trim().length >= 3) {
+            _filterNames(_controller.text);
+          }
+        });
+      }
+
+      await _fetchAllMasterDataForJob(extractedNames);
+    } catch (e) {
+      print("Error loading initial filter data: $e");
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
       }
     }
-
-    if (mounted) {
-      setState(() {
-        allNames = extractedNames.toList()..sort();
-        filteredNames = [];
-        if (_controller.text.trim().length >= 3) {
-          _filterNames(_controller.text);
-        }
-      });
-    }
-
-    _fetchAllMasterDataForJob(extractedNames);
   }
 
   Future<void> _fetchSubjects(String scheme, FilterModel filterModel) async {
@@ -438,475 +454,522 @@ class _FilterScreenState extends State<FilterScreen> {
             SizedBox(width: 4),
           ],
         ),
-        body: SingleChildScrollView(
-          padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
-          child: Padding(
-            padding: context.padding(horizontal: 20, top: 10),
-            child: Consumer<FiltterProvider>(
-              builder: (context, filter, child) {
-                return Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(l10n.locationFilterChoice, style: context.semiBold14(color: ColorManager.blackMedium)),
-                        Switch(
-                          value: locationFilter,
-                          activeColor: ColorManager.kPrimary,
-                          activeTrackColor: ColorManager.kPrimary.withOpacity(0.5),
-                          inactiveThumbColor: ColorManager.gray,
-                          inactiveTrackColor: ColorManager.grayLight,
-                          onChanged: (value) {
-                            setState(() {
-                              locationFilter = value;
-                              schoolFilter = false;
-                            });
-                          },
-                        ),
-                      ],
-                    ),
-                    locationFilter
-                        ? Column(
+        body:
+            _isLoading
+                ? Center(child: SpinKitFadingCircle(color: ColorManager.kPrimary, size: 40.0))
+                : SingleChildScrollView(
+                  padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
+                  child: Padding(
+                    padding: context.padding(horizontal: 20, top: 10),
+                    child: Consumer<FiltterProvider>(
+                      builder: (context, filter, child) {
+                        return Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisSize: MainAxisSize.min,
                           children: [
-                            SizedBox(height: context.verticalSize(8)),
-                            Container(
-                              height: context.verticalSize(40),
-                              width: double.infinity,
-                              padding: const EdgeInsets.symmetric(horizontal: 12),
-                              decoration: BoxDecoration(
-                                color: ColorManager.whiteddd,
-                                borderRadius: BorderRadius.circular(20),
-                              ),
-                              child: DropdownButton<String>(
-                                value: filter.filterDetails.province.isNotEmpty ? filter.filterDetails.province : null,
-                                hint: Text(
-                                  l10n.selectProvince,
-                                  style: context.regular14(color: ColorManager.disabledText),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  l10n.locationFilterChoice,
+                                  style: context.semiBold14(color: ColorManager.blackMedium),
                                 ),
-                                items:
-                                    filter.filterDetails.provinces
-                                        .map(
-                                          (province) => DropdownMenuItem(
-                                            value: province,
-                                            child: Text(
-                                              TranslationService.translate(context, province), // LOCALIZED
-                                              style: context.regular14(color: ColorManager.blackMedium),
+                                Switch(
+                                  value: locationFilter,
+                                  activeColor: ColorManager.kPrimary,
+                                  activeTrackColor: ColorManager.kPrimary.withOpacity(0.5),
+                                  inactiveThumbColor: ColorManager.gray,
+                                  inactiveTrackColor: ColorManager.grayLight,
+                                  onChanged: (value) {
+                                    setState(() {
+                                      locationFilter = value;
+                                      schoolFilter = false;
+                                    });
+                                  },
+                                ),
+                              ],
+                            ),
+                            locationFilter
+                                ? Column(
+                                  children: [
+                                    SizedBox(height: context.verticalSize(8)),
+                                    Container(
+                                      height: context.verticalSize(40),
+                                      width: double.infinity,
+                                      padding: const EdgeInsets.symmetric(horizontal: 12),
+                                      decoration: BoxDecoration(
+                                        color: ColorManager.whiteddd,
+                                        borderRadius: BorderRadius.circular(20),
+                                      ),
+                                      child: DropdownButton<String>(
+                                        value:
+                                            filter.filterDetails.province.isNotEmpty
+                                                ? filter.filterDetails.province
+                                                : null,
+                                        hint: Text(
+                                          l10n.selectProvince,
+                                          style: context.regular14(color: ColorManager.disabledText),
+                                        ),
+                                        items:
+                                            filter.filterDetails.provinces
+                                                .map(
+                                                  (province) => DropdownMenuItem(
+                                                    value: province,
+                                                    child: Text(
+                                                      TranslationService.translate(context, province), // LOCALIZED
+                                                      style: context.regular14(color: ColorManager.blackMedium),
+                                                    ),
+                                                  ),
+                                                )
+                                                .toList(),
+                                        onChanged: (value) async {
+                                          setState(() {
+                                            filter.filterDetails.province = value ?? '';
+                                            filter.filterDetails.district = '';
+                                            filter.filterDetails.kalapa = '';
+                                            filter.filterDetails.school = '';
+                                          });
+                                          if (value != null && value.isNotEmpty) {
+                                            setState(() => _isDistrictLoading = true);
+                                            await StaticDataService.fetchDistricts(filter.filterDetails, value);
+                                            if (mounted) {
+                                              setState(() => _isDistrictLoading = false);
+                                            }
+                                          }
+                                        },
+                                        dropdownColor: ColorManager.white,
+                                        underline: const SizedBox(),
+                                        icon:
+                                            _isDistrictLoading
+                                                ? SizedBox(
+                                                  width: 24,
+                                                  height: 24,
+                                                  child: SpinKitFadingCircle(color: ColorManager.kPrimary, size: 20),
+                                                )
+                                                : Icon(Icons.arrow_drop_down, color: ColorManager.disabledText),
+                                        isExpanded: true,
+                                      ),
+                                    ),
+
+                                    SizedBox(
+                                      height: context.verticalSize(filter.filterDetails.province.isNotEmpty ? 20 : 0),
+                                    ),
+
+                                    filter.filterDetails.province.isNotEmpty
+                                        ? Container(
+                                          height: context.verticalSize(40),
+                                          width: double.infinity,
+                                          padding: const EdgeInsets.symmetric(horizontal: 12),
+                                          decoration: BoxDecoration(
+                                            color: ColorManager.whiteddd,
+                                            borderRadius: BorderRadius.circular(20),
+                                          ),
+                                          child: DropdownButton<String>(
+                                            value:
+                                                filter.filterDetails.district.isNotEmpty
+                                                    ? filter.filterDetails.district
+                                                    : null,
+                                            hint: Text(
+                                              l10n.selectDistrict,
+                                              style: context.regular14(color: ColorManager.disabledText),
                                             ),
+                                            items:
+                                                (filter.filterDetails.province.isNotEmpty
+                                                        ? filter.filterDetails.provinceDistricts[filter
+                                                                .filterDetails
+                                                                .province] ??
+                                                            []
+                                                        : <String>[])
+                                                    .map(
+                                                      (district) => DropdownMenuItem(
+                                                        value: district,
+                                                        child: Text(
+                                                          TranslationService.translate(context, district), // LOCALIZED
+                                                          style: context.regular14(color: ColorManager.blackMedium),
+                                                        ),
+                                                      ),
+                                                    )
+                                                    .toList(),
+                                            onChanged: (value) {
+                                              setState(() {
+                                                filter.filterDetails.district = value ?? '';
+                                                filter.filterDetails.kalapa = '';
+                                                filter.filterDetails.school = '';
+                                              });
+                                            },
+                                            dropdownColor: ColorManager.white,
+                                            underline: const SizedBox(),
+                                            icon: Icon(Icons.arrow_drop_down, color: ColorManager.disabledText),
+                                            isExpanded: true,
                                           ),
                                         )
-                                        .toList(),
-                                onChanged: (value) async {
-                                  setState(() {
-                                    filter.filterDetails.province = value ?? '';
-                                    filter.filterDetails.district = '';
-                                    filter.filterDetails.kalapa = '';
-                                    filter.filterDetails.school = '';
-                                  });
-                                  if (value != null && value.isNotEmpty) {
-                                    await StaticDataService.fetchDistricts(filter.filterDetails, value);
-                                    setState(() {});
-                                  }
-                                },
-                                dropdownColor: ColorManager.white,
-                                underline: const SizedBox(),
-                                icon: Icon(Icons.arrow_drop_down, color: ColorManager.disabledText),
-                                isExpanded: true,
-                              ),
-                            ),
-
-                            SizedBox(height: context.verticalSize(filter.filterDetails.province.isNotEmpty ? 20 : 0)),
-
-                            filter.filterDetails.province.isNotEmpty
-                                ? Container(
-                                  height: context.verticalSize(40),
-                                  width: double.infinity,
-                                  padding: const EdgeInsets.symmetric(horizontal: 12),
-                                  decoration: BoxDecoration(
-                                    color: ColorManager.whiteddd,
-                                    borderRadius: BorderRadius.circular(20),
-                                  ),
-                                  child: DropdownButton<String>(
-                                    value:
-                                        filter.filterDetails.district.isNotEmpty ? filter.filterDetails.district : null,
-                                    hint: Text(
-                                      l10n.selectDistrict,
-                                      style: context.regular14(color: ColorManager.disabledText),
+                                        : SizedBox.shrink(),
+                                    SizedBox(
+                                      height: context.verticalSize(filter.filterDetails.district.isNotEmpty ? 20 : 0),
                                     ),
-                                    items:
-                                        (filter.filterDetails.province.isNotEmpty
-                                                ? filter.filterDetails.provinceDistricts[filter
-                                                        .filterDetails
-                                                        .province] ??
-                                                    []
-                                                : <String>[])
-                                            .map(
-                                              (district) => DropdownMenuItem(
-                                                value: district,
-                                                child: Text(
-                                                  TranslationService.translate(context, district), // LOCALIZED
-                                                  style: context.regular14(color: ColorManager.blackMedium),
-                                                ),
-                                              ),
-                                            )
-                                            .toList(),
-                                    onChanged: (value) {
-                                      setState(() {
-                                        filter.filterDetails.district = value ?? '';
-                                        filter.filterDetails.kalapa = '';
-                                        filter.filterDetails.school = '';
-                                      });
-                                    },
-                                    dropdownColor: ColorManager.white,
-                                    underline: const SizedBox(),
-                                    icon: Icon(Icons.arrow_drop_down, color: ColorManager.disabledText),
-                                    isExpanded: true,
-                                  ),
+                                  ],
                                 )
                                 : SizedBox.shrink(),
-                            SizedBox(height: context.verticalSize(filter.filterDetails.district.isNotEmpty ? 20 : 0)),
-                          ],
-                        )
-                        : SizedBox.shrink(),
-                    SizedBox(height: context.verticalSize(20)),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          (accProvider.appUser?.job == "Provincial School Teacher" ||
-                                  accProvider.appUser?.job == "National School Teacher")
-                              ? l10n.schoolFilter
-                              : l10n.officeFilter,
-                          style: context.semiBold14(color: ColorManager.blackMedium),
-                        ),
-                        Switch(
-                          value: schoolFilter,
-                          activeColor: ColorManager.kPrimary,
-                          activeTrackColor: ColorManager.kPrimary.withOpacity(0.5),
-                          inactiveThumbColor: ColorManager.gray,
-                          inactiveTrackColor: ColorManager.grayLight,
-                          onChanged: (value) {
-                            setState(() {
-                              schoolFilter = value;
-                              locationFilter = false;
-                            });
-                          },
-                        ),
-                      ],
-                    ),
-                    schoolFilter
-                        ? Column(
-                          children: [
-                            SizedBox(height: context.verticalSize(5)),
-                            Focus(
-                              onFocusChange: (hasFocus) {
-                                setState(() {
-                                  showList = hasFocus && _controller.text.trim().length >= 3;
-                                });
-                              },
-                              child: TextField(
-                                controller: _controller,
-                                focusNode: _focusNode,
-                                cursorColor: ColorManager.kPrimary,
-                                decoration: InputDecoration(
-                                  hintText: l10n.searchName,
-                                  hintStyle: TextStyle(color: ColorManager.grayText),
-                                  prefixIcon: Icon(Icons.search, color: ColorManager.grayText),
-                                  enabledBorder: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(8),
-                                    borderSide: BorderSide(color: ColorManager.gray, width: 1.2),
-                                  ),
-                                  focusedBorder: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(8),
-                                    borderSide: BorderSide(color: ColorManager.kPrimary, width: 1.5),
-                                  ),
-                                ),
-                                style: TextStyle(color: ColorManager.blackMedium),
-                                onChanged: (query) {
-                                  _filterNames(query);
-                                  setState(() {
-                                    showList = query.trim().length >= 3;
-                                  });
-                                },
-                                readOnly: false,
-                                autocorrect: false,
-                              ),
-                            ),
-                            const SizedBox(height: 8),
-                            if (showList)
-                              Container(
-                                constraints: BoxConstraints(maxHeight: 200),
-                                decoration: BoxDecoration(
-                                  color: ColorManager.white,
-                                  borderRadius: BorderRadius.circular(8),
-                                  border: Border.all(color: ColorManager.gray),
-                                ),
-                                child:
-                                    filteredNames.isEmpty
-                                        ? Padding(
-                                          padding: const EdgeInsets.all(16.0),
-                                          child: Text(
-                                            l10n.noResultsFound,
-                                            style: context.regular14(color: ColorManager.grayText),
-                                          ),
-                                        )
-                                        : ListView.builder(
-                                          shrinkWrap: true,
-                                          itemCount: filteredNames.length,
-                                          itemBuilder: (context, index) {
-                                            final name = filteredNames[index];
-                                            return Material(
-                                              color: Colors.transparent,
-                                              child: ListTile(
-                                                title: Text(
-                                                  TranslationService.translate(context, name),
-                                                  style: context.regular14(color: ColorManager.blackMedium),
-                                                ),
-                                                onTap: () {
-                                                  setState(() {
-                                                    selectedName = name;
-                                                    _controller.text = name;
-                                                    _hideList();
-                                                  });
-                                                },
-                                              ),
-                                            );
-                                          },
-                                        ),
-                              ),
-                          ],
-                        )
-                        : SizedBox.shrink(),
-                    SizedBox(height: context.verticalSize(20)),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          (accProvider.appUser?.job == "Provincial School Teacher" ||
-                                  accProvider.appUser?.job == "National School Teacher")
-                              ? l10n.schemeSubjectFilter
-                              : l10n.gradeFilter,
-                          style: context.semiBold14(color: ColorManager.blackMedium),
-                        ),
-                        Switch(
-                          value:
-                              (accProvider.appUser?.job == "Provincial School Teacher" ||
-                                      accProvider.appUser?.job == "National School Teacher")
-                                  ? subjectFilter
-                                  : gradeFilter,
-                          activeColor: ColorManager.kPrimary,
-                          activeTrackColor: ColorManager.kPrimary.withOpacity(0.5),
-                          inactiveThumbColor: ColorManager.gray,
-                          inactiveTrackColor: ColorManager.grayLight,
-                          onChanged: (value) {
-                            setState(() {
-                              if ((accProvider.appUser?.job == "Provincial School Teacher" ||
-                                  accProvider.appUser?.job == "National School Teacher")) {
-                                subjectFilter = value;
-                              } else {
-                                gradeFilter = value;
-                              }
-                            });
-                          },
-                        ),
-                      ],
-                    ),
-                    ((accProvider.appUser?.job == "Provincial School Teacher" ||
-                                    accProvider.appUser?.job == "National School Teacher") &&
-                                subjectFilter ||
-                            gradeFilter)
-                        ? Column(
-                          children: [
-                            SizedBox(height: context.verticalSize(8)),
-                            Container(
-                              height: context.verticalSize(40),
-                              width: double.infinity,
-                              padding: const EdgeInsets.symmetric(horizontal: 12),
-                              decoration: BoxDecoration(
-                                color: ColorManager.whiteddd,
-                                borderRadius: BorderRadius.circular(20),
-                              ),
-                              child: DropdownButton<String>(
-                                value:
-                                    (accProvider.appUser?.job == "Provincial School Teacher" ||
-                                            accProvider.appUser?.job == "National School Teacher")
-                                        ? filter.filterDetails.scheme.isNotEmpty
-                                            ? filter.filterDetails.scheme
-                                            : null
-                                        : filter.filterDetails.grade.isNotEmpty
-                                        ? filter.filterDetails.grade
-                                        : null,
-                                hint: Text(
+                            SizedBox(height: context.verticalSize(20)),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
                                   (accProvider.appUser?.job == "Provincial School Teacher" ||
                                           accProvider.appUser?.job == "National School Teacher")
-                                      ? l10n.selectScheme
-                                      : l10n.selectGrade,
-                                  style: context.regular14(color: ColorManager.disabledText),
+                                      ? l10n.schoolFilter
+                                      : l10n.officeFilter,
+                                  style: context.semiBold14(color: ColorManager.blackMedium),
                                 ),
-                                items:
-                                    ((accProvider.appUser?.job == "Provincial School Teacher" ||
-                                                accProvider.appUser?.job == "National School Teacher")
-                                            ? filter.filterDetails.schemes
-                                            : filter.filterDetails.gradeList)
-                                        .map(
-                                          (scheme) => DropdownMenuItem(
-                                            value: scheme,
-                                            child: Text(
-                                              TranslationService.translate(context, scheme), // LOCALIZED
-                                              style: context.regular14(color: ColorManager.blackMedium),
-                                            ),
+                                Switch(
+                                  value: schoolFilter,
+                                  activeColor: ColorManager.kPrimary,
+                                  activeTrackColor: ColorManager.kPrimary.withOpacity(0.5),
+                                  inactiveThumbColor: ColorManager.gray,
+                                  inactiveTrackColor: ColorManager.grayLight,
+                                  onChanged: (value) {
+                                    setState(() {
+                                      schoolFilter = value;
+                                      locationFilter = false;
+                                    });
+                                  },
+                                ),
+                              ],
+                            ),
+                            schoolFilter
+                                ? Column(
+                                  children: [
+                                    SizedBox(height: context.verticalSize(5)),
+                                    Focus(
+                                      onFocusChange: (hasFocus) {
+                                        setState(() {
+                                          showList = hasFocus && _controller.text.trim().length >= 3;
+                                        });
+                                      },
+                                      child: TextField(
+                                        controller: _controller,
+                                        focusNode: _focusNode,
+                                        cursorColor: ColorManager.kPrimary,
+                                        decoration: InputDecoration(
+                                          hintText: l10n.searchName,
+                                          hintStyle: TextStyle(color: ColorManager.grayText),
+                                          prefixIcon: Icon(Icons.search, color: ColorManager.grayText),
+                                          enabledBorder: OutlineInputBorder(
+                                            borderRadius: BorderRadius.circular(8),
+                                            borderSide: BorderSide(color: ColorManager.gray, width: 1.2),
                                           ),
-                                        )
-                                        .toList(),
-                                onChanged: (value) async {
-                                  setState(() {
-                                    if ((accProvider.appUser?.job == "Provincial School Teacher" ||
-                                        accProvider.appUser?.job == "National School Teacher")) {
-                                      filter.filterDetails.scheme = value ?? '';
-                                      filter.filterDetails.subject = ''; // reset subject
-                                    } else {
-                                      filter.filterDetails.grade = value ?? '';
-                                    }
-                                  });
-                                  if ((accProvider.appUser?.job == "Provincial School Teacher" ||
-                                          accProvider.appUser?.job == "National School Teacher") &&
-                                      value != null &&
-                                      value != "PRIMARY") {
-                                    await StaticDataService.fetchSubjects(filter.filterDetails, value);
-                                    await _fetchSubjects(value, filter.filterDetails);
-
-                                    setState(() {});
-                                  }
-                                },
-                                dropdownColor: ColorManager.white,
-                                underline: const SizedBox(),
-                                icon: Icon(Icons.arrow_drop_down, color: ColorManager.disabledText),
-                                isExpanded: true,
-                              ),
-                            ),
-
-                            SizedBox(
-                              height: context.verticalSize(
-                                (filter.filterDetails.scheme.isNotEmpty || filter.filterDetails.grade.isNotEmpty)
-                                    ? 20
-                                    : 0,
-                              ),
-                            ),
-
-                            // Subject Dropdown
-                            (filter.filterDetails.scheme != "PRIMARY" && filter.filterDetails.scheme.isNotEmpty)
-                                ? Container(
-                                  height: context.verticalSize(40),
-                                  width: double.infinity,
-                                  padding: const EdgeInsets.symmetric(horizontal: 12),
-                                  decoration: BoxDecoration(
-                                    color: ColorManager.whiteddd,
-                                    borderRadius: BorderRadius.circular(20),
-                                  ),
-                                  child: DropdownButton<String>(
-                                    value:
-                                        filter.filterDetails.subject.isNotEmpty ? filter.filterDetails.subject : null,
-                                    hint: Text(
-                                      l10n.selectSubject,
-                                      style: context.regular14(color: ColorManager.disabledText),
+                                          focusedBorder: OutlineInputBorder(
+                                            borderRadius: BorderRadius.circular(8),
+                                            borderSide: BorderSide(color: ColorManager.kPrimary, width: 1.5),
+                                          ),
+                                        ),
+                                        style: TextStyle(color: ColorManager.blackMedium),
+                                        onChanged: (query) {
+                                          _filterNames(query);
+                                          setState(() {
+                                            showList = query.trim().length >= 3;
+                                          });
+                                        },
+                                        readOnly: false,
+                                        autocorrect: false,
+                                      ),
                                     ),
-                                    items:
-                                        (filter.filterDetails.scheme.isNotEmpty
-                                                ? filter.filterDetails.schemeSubjects[filter.filterDetails.scheme] ?? []
-                                                : <String>[])
-                                            .map(
-                                              (subject) => DropdownMenuItem(
-                                                value: subject,
-                                                child: Text(
-                                                  TranslationService.translate(context, subject), // LOCALIZED
-                                                  style: context.regular14(color: ColorManager.blackMedium),
+                                    const SizedBox(height: 8),
+                                    if (showList)
+                                      Container(
+                                        constraints: BoxConstraints(maxHeight: 200),
+                                        decoration: BoxDecoration(
+                                          color: ColorManager.white,
+                                          borderRadius: BorderRadius.circular(8),
+                                          border: Border.all(color: ColorManager.gray),
+                                        ),
+                                        child:
+                                            filteredNames.isEmpty
+                                                ? Padding(
+                                                  padding: const EdgeInsets.all(16.0),
+                                                  child: Text(
+                                                    l10n.noResultsFound,
+                                                    style: context.regular14(color: ColorManager.grayText),
+                                                  ),
+                                                )
+                                                : ListView.builder(
+                                                  shrinkWrap: true,
+                                                  itemCount: filteredNames.length,
+                                                  itemBuilder: (context, index) {
+                                                    final name = filteredNames[index];
+                                                    return Material(
+                                                      color: Colors.transparent,
+                                                      child: ListTile(
+                                                        title: Text(
+                                                          TranslationService.translate(context, name),
+                                                          style: context.regular14(color: ColorManager.blackMedium),
+                                                        ),
+                                                        onTap: () {
+                                                          setState(() {
+                                                            selectedName = name;
+                                                            _controller.text = name;
+                                                            _hideList();
+                                                          });
+                                                        },
+                                                      ),
+                                                    );
+                                                  },
                                                 ),
-                                              ),
-                                            )
-                                            .toList(),
-                                    onChanged: (value) {
-                                      setState(() {
-                                        filter.filterDetails.subject = value ?? '';
-                                      });
-                                    },
-                                    dropdownColor: ColorManager.white,
-                                    underline: const SizedBox(),
-                                    icon: Icon(Icons.arrow_drop_down, color: ColorManager.disabledText),
-                                    isExpanded: true,
-                                  ),
+                                      ),
+                                  ],
                                 )
                                 : SizedBox.shrink(),
-                            filter.filterDetails.scheme != "PRIMARY"
-                                ? SizedBox(height: context.verticalSize(20))
+                            SizedBox(height: context.verticalSize(20)),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  (accProvider.appUser?.job == "Provincial School Teacher" ||
+                                          accProvider.appUser?.job == "National School Teacher")
+                                      ? l10n.schemeSubjectFilter
+                                      : l10n.gradeFilter,
+                                  style: context.semiBold14(color: ColorManager.blackMedium),
+                                ),
+                                Switch(
+                                  value:
+                                      (accProvider.appUser?.job == "Provincial School Teacher" ||
+                                              accProvider.appUser?.job == "National School Teacher")
+                                          ? subjectFilter
+                                          : gradeFilter,
+                                  activeColor: ColorManager.kPrimary,
+                                  activeTrackColor: ColorManager.kPrimary.withOpacity(0.5),
+                                  inactiveThumbColor: ColorManager.gray,
+                                  inactiveTrackColor: ColorManager.grayLight,
+                                  onChanged: (value) {
+                                    setState(() {
+                                      if ((accProvider.appUser?.job == "Provincial School Teacher" ||
+                                          accProvider.appUser?.job == "National School Teacher")) {
+                                        subjectFilter = value;
+                                      } else {
+                                        gradeFilter = value;
+                                      }
+                                    });
+                                  },
+                                ),
+                              ],
+                            ),
+                            ((accProvider.appUser?.job == "Provincial School Teacher" ||
+                                            accProvider.appUser?.job == "National School Teacher") &&
+                                        subjectFilter ||
+                                    gradeFilter)
+                                ? Column(
+                                  children: [
+                                    SizedBox(height: context.verticalSize(8)),
+                                    Container(
+                                      height: context.verticalSize(40),
+                                      width: double.infinity,
+                                      padding: const EdgeInsets.symmetric(horizontal: 12),
+                                      decoration: BoxDecoration(
+                                        color: ColorManager.whiteddd,
+                                        borderRadius: BorderRadius.circular(20),
+                                      ),
+                                      child: DropdownButton<String>(
+                                        value:
+                                            (accProvider.appUser?.job == "Provincial School Teacher" ||
+                                                    accProvider.appUser?.job == "National School Teacher")
+                                                ? filter.filterDetails.scheme.isNotEmpty
+                                                    ? filter.filterDetails.scheme
+                                                    : null
+                                                : filter.filterDetails.grade.isNotEmpty
+                                                ? filter.filterDetails.grade
+                                                : null,
+                                        hint: Text(
+                                          (accProvider.appUser?.job == "Provincial School Teacher" ||
+                                                  accProvider.appUser?.job == "National School Teacher")
+                                              ? l10n.selectScheme
+                                              : l10n.selectGrade,
+                                          style: context.regular14(color: ColorManager.disabledText),
+                                        ),
+                                        items:
+                                            ((accProvider.appUser?.job == "Provincial School Teacher" ||
+                                                        accProvider.appUser?.job == "National School Teacher")
+                                                    ? filter.filterDetails.schemes
+                                                    : filter.filterDetails.gradeList)
+                                                .map(
+                                                  (scheme) => DropdownMenuItem(
+                                                    value: scheme,
+                                                    child: Text(
+                                                      TranslationService.translate(context, scheme), // LOCALIZED
+                                                      style: context.regular14(color: ColorManager.blackMedium),
+                                                    ),
+                                                  ),
+                                                )
+                                                .toList(),
+                                        onChanged: (value) async {
+                                          setState(() {
+                                            if ((accProvider.appUser?.job == "Provincial School Teacher" ||
+                                                accProvider.appUser?.job == "National School Teacher")) {
+                                              filter.filterDetails.scheme = value ?? '';
+                                              filter.filterDetails.subject = ''; // reset subject
+                                            } else {
+                                              filter.filterDetails.grade = value ?? '';
+                                            }
+                                          });
+                                          if ((accProvider.appUser?.job == "Provincial School Teacher" ||
+                                                  accProvider.appUser?.job == "National School Teacher") &&
+                                              value != null &&
+                                              value != "PRIMARY") {
+                                            setState(() => _isSubjectLoading = true);
+                                            await StaticDataService.fetchSubjects(filter.filterDetails, value);
+                                            await _fetchSubjects(value, filter.filterDetails);
+                                            if (mounted) {
+                                              setState(() => _isSubjectLoading = false);
+                                            }
+                                          }
+                                        },
+                                        dropdownColor: ColorManager.white,
+                                        underline: const SizedBox(),
+                                        icon:
+                                            _isSubjectLoading
+                                                ? SizedBox(
+                                                  width: 24,
+                                                  height: 24,
+                                                  child: SpinKitFadingCircle(color: ColorManager.kPrimary, size: 20),
+                                                )
+                                                : Icon(Icons.arrow_drop_down, color: ColorManager.disabledText),
+                                        isExpanded: true,
+                                      ),
+                                    ),
+
+                                    SizedBox(
+                                      height: context.verticalSize(
+                                        (filter.filterDetails.scheme.isNotEmpty ||
+                                                filter.filterDetails.grade.isNotEmpty)
+                                            ? 20
+                                            : 0,
+                                      ),
+                                    ),
+
+                                    // Subject Dropdown
+                                    (filter.filterDetails.scheme != "PRIMARY" && filter.filterDetails.scheme.isNotEmpty)
+                                        ? Container(
+                                          height: context.verticalSize(40),
+                                          width: double.infinity,
+                                          padding: const EdgeInsets.symmetric(horizontal: 12),
+                                          decoration: BoxDecoration(
+                                            color: ColorManager.whiteddd,
+                                            borderRadius: BorderRadius.circular(20),
+                                          ),
+                                          child: DropdownButton<String>(
+                                            value:
+                                                filter.filterDetails.subject.isNotEmpty
+                                                    ? filter.filterDetails.subject
+                                                    : null,
+                                            hint: Text(
+                                              l10n.selectSubject,
+                                              style: context.regular14(color: ColorManager.disabledText),
+                                            ),
+                                            items:
+                                                (filter.filterDetails.scheme.isNotEmpty
+                                                        ? filter.filterDetails.schemeSubjects[filter
+                                                                .filterDetails
+                                                                .scheme] ??
+                                                            []
+                                                        : <String>[])
+                                                    .map(
+                                                      (subject) => DropdownMenuItem(
+                                                        value: subject,
+                                                        child: Text(
+                                                          TranslationService.translate(context, subject), // LOCALIZED
+                                                          style: context.regular14(color: ColorManager.blackMedium),
+                                                        ),
+                                                      ),
+                                                    )
+                                                    .toList(),
+                                            onChanged: (value) {
+                                              setState(() {
+                                                filter.filterDetails.subject = value ?? '';
+                                              });
+                                            },
+                                            dropdownColor: ColorManager.white,
+                                            underline: const SizedBox(),
+                                            icon: Icon(Icons.arrow_drop_down, color: ColorManager.disabledText),
+                                            isExpanded: true,
+                                          ),
+                                        )
+                                        : SizedBox.shrink(),
+                                    filter.filterDetails.scheme != "PRIMARY"
+                                        ? SizedBox(height: context.verticalSize(20))
+                                        : SizedBox.shrink(),
+                                  ],
+                                )
                                 : SizedBox.shrink(),
+                            SizedBox(height: context.verticalSize(100)),
+                            CenterTextIconButton(
+                              onPress: () async {
+                                if (hasUnsavedChanges) {
+                                  final filterDetails =
+                                      Provider.of<FiltterProvider>(context, listen: false).filterDetails;
+                                  final summary = _buildFilterSummary(filterDetails);
+
+                                  if (summary == 'No filters selected.') {
+                                    toastErrorMessage("Please select at least one filter before saving.");
+                                    return;
+                                  }
+
+                                  if (filterDetails.province.isNotEmpty && filterDetails.district.isEmpty) {
+                                    toastErrorMessage("Please select a district for the selected province.");
+                                    return;
+                                  }
+
+                                  final shouldSave = await _saveAlertDialog(
+                                    context,
+                                    'Confirm Filters',
+                                    summary,
+                                    l10n.save,
+                                  );
+
+                                  if (shouldSave == true) {
+                                    final prefs = await SharedPreferences.getInstance();
+                                    await prefs.setString('province', filterDetails.province);
+                                    await prefs.setString('district', filterDetails.district);
+                                    await prefs.setString('kalapa', filterDetails.kalapa);
+                                    await prefs.setString('school', filterDetails.school);
+                                    await prefs.setString('scheme', filterDetails.scheme);
+                                    await prefs.setString('subject', filterDetails.subject);
+                                    await prefs.setString('grade', filterDetails.grade);
+                                    await prefs.setString('locationViaFilter', locationFilter ? "true" : "false");
+                                    await prefs.setString('schoolViaFilter', schoolFilter ? "true" : "false");
+                                    await prefs.setString('subjectViaFilter', subjectFilter ? "true" : "false");
+                                    await prefs.setString('gradeViaFilter', gradeFilter ? "true" : "false");
+                                    await prefs.setString('selectedName', selectedName ?? '');
+
+                                    originalFilterDetails = filterDetails.copy();
+                                    originalSelectedName = selectedName;
+                                    originalLocationFilter = locationFilter;
+                                    originalSchoolFilter = schoolFilter;
+                                    originalSubjectFilter = subjectFilter;
+                                    originalgradeFilter = gradeFilter;
+
+                                    filter.applyFilters(
+                                      district: summary.contains('District:') ? filterDetails.district : null,
+                                      school: schoolFilter && selectedName != "" ? selectedName : null,
+                                      scheme: summary.contains('Scheme:') ? filterDetails.scheme : null,
+                                      subject: summary.contains('Subject:') ? filterDetails.subject : null,
+                                      grade: summary.contains('Grade:') ? filterDetails.grade : null,
+                                      job: accProvider.appUser?.job,
+                                    );
+                                    Navigator.pop(context);
+                                  }
+                                } else {
+                                  print('No changes to save.');
+                                }
+                              },
+                              buttonText: l10n.saveChanges,
+                              gradientColors:
+                                  hasUnsavedChanges ? ColorManager.gradientButtons2 : ColorManager.gradientGray,
+                            ),
                           ],
-                        )
-                        : SizedBox.shrink(),
-                    SizedBox(height: context.verticalSize(100)),
-                    CenterTextIconButton(
-                      onPress: () async {
-                        if (hasUnsavedChanges) {
-                          final filterDetails = Provider.of<FiltterProvider>(context, listen: false).filterDetails;
-                          final summary = _buildFilterSummary(filterDetails);
-
-                          if (summary == 'No filters selected.') {
-                            toastErrorMessage("Please select at least one filter before saving.");
-                            return;
-                          }
-
-                          if (filterDetails.province.isNotEmpty && filterDetails.district.isEmpty) {
-                            toastErrorMessage("Please select a district for the selected province.");
-                            return;
-                          }
-
-                          final shouldSave = await _saveAlertDialog(context, 'Confirm Filters', summary, l10n.save);
-
-                          if (shouldSave == true) {
-                            final prefs = await SharedPreferences.getInstance();
-                            await prefs.setString('province', filterDetails.province);
-                            await prefs.setString('district', filterDetails.district);
-                            await prefs.setString('kalapa', filterDetails.kalapa);
-                            await prefs.setString('school', filterDetails.school);
-                            await prefs.setString('scheme', filterDetails.scheme);
-                            await prefs.setString('subject', filterDetails.subject);
-                            await prefs.setString('grade', filterDetails.grade);
-                            await prefs.setString('locationViaFilter', locationFilter ? "true" : "false");
-                            await prefs.setString('schoolViaFilter', schoolFilter ? "true" : "false");
-                            await prefs.setString('subjectViaFilter', subjectFilter ? "true" : "false");
-                            await prefs.setString('gradeViaFilter', gradeFilter ? "true" : "false");
-                            await prefs.setString('selectedName', selectedName ?? '');
-
-                            originalFilterDetails = filterDetails.copy();
-                            originalSelectedName = selectedName;
-                            originalLocationFilter = locationFilter;
-                            originalSchoolFilter = schoolFilter;
-                            originalSubjectFilter = subjectFilter;
-                            originalgradeFilter = gradeFilter;
-
-                            filter.applyFilters(
-                              district: summary.contains('District:') ? filterDetails.district : null,
-                              school: schoolFilter && selectedName != "" ? selectedName : null,
-                              scheme: summary.contains('Scheme:') ? filterDetails.scheme : null,
-                              subject: summary.contains('Subject:') ? filterDetails.subject : null,
-                              grade: summary.contains('Grade:') ? filterDetails.grade : null,
-                              job: accProvider.appUser?.job,
-                            );
-                            Navigator.pop(context);
-                          }
-                        } else {
-                          print('No changes to save.');
-                        }
+                        );
                       },
-                      buttonText: l10n.saveChanges,
-                      gradientColors: hasUnsavedChanges ? ColorManager.gradientButtons2 : ColorManager.gradientGray,
                     ),
-                  ],
-                );
-              },
-            ),
-          ),
-        ),
+                  ),
+                ),
       ),
     );
   }
