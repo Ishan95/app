@@ -46,6 +46,14 @@
           }
         },
         {
+          "client_id": "609068416384-vslfi17figfhup0pnp5giflaqel9vmou.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "lk.transfer.multiservice",
+            "certificate_hash": "87e558eca94809a5a3e806380aa3ae20f3e94e75"
+          }
+        },
+        {
           "client_id": "609068416384-b5upmlt2hcc7t1ffpuqkb432jka7ioum.apps.googleusercontent.com",
           "client_type": 3
         }
