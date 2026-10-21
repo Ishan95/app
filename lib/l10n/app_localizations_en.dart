@@ -749,4 +749,15 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get groupMembers => 'Group Members';
+
+  @override
+  String get privacyPolicy => 'Privacy Policy';
+
+  @override
+  String get privacyPolicyOpenError =>
+      'Unable to open the privacy policy. Please try again.';
+
+  @override
+  String get privacyPolicyDescription =>
+      'Read how we collect, use, and protect your information.';
 }

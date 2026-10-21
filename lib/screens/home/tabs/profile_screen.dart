@@ -1,3 +1,4 @@
+import 'package:app/app/widgets/privacy_policy_link.dart';
 import 'package:app/app/export.dart';
 import 'package:app/app/utils/context_helper.dart';
 import 'package:app/providers/account_provider.dart';
@@ -421,6 +422,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   onTap: () {
                     contactWhatsApp("94713905383", "${l10n.whatsappSupportMessage} #${accountProvider.appUser?.uid}");
                   },
+                ),
+                _buildDivider(),
+                const Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  child: PrivacyPolicyLink(),
                 ),
                 _buildDivider(),
                 _buildListTile(

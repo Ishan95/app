@@ -759,4 +759,15 @@ class AppLocalizationsTa extends AppLocalizations {
 
   @override
   String get groupMembers => 'குழு உறுப்பினர்கள்';
+
+  @override
+  String get privacyPolicy => 'தனியுரிமைக் கொள்கை';
+
+  @override
+  String get privacyPolicyOpenError =>
+      'தனியுரிமைக் கொள்கையைத் திறக்க முடியவில்லை. மீண்டும் முயற்சிக்கவும்.';
+
+  @override
+  String get privacyPolicyDescription =>
+      'உங்கள் தகவல்களை நாங்கள் எவ்வாறு சேகரித்து, பயன்படுத்தி, பாதுகாக்கிறோம் என்பதைப் படிக்கவும்.';
 }

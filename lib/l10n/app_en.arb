@@ -240,5 +240,8 @@
   "cycleCompletesBackTo": "Cycle completes back to",
   "findMultiPersonCycles": "Find Multi-Person Transfer Cycles",
   "cycleGroupChat": "Cycle Group Chat",
-  "groupMembers": "Group Members"
+  "groupMembers": "Group Members",
+  "privacyPolicy": "Privacy Policy",
+  "privacyPolicyOpenError": "Unable to open the privacy policy. Please try again.",
+  "privacyPolicyDescription": "Read how we collect, use, and protect your information."
 }
