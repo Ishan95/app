@@ -751,4 +751,15 @@ class AppLocalizationsSi extends AppLocalizations {
 
   @override
   String get groupMembers => 'කණ්ඩායම් සාමාජිකයන්';
+
+  @override
+  String get privacyPolicy => 'පෞද්ගලිකත්ව ප්‍රතිපත්තිය';
+
+  @override
+  String get privacyPolicyOpenError =>
+      'පෞද්ගලිකත්ව ප්‍රතිපත්තිය විවෘත කළ නොහැක. කරුණාකර නැවත උත්සාහ කරන්න.';
+
+  @override
+  String get privacyPolicyDescription =>
+      'අපි ඔබේ තොරතුරු රැස් කරන, භාවිත කරන සහ ආරක්ෂා කරන ආකාරය කියවන්න.';
 }

@@ -1545,6 +1545,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Group Members'**
   String get groupMembers;
+
+  /// No description provided for @privacyPolicy.
+  ///
+  /// In en, this message translates to:
+  /// **'Privacy Policy'**
+  String get privacyPolicy;
+
+  /// No description provided for @privacyPolicyOpenError.
+  ///
+  /// In en, this message translates to:
+  /// **'Unable to open the privacy policy. Please try again.'**
+  String get privacyPolicyOpenError;
+
+  /// No description provided for @privacyPolicyDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Read how we collect, use, and protect your information.'**
+  String get privacyPolicyDescription;
 }
 
 class _AppLocalizationsDelegate

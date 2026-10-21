@@ -240,5 +240,8 @@
   "cycleCompletesBackTo": "චක්‍රය නැවත සම්පූර්ණ වන්නේ",
   "findMultiPersonCycles": "බහු-පුද්ගල මාරුවීම් චක්‍ර සොයන්න",
   "cycleGroupChat": "චක්‍රයේ කණ්ඩායම් සංවාද",
-  "groupMembers": "කණ්ඩායම් සාමාජිකයන්"
+  "groupMembers": "කණ්ඩායම් සාමාජිකයන්",
+  "privacyPolicy": "පෞද්ගලිකත්ව ප්‍රතිපත්තිය",
+  "privacyPolicyOpenError": "පෞද්ගලිකත්ව ප්‍රතිපත්තිය විවෘත කළ නොහැක. කරුණාකර නැවත උත්සාහ කරන්න.",
+  "privacyPolicyDescription": "අපි ඔබේ තොරතුරු රැස් කරන, භාවිත කරන සහ ආරක්ෂා කරන ආකාරය කියවන්න."
 }
