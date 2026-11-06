@@ -32,7 +32,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
     super.initState();
     _loadVersion();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      final accountProvider = Provider.of<AccountProvider>(context, listen: false);
+      final accountProvider = Provider.of<AccountProvider>(
+        context,
+        listen: false,
+      );
       accountProvider.refreshCurrentUser();
     });
   }
@@ -57,21 +60,35 @@ class _ProfileScreenState extends State<ProfileScreen> {
       builder:
           (context) => AlertDialog(
             elevation: 10,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-            title: Text(title, textAlign: TextAlign.start, style: context.bold16(color: ColorManager.blackMedium)),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
+            ),
+            title: Text(
+              title,
+              textAlign: TextAlign.start,
+              style: context.bold16(color: ColorManager.blackMedium),
+            ),
             content: Text(
               content,
               textAlign: TextAlign.start,
-              style: context.regular14(color: ColorManager.blackMedium.withOpacity(0.8)),
+              style: context.regular14(
+                color: ColorManager.blackMedium.withOpacity(0.8),
+              ),
             ),
             actions: [
               TextButton(
                 onPressed: () => Navigator.pop(context, false),
-                child: Text(l10n.cancel, style: context.semiBold14(color: ColorManager.blackMedium)),
+                child: Text(
+                  l10n.cancel,
+                  style: context.semiBold14(color: ColorManager.blackMedium),
+                ),
               ),
               TextButton(
                 onPressed: () => Navigator.pop(context, true),
-                child: Text(confirmText, style: context.semiBold14(color: ColorManager.red)),
+                child: Text(
+                  confirmText,
+                  style: context.semiBold14(color: ColorManager.red),
+                ),
               ),
             ],
           ),
@@ -83,7 +100,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
       phone = '+$phone';
     }
     final encodedMessage = Uri.encodeComponent(message);
-    final uriApp = Uri.parse("https://api.whatsapp.com/send?phone=$phone&text=$encodedMessage");
+    final uriApp = Uri.parse(
+      "https://api.whatsapp.com/send?phone=$phone&text=$encodedMessage",
+    );
     final uriWeb = Uri.parse("https://wa.me/$phone?text=$encodedMessage");
 
     try {
@@ -103,14 +122,27 @@ class _ProfileScreenState extends State<ProfileScreen> {
     }
   }
 
-  Widget _buildProfileRow(String label, Widget valueWidget, BuildContext context) {
+  Widget _buildProfileRow(
+    String label,
+    Widget valueWidget,
+    BuildContext context,
+  ) {
     return Padding(
       padding: EdgeInsets.only(bottom: context.verticalSize(10)),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Expanded(flex: 4, child: Text(label, style: context.semiBold14(color: ColorManager.grayText))),
-          Text(" :  ", style: context.semiBold14(color: ColorManager.blackMedium)),
+          Expanded(
+            flex: 4,
+            child: Text(
+              label,
+              style: context.semiBold14(color: ColorManager.grayText),
+            ),
+          ),
+          Text(
+            " :  ",
+            style: context.semiBold14(color: ColorManager.blackMedium),
+          ),
           Expanded(flex: 6, child: valueWidget),
         ],
       ),
@@ -141,14 +173,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         padding: const EdgeInsets.only(left: 15.0),
                         child: Consumer<AccountProvider>(
                           builder: (context, accProvider, child) {
-                            final isActive = accProvider.appUser?.isActive ?? true;
+                            final isActive =
+                                accProvider.appUser?.isActive ?? true;
                             return Row(
                               mainAxisSize: MainAxisSize.min,
                               children: [
                                 Text(
                                   isActive ? "Active" : "Inactive",
                                   style: context.semiBold14(
-                                    color: isActive ? ColorManager.kPrimary : ColorManager.grayText,
+                                    color:
+                                        isActive
+                                            ? ColorManager.kPrimary
+                                            : ColorManager.grayText,
                                   ),
                                 ),
                                 Switch(
@@ -162,7 +198,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                             .update({'isActive': val});
                                         accProvider.refreshCurrentUser();
                                       } catch (e) {
-                                        print("Error updating profile status: $e");
+                                        print(
+                                          "Error updating profile status: $e",
+                                        );
                                       }
                                     }
                                   },
@@ -176,18 +214,30 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     ),
                     Align(
                       alignment: Alignment.center,
-                      child: Text(l10n.myProfile, style: context.semiBold20(color: ColorManager.blackMedium)),
+                      child: Text(
+                        l10n.myProfile,
+                        style: context.semiBold20(
+                          color: ColorManager.blackMedium,
+                        ),
+                      ),
                     ),
                     const Align(
                       alignment: Alignment.centerRight,
-                      child: Padding(padding: EdgeInsets.only(right: 15.0), child: LanguageSelector()),
+                      child: Padding(
+                        padding: EdgeInsets.only(right: 15.0),
+                        child: LanguageSelector(),
+                      ),
                     ),
                   ],
                 ),
                 SizedBox(height: context.verticalSize(20)),
                 Center(
                   child: ClipOval(
-                    child: Icon(Icons.person, size: context.horizontalSize(60), color: ColorManager.kPrimary),
+                    child: Icon(
+                      Icons.person,
+                      size: context.horizontalSize(60),
+                      color: ColorManager.kPrimary,
+                    ),
                   ),
                 ),
                 SizedBox(height: context.verticalSize(20)),
@@ -196,7 +246,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   child: Consumer<AccountProvider>(
                     builder: (context, accProvider, child) {
                       if (accProvider.isLoading) {
-                        return Center(child: SpinKitFadingCircle(color: ColorManager.kPrimary, size: 40));
+                        return Center(
+                          child: SpinKitFadingCircle(
+                            color: ColorManager.kPrimary,
+                            size: 40,
+                          ),
+                        );
                       }
 
                       final user = accProvider.appUser;
@@ -207,17 +262,32 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         children: [
                           _buildProfileRow(
                             l10n.occupation,
-                            Text(user.job ?? "--", style: context.semiBold14(color: ColorManager.blackMedium)),
+                            Text(
+                              user.job ?? "--",
+                              style: context.semiBold14(
+                                color: ColorManager.blackMedium,
+                              ),
+                            ),
                             context,
                           ),
                           _buildProfileRow(
                             l10n.name,
-                            Text(user.displayName ?? "--", style: context.semiBold14(color: ColorManager.blackMedium)),
+                            Text(
+                              user.displayName ?? "--",
+                              style: context.semiBold14(
+                                color: ColorManager.blackMedium,
+                              ),
+                            ),
                             context,
                           ),
                           _buildProfileRow(
                             l10n.email,
-                            Text(user.authEmail ?? "--", style: context.semiBold14(color: ColorManager.blackMedium)),
+                            Text(
+                              user.authEmail ?? "--",
+                              style: context.semiBold14(
+                                color: ColorManager.blackMedium,
+                              ),
+                            ),
                             context,
                           ),
                           _buildProfileRow(
@@ -228,12 +298,20 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 Expanded(
                                   child: Text(
                                     user.phone ?? '--',
-                                    style: context.semiBold14(color: ColorManager.blackMedium),
+                                    style: context.semiBold14(
+                                      color: ColorManager.blackMedium,
+                                    ),
                                     overflow: TextOverflow.ellipsis,
                                   ),
                                 ),
-                                if (user.isPhoneHide == true && user.phone != null)
-                                  Text(l10n.hidden, style: context.semiBold14(color: ColorManager.grayText)),
+                                if (user.isPhoneHide == true &&
+                                    user.phone != null)
+                                  Text(
+                                    l10n.hidden,
+                                    style: context.semiBold14(
+                                      color: ColorManager.grayText,
+                                    ),
+                                  ),
                               ],
                             ),
                             context,
@@ -245,29 +323,52 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               children: [
                                 Expanded(
                                   child: Text(
-                                    (user.whatsapp != null && user.whatsapp!.isNotEmpty) ? user.whatsapp! : '--',
-                                    style: context.semiBold14(color: ColorManager.blackMedium),
+                                    (user.whatsapp != null &&
+                                            user.whatsapp!.isNotEmpty)
+                                        ? user.whatsapp!
+                                        : '--',
+                                    style: context.semiBold14(
+                                      color: ColorManager.blackMedium,
+                                    ),
                                     overflow: TextOverflow.ellipsis,
                                   ),
                                 ),
-                                if (user.isWhatsappHide == true && user.whatsapp != null && user.whatsapp!.isNotEmpty)
-                                  Text(l10n.hidden, style: context.semiBold14(color: ColorManager.grayText)),
+                                if (user.isWhatsappHide == true &&
+                                    user.whatsapp != null &&
+                                    user.whatsapp!.isNotEmpty)
+                                  Text(
+                                    l10n.hidden,
+                                    style: context.semiBold14(
+                                      color: ColorManager.grayText,
+                                    ),
+                                  ),
                               ],
                             ),
                             context,
                           ),
                           _buildProfileRow(
                             l10n.provinceLabel,
-                            Text(user.province ?? "--", style: context.semiBold14(color: ColorManager.blackMedium)),
+                            Text(
+                              user.province ?? "--",
+                              style: context.semiBold14(
+                                color: ColorManager.blackMedium,
+                              ),
+                            ),
                             context,
                           ),
                           _buildProfileRow(
                             l10n.districtLabel,
-                            Text(user.district ?? "--", style: context.semiBold14(color: ColorManager.blackMedium)),
+                            Text(
+                              user.district ?? "--",
+                              style: context.semiBold14(
+                                color: ColorManager.blackMedium,
+                              ),
+                            ),
                             context,
                           ),
                           _buildProfileRow(
-                            (user.job == "Provincial School Teacher" || user.job == "National School Teacher")
+                            (user.job == "Provincial School Teacher" ||
+                                    user.job == "National School Teacher")
                                 ? l10n.kalapaLabel
                                 : user.job == "Police Officer"
                                 ? l10n.policeDivisionLabel
@@ -275,7 +376,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 ? l10n.divisionalSecretariatLabel
                                 : l10n.institutionLabel,
                             Text(
-                              (user.job == "Provincial School Teacher" || user.job == "National School Teacher")
+                              (user.job == "Provincial School Teacher" ||
+                                      user.job == "National School Teacher")
                                   ? user.kalapa ?? "--"
                                   : (user.job == "Nurse" ||
                                       user.job == "Hospital Attendant" ||
@@ -289,12 +391,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   : user.job == "Police Officer"
                                   ? user.policeDivisions ?? "--"
                                   : user.divisionalSecretariat ?? "--",
-                              style: context.semiBold14(color: ColorManager.blackMedium),
+                              style: context.semiBold14(
+                                color: ColorManager.blackMedium,
+                              ),
                             ),
                             context,
                           ),
                           _buildProfileRow(
-                            (user.job == "Provincial School Teacher" || user.job == "National School Teacher")
+                            (user.job == "Provincial School Teacher" ||
+                                    user.job == "National School Teacher")
                                 ? l10n.schoolLabel
                                 : user.job == "Police Officer"
                                 ? l10n.policeStationLabel
@@ -310,84 +415,131 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                         ? user.nationalSchool ?? '--'
                                         : (user.job == "Nurse" ||
                                             user.job == "Hospital Attendant" ||
-                                            user.job == "Public Health Inspector" ||
+                                            user.job ==
+                                                "Public Health Inspector" ||
                                             user.job == "Public Health Midwife")
                                         ? user.officeForNurse ?? '--'
                                         : (user.job == "Management Assistant" ||
                                             user.job == "Development Officer" ||
-                                            user.job == "Administrative Officer")
+                                            user.job ==
+                                                "Administrative Officer")
                                         ? user.officeForMA ?? '--'
                                         : user.job == "Police Officer"
                                         ? user.policeStations ?? "--"
-                                        : (user.gramaNiladhariDivision?.length ?? 0) > 20
+                                        : (user
+                                                    .gramaNiladhariDivision
+                                                    ?.length ??
+                                                0) >
+                                            20
                                         ? '${user.gramaNiladhariDivision?.substring(0, 20)}...'
                                         : user.gramaNiladhariDivision ?? "--",
-                                    style: context.semiBold14(color: ColorManager.blackMedium),
+                                    style: context.semiBold14(
+                                      color: ColorManager.blackMedium,
+                                    ),
                                     overflow: TextOverflow.ellipsis,
                                   ),
                                 ),
-                                if (user.isSchoolHide == true && user.school != null)
-                                  Text(l10n.hidden, style: context.semiBold14(color: ColorManager.grayText)),
+                                if (user.isSchoolHide == true &&
+                                    user.school != null)
+                                  Text(
+                                    l10n.hidden,
+                                    style: context.semiBold14(
+                                      color: ColorManager.grayText,
+                                    ),
+                                  ),
                               ],
                             ),
                             context,
                           ),
                           _buildProfileRow(
-                            (user.job == "Provincial School Teacher" || user.job == "National School Teacher")
+                            (user.job == "Provincial School Teacher" ||
+                                    user.job == "National School Teacher")
                                 ? l10n.schemeLabel
                                 : l10n.gradeLabel,
                             Text(
-                              (user.job == "Provincial School Teacher" || user.job == "National School Teacher")
+                              (user.job == "Provincial School Teacher" ||
+                                      user.job == "National School Teacher")
                                   ? user.scheme ?? "--"
                                   : user.grade ?? "--",
-                              style: context.semiBold14(color: ColorManager.blackMedium),
+                              style: context.semiBold14(
+                                color: ColorManager.blackMedium,
+                              ),
                             ),
                             context,
                           ),
-                          if (user.job == "Provincial School Teacher" || user.job == "National School Teacher")
+                          if (user.job == "Provincial School Teacher" ||
+                              user.job == "National School Teacher")
                             _buildProfileRow(
                               l10n.subjectLabel,
                               Text(
-                                (user.subject != null && user.scheme != "PRIMARY") ? user.subject! : "--",
-                                style: context.semiBold14(color: ColorManager.blackMedium),
+                                (user.subject != null &&
+                                        user.scheme != "PRIMARY")
+                                    ? user.subject!
+                                    : "--",
+                                style: context.semiBold14(
+                                  color: ColorManager.blackMedium,
+                                ),
                               ),
                               context,
                             ),
-                          if (user.job == "Provincial School Teacher" || user.job == "National School Teacher")
+                          if (user.job == "Provincial School Teacher" ||
+                              user.job == "National School Teacher")
                             _buildProfileRow(
                               l10n.mediumLabel,
                               Text(
-                                (user.subjectMedium != null && user.subjectMedium != "") ? user.subjectMedium! : "--",
-                                style: context.semiBold14(color: ColorManager.blackMedium),
+                                (user.subjectMedium != null &&
+                                        user.subjectMedium != "")
+                                    ? user.subjectMedium!
+                                    : "--",
+                                style: context.semiBold14(
+                                  color: ColorManager.blackMedium,
+                                ),
                               ),
                               context,
                             ),
                           _buildProfileRow(
                             l10n.choice1Label,
-                            Text(user.choice1 ?? "--", style: context.semiBold14(color: ColorManager.blackMedium)),
+                            Text(
+                              user.choice1 ?? "--",
+                              style: context.semiBold14(
+                                color: ColorManager.blackMedium,
+                              ),
+                            ),
                             context,
                           ),
                           _buildProfileRow(
                             l10n.choice2Label,
                             Text(
-                              (user.choice2 != null && user.choice2 != "") ? user.choice2! : "--",
-                              style: context.semiBold14(color: ColorManager.blackMedium),
+                              (user.choice2 != null && user.choice2 != "")
+                                  ? user.choice2!
+                                  : "--",
+                              style: context.semiBold14(
+                                color: ColorManager.blackMedium,
+                              ),
                             ),
                             context,
                           ),
                           _buildProfileRow(
                             l10n.choice3Label,
                             Text(
-                              (user.choice3 != null && user.choice3 != "") ? user.choice3! : "--",
-                              style: context.semiBold14(color: ColorManager.blackMedium),
+                              (user.choice3 != null && user.choice3 != "")
+                                  ? user.choice3!
+                                  : "--",
+                              style: context.semiBold14(
+                                color: ColorManager.blackMedium,
+                              ),
                             ),
                             context,
                           ),
                           _buildProfileRow(
                             l10n.noteLabel,
                             Text(
-                              (user.note != null && user.note != "") ? user.note! : "--",
-                              style: context.semiBold14(color: ColorManager.blackMedium),
+                              (user.note != null && user.note != "")
+                                  ? user.note!
+                                  : "--",
+                              style: context.semiBold14(
+                                color: ColorManager.blackMedium,
+                              ),
                             ),
                             context,
                           ),
@@ -399,10 +551,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 SizedBox(height: context.verticalSize(20)),
                 _buildListTile(
                   context,
-                  titleStyle: context.semiBold14(color: ColorManager.blackMedium),
+                  titleStyle: context.semiBold14(
+                    color: ColorManager.blackMedium,
+                  ),
                   title: l10n.editProfile,
                   onTap: () {
-                    Navigator.push(context, MaterialPageRoute(builder: (context) => const EditDetailsScreen()));
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const EditDetailsScreen(),
+                      ),
+                    );
                   },
                 ),
                 _buildDivider(),
@@ -417,22 +576,24 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 // _buildDivider(),
                 _buildListTile(
                   context,
-                  titleStyle: context.semiBold14(color: ColorManager.blackMedium),
+                  titleStyle: context.semiBold14(
+                    color: ColorManager.blackMedium,
+                  ),
                   title: l10n.helpAndSupport,
                   onTap: () {
-                    contactWhatsApp("94713905383", "${l10n.whatsappSupportMessage} #${accountProvider.appUser?.uid}");
+                    contactWhatsApp(
+                      "94713905383",
+                      "${l10n.whatsappSupportMessage} #${accountProvider.appUser?.uid}",
+                    );
                   },
-                ),
-                _buildDivider(),
-                const Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                  child: PrivacyPolicyLink(),
                 ),
                 _buildDivider(),
                 _buildListTile(
                   context,
                   title: l10n.signOut,
-                  titleStyle: context.semiBold14(color: ColorManager.blackMedium),
+                  titleStyle: context.semiBold14(
+                    color: ColorManager.blackMedium,
+                  ),
                   onTap: () async {
                     final shouldSave = await _alertDialog(
                       context,
@@ -460,7 +621,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       l10n,
                     );
                     if (shouldSave == true) {
-                      await authProvider.deleteAccount(ContextHelper.navigatorKey.currentContext!);
+                      await authProvider.deleteAccount(
+                        ContextHelper.navigatorKey.currentContext!,
+                      );
                     }
                   },
                 ),
@@ -468,9 +631,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
                 SizedBox(height: context.verticalSize(40)),
                 Center(
-                  child: Text('${l10n.version} $_version', style: context.semiBold14(color: ColorManager.grayText)),
+                  child: Text(
+                    '${l10n.version} $_version',
+                    style: context.semiBold14(color: ColorManager.grayText),
+                  ),
                 ),
-                SizedBox(height: context.verticalSize(150)),
+                const Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  child: PrivacyPolicyLink(),
+                ),
+                SizedBox(height: context.verticalSize(100)),
               ],
             ),
           ),
@@ -480,7 +650,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
           Positioned.fill(
             child: Container(
               color: Colors.black.withOpacity(0.5),
-              child: Center(child: SpinKitFadingCircle(color: ColorManager.kPrimary, size: 50.0)),
+              child: Center(
+                child: SpinKitFadingCircle(
+                  color: ColorManager.kPrimary,
+                  size: 50.0,
+                ),
+              ),
             ),
           ),
       ],
@@ -496,8 +671,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }) {
     return ListTile(
       contentPadding: const EdgeInsets.symmetric(vertical: 1, horizontal: 16),
-      title: Text(title, style: titleStyle ?? context.semiBold14(color: ColorManager.blackMedium)),
-      trailing: trailingWidget ?? const Icon(Icons.arrow_forward_ios, color: Color(0xff8F9098), size: 12),
+      title: Text(
+        title,
+        style:
+            titleStyle ?? context.semiBold14(color: ColorManager.blackMedium),
+      ),
+      trailing:
+          trailingWidget ??
+          const Icon(
+            Icons.arrow_forward_ios,
+            color: Color(0xff8F9098),
+            size: 12,
+          ),
       onTap: onTap,
     );
   }
