@@ -1,6 +1,7 @@
 import 'package:app/app/models/filter_model.dart';
 import 'package:app/app/models/person_details_model.dart';
 import 'package:app/app/utils/context_helper.dart';
+import 'package:app/app/utils/whatsapp_number.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart' as firebase_auth;
 import 'package:firebase_auth/firebase_auth.dart';
@@ -207,8 +208,9 @@ class AccountProvider extends ChangeNotifier {
         updatedData['phone'] = contactController.text.trim();
       }
 
-      if (whatsappController.text.trim() != _appUser!.whatsapp) {
-        updatedData['whatsapp'] = whatsappController.text.trim();
+      final whatsappNumber = normalizeWhatsAppNumber(whatsappController.text);
+      if (whatsappNumber != (_appUser!.whatsapp ?? '')) {
+        updatedData['whatsapp'] = whatsappNumber;
       }
       if (isWhatsappVisible != (_appUser?.isWhatsappHide ?? false)) {
         updatedData['isWhatsappHide'] = isWhatsappVisible;
@@ -311,9 +313,9 @@ class AccountProvider extends ChangeNotifier {
         updatedData['subjectMedium'] = editDetails.subjectMedium;
       }
 
-      // if (editDetails.grade != "" && _appUser!.grade != editDetails.grade) {
-      //   updatedData['grade'] = editDetails.grade;
-      // }
+      if (editDetails.grade.isNotEmpty && _appUser!.grade != editDetails.grade) {
+        updatedData['grade'] = editDetails.grade;
+      }
 
       if (editDetails.choice1 != "" && _appUser!.choice1 != editDetails.choice1) {
         updatedData['choice1'] = editDetails.choice1;

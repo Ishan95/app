@@ -1,6 +1,7 @@
 import 'package:app/app/models/chat/chat_model.dart';
 import 'package:app/providers/auth_provider.dart';
 import 'package:app/providers/chat_provider.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -61,7 +62,25 @@ class BottomNavBar extends StatelessWidget {
                           child: Column(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              Icon(Icons.notifications, color: ColorManager.grayText),
+                              currentUserId == null
+                                  ? Icon(Icons.notifications, color: ColorManager.grayText)
+                                  : StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
+                                    stream: FirebaseFirestore.instance
+                                        .collection('notifications')
+                                        .where('receiverId', isEqualTo: currentUserId)
+                                        .where('isRead', isEqualTo: false)
+                                        .orderBy('createdAt', descending: true)
+                                        .snapshots(),
+                                    builder: (context, snapshot) {
+                                      final unreadCount = snapshot.data?.docs.length ?? 0;
+                                      return Badge(
+                                        isLabelVisible: unreadCount > 0,
+                                        label: Text(unreadCount > 99 ? '99+' : unreadCount.toString()),
+                                        backgroundColor: Colors.red,
+                                        child: Icon(Icons.notifications, color: ColorManager.grayText),
+                                      );
+                                    },
+                                  ),
                               SizedBox(height: context.verticalSize(4)),
                               Text(l10n.notificationsNav, style: context.regular12(color: ColorManager.grayText)),
                               SizedBox(height: context.verticalSize(4)),

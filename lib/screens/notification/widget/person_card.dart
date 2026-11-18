@@ -12,12 +12,14 @@ import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:app/l10n/app_localizations.dart';
 import 'package:app/app/utils/translation_service.dart';
+import 'package:app/app/utils/whatsapp_number.dart';
 
 class PersonCard extends StatefulWidget {
   final PersonDetailsModel personDetails;
   final String page;
+  final bool hideWhatsAppOnHome;
 
-  const PersonCard({super.key, required this.personDetails, this.page = 'home'});
+  const PersonCard({super.key, required this.personDetails, this.page = 'home', this.hideWhatsAppOnHome = false});
 
   @override
   State<PersonCard> createState() => _PersonCardState();
@@ -27,12 +29,10 @@ class _PersonCardState extends State<PersonCard> {
   bool isExpanded = false;
 
   Future<void> contactWhatsApp(String phone, String message) async {
-    if (!phone.startsWith('+')) {
-      phone = '+$phone';
-    }
+    final linkNumber = whatsappLinkNumber(phone);
     final encodedMessage = Uri.encodeComponent(message);
-    final uriApp = Uri.parse("https://api.whatsapp.com/send?phone=$phone&text=$encodedMessage");
-    final uriWeb = Uri.parse("https://wa.me/$phone?text=$encodedMessage");
+    final uriApp = Uri.parse("https://api.whatsapp.com/send?phone=$linkNumber&text=$encodedMessage");
+    final uriWeb = Uri.parse("https://wa.me/$linkNumber?text=$encodedMessage");
 
     try {
       if (await canLaunchUrl(uriApp)) {
@@ -54,6 +54,8 @@ class _PersonCardState extends State<PersonCard> {
     final FiltterProvider filterProvider = Provider.of<FiltterProvider>(context, listen: false);
     final String? currentUserId = filterProvider.firebaseUser?.uid;
     final l10n = AppLocalizations.of(context)!;
+    final hideWhatsApp =
+        widget.hideWhatsAppOnHome && widget.personDetails.uid != currentUserId && widget.personDetails.isWhatsappHide;
 
     return Container(
       decoration: BoxDecoration(
@@ -357,7 +359,7 @@ class _PersonCardState extends State<PersonCard> {
                           ),
                           SizedBox(height: context.verticalSize(5)),
                           Row(
-                            crossAxisAlignment: CrossAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
                               Text(l10n.contactIndicator, style: context.semiBold14(color: ColorManager.grayText)),
                               Expanded(
@@ -369,15 +371,17 @@ class _PersonCardState extends State<PersonCard> {
                                             sigmaY: widget.personDetails.isPhoneHide ? 5 : 0,
                                           ),
                                           child: Text(
-                                            "${widget.personDetails.phone ?? '07********'}    ",
+                                            widget.personDetails.phone ?? '07********',
                                             style: context.semiBold14(color: ColorManager.blackMedium),
-                                            overflow: TextOverflow.visible,
+                                            maxLines: 1,
+                                            overflow: TextOverflow.ellipsis,
                                           ),
                                         )
                                         : Text(
-                                          "${widget.personDetails.phone ?? '07********'}    ",
+                                          widget.personDetails.phone ?? '07********',
                                           style: context.semiBold14(color: ColorManager.blackMedium),
-                                          overflow: TextOverflow.visible,
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
                                         ),
                               ),
                               widget.personDetails.isPhoneHide
@@ -397,7 +401,7 @@ class _PersonCardState extends State<PersonCard> {
                             SizedBox(height: context.verticalSize(5)),
                           if (widget.personDetails.whatsapp != null && widget.personDetails.whatsapp!.isNotEmpty)
                             Row(
-                              crossAxisAlignment: CrossAxisAlignment.start,
+                              crossAxisAlignment: CrossAxisAlignment.center,
                               children: [
                                 Text(
                                   "   ${l10n.whatsappIndicator}",
@@ -409,6 +413,20 @@ class _PersonCardState extends State<PersonCard> {
                                           ? Text(
                                             widget.personDetails.whatsapp!,
                                             style: context.semiBold14(color: ColorManager.blackMedium),
+                                            maxLines: 1,
+                                            overflow: TextOverflow.ellipsis,
+                                          )
+                                          : hideWhatsApp
+                                          ? ImageFiltered(
+                                            imageFilter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
+                                            child: Text(
+                                              l10n.chatWithWhatsapp,
+                                              style: context
+                                                  .semiBold14(color: Colors.green)
+                                                  .copyWith(decoration: TextDecoration.underline),
+                                              maxLines: 1,
+                                              overflow: TextOverflow.ellipsis,
+                                            ),
                                           )
                                           : InkWell(
                                             onTap: () {
@@ -422,9 +440,19 @@ class _PersonCardState extends State<PersonCard> {
                                               style: context
                                                   .semiBold14(color: Colors.green)
                                                   .copyWith(decoration: TextDecoration.underline),
+                                              maxLines: 1,
+                                              overflow: TextOverflow.ellipsis,
                                             ),
                                           ),
                                 ),
+                                if (hideWhatsApp)
+                                  Padding(
+                                    padding: const EdgeInsets.only(right: 15.0),
+                                    child: InfoButtonWithTooltip(
+                                      tooltipText: l10n.contentHiddenTooltip,
+                                      child: Icon(Icons.visibility_off, color: ColorManager.grayText, size: 16),
+                                    ),
+                                  ),
                               ],
                             ),
 

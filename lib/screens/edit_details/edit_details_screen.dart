@@ -57,6 +57,23 @@ class _EditDetailsScreenState extends State<EditDetailsScreen> {
   late AccountProvider accProvider;
   FilterModel filterDetails = FilterModel();
   late FilterModel _initialFilterDetails;
+  late String _initialFirstName;
+  late String _initialLastName;
+  late String _initialContact;
+  late String _initialWhatsApp;
+  late bool _initialContactHidden;
+  late bool _initialWhatsAppHidden;
+  late bool _initialSchoolHidden;
+
+  void _captureInitialInputs() {
+    _initialFirstName = accProvider.firstNameController.text.trim();
+    _initialLastName = accProvider.lastNameController.text.trim();
+    _initialContact = accProvider.contactController.text.trim();
+    _initialWhatsApp = accProvider.whatsappController.text.trim();
+    _initialContactHidden = accProvider.isContactVisible;
+    _initialWhatsAppHidden = accProvider.isWhatsappVisible;
+    _initialSchoolHidden = accProvider.isSchoolVisible;
+  }
 
   @override
   void initState() {
@@ -92,6 +109,7 @@ class _EditDetailsScreenState extends State<EditDetailsScreen> {
       choice3: accProvider.appUser?.choice3 ?? '',
     );
     _initialFilterDetails = filterDetails.copy();
+    _captureInitialInputs();
     _loadInitialData();
   }
 
@@ -153,6 +171,7 @@ class _EditDetailsScreenState extends State<EditDetailsScreen> {
     }
 
     _initialFilterDetails = filterDetails.copy();
+    _captureInitialInputs();
 
     if (mounted) {
       setState(() {
@@ -357,7 +376,28 @@ class _EditDetailsScreenState extends State<EditDetailsScreen> {
   }
 
   bool get hasUnsavedChanges {
-    return !_initialFilterDetails.isEqual(filterDetails);
+    return !_initialFilterDetails.isEqual(filterDetails) ||
+        _initialFirstName != accProvider.firstNameController.text.trim() ||
+        _initialLastName != accProvider.lastNameController.text.trim() ||
+        _initialContact != accProvider.contactController.text.trim() ||
+        _initialWhatsApp != accProvider.whatsappController.text.trim() ||
+        _initialContactHidden != accProvider.isContactVisible ||
+        _initialWhatsAppHidden != accProvider.isWhatsappVisible ||
+        _initialSchoolHidden != accProvider.isSchoolVisible ||
+        selectedImage != null;
+  }
+
+  bool _matchingDetailsChanged(Map<String, dynamic> savedDetails) {
+    String saved(String field) => savedDetails[field]?.toString() ?? '';
+
+    return _initialFilterDetails.job != saved('job') ||
+        _initialFilterDetails.district != saved('district') ||
+        _initialFilterDetails.choice1 != saved('choice1') ||
+        _initialFilterDetails.choice2 != saved('choice2') ||
+        _initialFilterDetails.choice3 != saved('choice3') ||
+        _initialFilterDetails.scheme != saved('scheme') ||
+        _initialFilterDetails.subject != saved('subject') ||
+        _initialFilterDetails.subjectMedium != saved('subjectMedium');
   }
 
   @override
@@ -371,27 +411,15 @@ class _EditDetailsScreenState extends State<EditDetailsScreen> {
         centerTitle: true,
         leading: GestureDetector(
           onTap: () {
-            (hasUnsavedChanges ||
-                    accProvider.appUser?.displayName !=
-                        "${accProvider.firstNameController.text.trim()} ${accProvider.lastNameController.text.trim()}" ||
-                    accProvider.appUser?.phone != accProvider.contactController.text.trim() ||
-                    accProvider.appUser?.whatsapp != accProvider.whatsappController.text.trim() ||
-                    accProvider.appUser?.note != accProvider.noteController.text.trim() ||
-                    accProvider.appUser?.isPhoneHide != accProvider.isContactVisible ||
-                    accProvider.appUser?.isWhatsappHide != accProvider.isWhatsappVisible ||
-                    accProvider.appUser?.isSchoolHide != accProvider.isSchoolVisible)
+            hasUnsavedChanges
                 ? _confirmAlertDialog(context, l10n.goBackConfirmTitle, l10n.goBackConfirmDesc, l10n.goBack, () {
-                  List<String> parts = (accProvider.appUser?.displayName ?? "").split(' ');
-                  accProvider.firstNameController.text = parts[0];
-                  accProvider.lastNameController.text = parts.length > 1 ? parts[1] : '';
-                  accProvider.contactController.text =
-                      accProvider.appUser?.phone != null ? accProvider.appUser!.phone.toString() : '';
-                  accProvider.whatsappController.text =
-                      accProvider.appUser?.whatsapp != null ? accProvider.appUser!.whatsapp.toString() : '';
-                  accProvider.isContactVisible = accProvider.appUser?.isPhoneHide ?? false;
-                  accProvider.isWhatsappVisible = accProvider.appUser?.isWhatsappHide ?? false;
-                  accProvider.isSchoolVisible = accProvider.appUser?.isSchoolHide ?? false;
-                  accProvider.noteController.text = accProvider.appUser?.note ?? '';
+                  accProvider.firstNameController.text = _initialFirstName;
+                  accProvider.lastNameController.text = _initialLastName;
+                  accProvider.contactController.text = _initialContact;
+                  accProvider.whatsappController.text = _initialWhatsApp;
+                  accProvider.isContactVisible = _initialContactHidden;
+                  accProvider.isWhatsappVisible = _initialWhatsAppHidden;
+                  accProvider.isSchoolVisible = _initialSchoolHidden;
                   Navigator.of(context)
                     ..pop()
                     ..pop();
@@ -1928,16 +1956,7 @@ class _EditDetailsScreenState extends State<EditDetailsScreen> {
                                         accProvider.contactController.text.length <= 12 &&
                                         isJobDetailsValid &&
                                         filterDetails.choice1.isNotEmpty) {
-                                      if (hasUnsavedChanges ||
-                                          accProvider.appUser?.displayName !=
-                                              "${accProvider.firstNameController.text.trim()} ${accProvider.lastNameController.text.trim()}" ||
-                                          accProvider.appUser?.phone != accProvider.contactController.text.trim() ||
-                                          accProvider.appUser?.whatsapp != accProvider.whatsappController.text.trim() ||
-                                          accProvider.appUser?.note != accProvider.noteController.text.trim() ||
-                                          accProvider.appUser?.isPhoneHide != accProvider.isContactVisible ||
-                                          accProvider.appUser?.isWhatsappHide != accProvider.isWhatsappVisible ||
-                                          accProvider.appUser?.isSchoolHide != accProvider.isSchoolVisible ||
-                                          selectedImage != null) {
+                                      if (hasUnsavedChanges) {
                                         final summary = _buildFilterSummary(filterDetails);
 
                                         if (summary == 'No changes selected.') {
@@ -1953,8 +1972,6 @@ class _EditDetailsScreenState extends State<EditDetailsScreen> {
                                         );
 
                                         if (shouldSave == true) {
-                                          bool triggersMatching = !_initialFilterDetails.isEqual(filterDetails);
-
                                           final authProvider = Provider.of<AuthenticationProvider>(
                                             context,
                                             listen: false,
@@ -1963,12 +1980,13 @@ class _EditDetailsScreenState extends State<EditDetailsScreen> {
 
                                           await acc.updateAccount(filterDetails);
 
-                                          if (triggersMatching && uid != null) {
+                                          if (uid != null) {
                                             final updatedDoc =
                                                 await FirebaseFirestore.instance.collection('users').doc(uid).get();
-                                            if (updatedDoc.exists && updatedDoc.data() != null) {
+                                            final savedDetails = updatedDoc.data();
+                                            if (savedDetails != null && _matchingDetailsChanged(savedDetails)) {
                                               await authProvider.notifyMatches(
-                                                updatedDoc.data() as Map<String, dynamic>,
+                                                savedDetails,
                                                 uid,
                                               );
                                             }

@@ -16,10 +16,6 @@ class OneSignalService {
     OneSignal.initialize(appId);
     OneSignal.Notifications.requestPermission(true);
 
-    OneSignal.Notifications.addForegroundWillDisplayListener((event) {
-      event.preventDefault();
-    });
-
     OneSignal.Notifications.addClickListener((event) {
       if (FirebaseAuth.instance.currentUser != null) {
         int homeIndex = 1;
@@ -42,8 +38,12 @@ class OneSignalService {
     });
   }
 
-  static void loginUser(String uid) {
-    OneSignal.login(uid);
+  static Future<void> loginUser(String uid) async {
+    try {
+      await OneSignal.login(uid);
+    } catch (e) {
+      debugPrint('Could not link OneSignal subscription to the signed-in user: $e');
+    }
   }
 
   static void logoutUser() {

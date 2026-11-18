@@ -175,6 +175,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           return Padding(
                             padding: const EdgeInsets.only(bottom: 10.0),
                             child: PersonCard(
+                              hideWhatsAppOnHome: true,
                               personDetails: PersonDetailsModel(
                                 uid:
                                     user.uid == "UNKNOWN"

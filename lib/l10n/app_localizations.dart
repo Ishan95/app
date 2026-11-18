@@ -1069,7 +1069,7 @@ abstract class AppLocalizations {
   /// No description provided for @contentHiddenTooltip.
   ///
   /// In en, this message translates to:
-  /// **'This content is hidden. Tap the chat icon to request your details.'**
+  /// **'This content is hidden. Tap the chat icon to request his details.'**
   String get contentHiddenTooltip;
 
   /// No description provided for @contactIndicator.

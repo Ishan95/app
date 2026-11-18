@@ -42,6 +42,10 @@ void main() async {
   await dotenv.load(fileName: ".env");
   OneSignalService.initialize();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  final signedInUser = FirebaseAuth.instance.currentUser;
+  if (signedInUser != null) {
+    await OneSignalService.loginUser(signedInUser.uid);
+  }
   FirebaseMessaging.onBackgroundMessage(handleBackgroundMessage);
   final firebaseService = FirebaseService();
   await firebaseService.initNotifications();

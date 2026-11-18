@@ -1,12 +1,11 @@
 import 'package:app/app/export.dart';
 import 'package:app/providers/account_provider.dart';
 import 'package:app/providers/auth_provider.dart';
+import 'package:app/screens/onboarding/onboarding_help_dialog.dart';
 import 'package:app/screens/home/home.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart' as firebase_auth;
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:url_launcher/url_launcher.dart';
 import 'package:app/l10n/app_localizations.dart';
 
 class VerifyEmailScreen extends StatefulWidget {
@@ -30,67 +29,6 @@ class VerifyEmailScreen extends StatefulWidget {
 
 class _VerifyEmailScreenState extends State<VerifyEmailScreen> {
   bool checking = false;
-
-  Future<bool?> _saveAlertDialog(
-    BuildContext context,
-    String title,
-    String content,
-    String confirmText,
-    AppLocalizations l10n,
-  ) {
-    return showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder:
-          (context) => AlertDialog(
-            elevation: 10,
-            backgroundColor: ColorManager.white,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-            title: Text(title, textAlign: TextAlign.start, style: context.bold16(color: ColorManager.blackMedium)),
-            content: Text(
-              content,
-              textAlign: TextAlign.start,
-              style: context.regular14(color: ColorManager.blackMedium.withOpacity(0.8)),
-            ),
-
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context, false),
-                child: Text(l10n.cancel, style: context.semiBold14(color: ColorManager.blackMedium)),
-              ),
-              TextButton(
-                onPressed: () => Navigator.pop(context, true),
-                child: Text(confirmText, style: context.semiBold14(color: ColorManager.red)),
-              ),
-            ],
-          ),
-    );
-  }
-
-  Future<void> contactWhatsApp(String phone, String message) async {
-    if (!phone.startsWith('+')) {
-      phone = '+$phone';
-    }
-    final encodedMessage = Uri.encodeComponent(message);
-    final uriApp = Uri.parse("https://api.whatsapp.com/send?phone=$phone&text=$encodedMessage");
-    final uriWeb = Uri.parse("https://wa.me/$phone?text=$encodedMessage");
-
-    try {
-      if (await canLaunchUrl(uriApp)) {
-        print('$uriApp');
-        await launchUrl(uriApp, mode: LaunchMode.externalApplication);
-        return;
-      }
-      if (await canLaunchUrl(uriWeb)) {
-        print('$uriWeb');
-        await launchUrl(uriWeb, mode: LaunchMode.platformDefault);
-        return;
-      }
-      print("WhatsApp not available");
-    } catch (e) {
-      print("Error launching WhatsApp: $e");
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -140,6 +78,7 @@ class _VerifyEmailScreenState extends State<VerifyEmailScreen> {
               style: TextButton.styleFrom(foregroundColor: ColorManager.kPrimary),
               onPressed: () async {
                 await widget.user.sendEmailVerification();
+                if (!context.mounted) return;
                 ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(l10n.verificationEmailResent)));
               },
               child: Text(l10n.resendVerificationEmail, style: context.semiBold14(color: ColorManager.kPrimary)),
@@ -153,42 +92,45 @@ class _VerifyEmailScreenState extends State<VerifyEmailScreen> {
   Future<void> checkVerification(AppLocalizations l10n) async {
     setState(() => checking = true);
 
-    final authProvider = Provider.of<AuthenticationProvider>(context, listen: false);
-    final accProvider = Provider.of<AccountProvider>(context, listen: false);
-    final verified = await authProvider.reloadAndCheckVerified();
+    final screenContext = context;
+    final authProvider = Provider.of<AuthenticationProvider>(screenContext, listen: false);
+    final accProvider = Provider.of<AccountProvider>(screenContext, listen: false);
+    try {
+      final verified = await authProvider.reloadAndCheckVerified();
+      if (!screenContext.mounted) return;
 
-    if (verified) {
-      final success = await authProvider.createAccount(
-        isPhoneHide: widget.isSelected,
-        isWhatsappHide: widget.isWhatsappSelected,
-        isSchoolHide: widget.isSchoolSelected,
-        isEnable: widget.isEnable,
-      );
-
-      if (success) {
-        await accProvider.refreshCurrentUser();
-        Navigator.pushAndRemoveUntil(
-          context,
-          MaterialPageRoute(builder: (_) => const Home(index: 0)),
-          (route) => false,
+      if (verified) {
+        final success = await authProvider.createAccount(
+          isPhoneHide: widget.isSelected,
+          isWhatsappHide: widget.isWhatsappSelected,
+          isSchoolHide: widget.isSchoolSelected,
+          isEnable: widget.isEnable,
         );
-      } else {
-        final shouldSave = await _saveAlertDialog(
-          context,
-          l10n.cantCreateAccount,
-          l10n.connectWhatsappToCreate,
-          l10n.needHelp,
-          l10n,
-        );
+        if (!screenContext.mounted) return;
 
-        if (shouldSave == true) {
-          contactWhatsApp("94713905383", "Hello, I need assistance with my account.");
+        if (success) {
+          await accProvider.refreshCurrentUser();
+          if (!screenContext.mounted) return;
+          Navigator.pushAndRemoveUntil(
+            screenContext,
+            MaterialPageRoute(builder: (_) => const Home(index: 0)),
+            (route) => false,
+          );
+        } else {
+          await showOnboardingHelpDialog(
+            screenContext,
+            authProvider.errorMessage ?? 'Failed to complete setup.',
+          );
         }
+      } else {
+        ScaffoldMessenger.of(screenContext).showSnackBar(SnackBar(content: Text(l10n.emailNotVerifiedYet)));
       }
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(l10n.emailNotVerifiedYet)));
+    } catch (e) {
+      if (screenContext.mounted) {
+        await showOnboardingHelpDialog(screenContext, e.toString());
+      }
+    } finally {
+      if (mounted) setState(() => checking = false);
     }
-
-    setState(() => checking = false);
   }
 }

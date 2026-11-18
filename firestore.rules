@@ -1,0 +1,117 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Existing user rules
+    match /users/{userId} {
+      allow read: if request.auth != null; // <--- This rule makes ALL user profiles public to authenticated users
+      allow create: if request.auth != null && request.auth.uid == userId
+        && request.auth.token.email_verified == true
+        && request.auth.token.firebase.sign_in_provider == 'google.com'
+        && request.resource.data.uid == userId;
+      // Existing clients update profile, device, and login fields. Keep those
+      // writes working while protecting fields that identify the document.
+      allow update: if request.auth != null && request.auth.uid == userId
+        && !request.resource.data.diff(resource.data).affectedKeys()
+          .hasAny(['uid', 'createdAt']);
+      allow delete: if request.auth != null && request.auth.uid == userId;
+
+      // Match alert history is private to its owner. It is kept separately
+      // from the profile, which other signed-in users can read.
+      match /match_notification_state/{documentId} {
+        allow read, write: if request.auth != null && request.auth.uid == userId;
+      }
+    }
+
+    // Rules for central chat rooms and their messages
+    match /chats/{chatRoomId} {
+      // Helper function to extract UIDs from chatRoomId (e.g., "uidA_uidB")
+      function getChatParticipants(id) {
+        return id.split('_');
+      }
+
+      // Allow read/write only if the authenticated user is a participant in the chat
+      allow read, update: if request.auth != null && request.auth.uid in getChatParticipants(chatRoomId);
+      allow create: if request.auth != null && request.auth.uid in getChatParticipants(chatRoomId) && request.resource.data.participants.toSet() == getChatParticipants(chatRoomId).toSet();
+
+      // Rules for messages subcollection within a chat
+      match /messages/{messageId} {
+        // Allow read/write only if the authenticated user is a participant in the parent chat
+        allow read: if request.auth != null && request.auth.uid in getChatParticipants(chatRoomId);
+        allow create: if request.auth != null && request.auth.uid in getChatParticipants(chatRoomId) && request.resource.data.senderId == request.auth.uid;
+      }
+    }
+
+    // Rules for user-specific chat metadata (what appears in the "Chats" tab)
+    match /users_chat_metadata/{userId}/chatList/{chatRoomId} {
+      function isRoomParticipant() {
+        return (userId in chatRoomId.split('_') && request.auth.uid in chatRoomId.split('_'))
+          || (userId in chatRoomId.split('-') && request.auth.uid in chatRoomId.split('-'));
+      }
+
+      // The recipient reads their own chat list. Sending a message also writes
+      // a preview to the other participant's chat list in current app builds.
+      allow read, delete: if request.auth != null && request.auth.uid == userId;
+      allow create, update: if request.auth != null
+        && (request.auth.uid == userId || isRoomParticipant());
+    }
+		
+    match /notifications/{notificationId} {
+      function isOwnWelcomeNotification() {
+        return notificationId == 'welcome_' + request.auth.uid
+          && request.resource.data.receiverId == request.auth.uid
+          && request.resource.data.senderId == '23'
+          && request.resource.data.type == 'welcome'
+          && request.resource.data.isRead == false
+          && request.resource.data.createdAt == request.time
+          && request.resource.data.title is string
+          && request.resource.data.message is string
+          && exists(/databases/$(database)/documents/users/$(request.auth.uid));
+      }
+
+      // Recipients read their notifications. Senders can read the alerts they
+      // already sent so edited profiles do not notify the same person again.
+      allow read: if request.auth != null
+        && (request.auth.uid == resource.data.receiverId
+          || request.auth.uid == resource.data.senderId);
+
+      // Allow update ONLY to change the 'isRead' status
+      allow update: if request.auth != null
+        && request.auth.uid == resource.data.receiverId
+        && request.resource.data.isRead == true
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['isRead']);
+
+      // Existing match notifications are sent by a user. A new account may
+      // also create one welcome notification addressed only to itself.
+      allow create: if request.auth != null
+        && (request.auth.uid == request.resource.data.senderId
+          || isOwnWelcomeNotification());
+      
+      // FIX: Allow deleting if the user is the one who received the notification
+  		allow delete: if request.auth != null && request.auth.uid == resource.data.receiverId;
+    }
+    // Allow users to read static filter data, but not write
+    match /static_data/{document=**} {
+      allow read: if true;
+      allow write: if false; 
+    }
+    // Allow users to read static hierarchy collections
+    match /{collectionName}/{document=**} {
+      allow read: if true && collectionName.matches('^filter_.*');
+    }
+    match /cycle_group_chats/{matchId} {
+      function getCycleParticipants(id) {
+        return id.split('-'); // Cycle UIDs are joined by hyphens in the provider
+      }
+
+      // Optional: Allow base document interactions if you ever store metadata at the root
+      allow read, write: if request.auth != null && request.auth.uid in getCycleParticipants(matchId);
+
+      match /messages/{messageId} {
+        // Only allow members of this specific transfer cycle to read/write messages
+        allow read: if request.auth != null && request.auth.uid in getCycleParticipants(matchId);
+        allow create: if request.auth != null && request.auth.uid in getCycleParticipants(matchId) && request.resource.data.senderId == request.auth.uid;
+      }
+    }
+  }
+}

@@ -1,10 +1,10 @@
 import 'package:app/app/models/filter_model.dart';
-import 'package:app/app/utils/custom_toast.dart';
 import 'package:app/providers/auth_provider.dart';
 import 'package:app/providers/service_providers/firebase_service.dart';
 import 'package:app/providers/service_providers/static_data_service.dart';
 import 'package:app/screens/home/home.dart';
 import 'package:app/screens/onboarding/verify_email_screen.dart';
+import 'package:app/screens/onboarding/onboarding_help_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:provider/provider.dart';
@@ -59,7 +59,7 @@ class _GetDetailsScreenState extends State<GetDetailsScreen> {
   String? schemeError;
   String? subjectError;
   String? subjectMediumError;
-  // String? gradeError;
+  String? gradeError;
   String? choiceError;
 
   bool _obscureText = true;
@@ -772,7 +772,8 @@ class _GetDetailsScreenState extends State<GetDetailsScreen> {
                                           filterDetails.policeDivisions = '';
                                           filterDetails.policeStations = '';
                                           filterDetails.subjectMedium = '';
-                                          // filterDetails.grade = '';
+                                          filterDetails.grade = '';
+                                          gradeError = null;
                                         });
                                       }
                                     },
@@ -1820,6 +1821,59 @@ class _GetDetailsScreenState extends State<GetDetailsScreen> {
                                         ),
                                     ],
                                   ),
+                                ] else if (filterDetails.job.isNotEmpty && filterDetails.job != "Pirivena Teacher") ...[
+                                  SizedBox(height: context.verticalSize(30)),
+                                  Align(
+                                    alignment: Alignment.centerLeft,
+                                    child: Text(
+                                      l10n.setupGradeDetails,
+                                      style: context.semiBold14(color: ColorManager.blackMedium),
+                                    ),
+                                  ),
+                                  SizedBox(height: context.verticalSize(8)),
+                                  Container(
+                                    height: context.verticalSize(40),
+                                    width: double.infinity,
+                                    padding: const EdgeInsets.symmetric(horizontal: 12),
+                                    decoration: BoxDecoration(
+                                      color: ColorManager.white10,
+                                      borderRadius: BorderRadius.circular(20),
+                                    ),
+                                    child: DropdownButton<String>(
+                                      value: filterDetails.grade.isNotEmpty ? filterDetails.grade : null,
+                                      hint: Text(
+                                        l10n.selectGrade,
+                                        style: context.regular14(color: ColorManager.disabledText),
+                                      ),
+                                      items:
+                                          filterDetails.gradeList
+                                              .map(
+                                                (grade) => DropdownMenuItem(
+                                                  value: grade,
+                                                  child: Text(
+                                                    TranslationService.translate(context, grade),
+                                                    style: context.regular14(color: ColorManager.blackMedium),
+                                                  ),
+                                                ),
+                                              )
+                                              .toList(),
+                                      onChanged: (value) {
+                                        setState(() {
+                                          filterDetails.grade = value ?? '';
+                                          gradeError = null;
+                                        });
+                                      },
+                                      dropdownColor: ColorManager.kPrimaryBlack,
+                                      underline: const SizedBox(),
+                                      icon: Icon(Icons.arrow_drop_down, color: ColorManager.disabledText),
+                                      isExpanded: true,
+                                    ),
+                                  ),
+                                  if (gradeError != null)
+                                    Padding(
+                                      padding: const EdgeInsets.only(top: 4.0, left: 5.0),
+                                      child: Text(gradeError!, style: const TextStyle(color: Colors.red, fontSize: 12.0)),
+                                    ),
                                 ],
                               ],
 
@@ -2081,6 +2135,7 @@ class _GetDetailsScreenState extends State<GetDetailsScreen> {
                                       schemeError = null;
                                       subjectError = null;
                                       subjectMediumError = null;
+                                      gradeError = null;
                                     });
 
                                     if (filterDetails.job.isEmpty) {
@@ -2201,6 +2256,9 @@ class _GetDetailsScreenState extends State<GetDetailsScreen> {
                                           setState(() => subjectMediumError = l10n.reqSelectMedium);
                                           isValid = false;
                                         }
+                                      } else if (filterDetails.job != "Pirivena Teacher" && filterDetails.grade.isEmpty) {
+                                        setState(() => gradeError = l10n.selectGrade);
+                                        isValid = false;
                                       }
                                     }
 
@@ -2235,6 +2293,7 @@ class _GetDetailsScreenState extends State<GetDetailsScreen> {
                                           isSchoolHide: isSchoolSelected,
                                           isEnable: isEnable,
                                         );
+                                        if (!context.mounted) return;
                                         if (success) {
                                           Navigator.pushAndRemoveUntil(
                                             context,
@@ -2242,7 +2301,10 @@ class _GetDetailsScreenState extends State<GetDetailsScreen> {
                                             (route) => false,
                                           );
                                         } else {
-                                          toastErrorMessage(auth.errorMessage ?? 'Failed to complete setup.');
+                                          await showOnboardingHelpDialog(
+                                            context,
+                                            auth.errorMessage ?? 'Failed to complete setup.',
+                                          );
                                         }
                                       } else {
                                         // Standard Email & Password registration
@@ -2252,6 +2314,7 @@ class _GetDetailsScreenState extends State<GetDetailsScreen> {
                                             auth.passwordController.text,
                                           );
 
+                                          if (!context.mounted) return;
                                           Navigator.push(
                                             context,
                                             MaterialPageRoute(
@@ -2266,7 +2329,8 @@ class _GetDetailsScreenState extends State<GetDetailsScreen> {
                                             ),
                                           );
                                         } catch (e) {
-                                          toastErrorMessage('Email is already verified or in use.');
+                                          if (!context.mounted) return;
+                                          await showOnboardingHelpDialog(context, e.toString());
                                         }
                                       }
                                     }
