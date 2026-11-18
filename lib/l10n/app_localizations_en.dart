@@ -508,7 +508,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get contentHiddenTooltip =>
-      'This content is hidden. Tap the chat icon to request your details.';
+      'This content is hidden. Tap the chat icon to request his details.';
 
   @override
   String get contactIndicator => '   Contact :  ';

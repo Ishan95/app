@@ -3,6 +3,7 @@ import 'package:app/app/models/mutual_transfer_match_model.dart';
 import 'package:app/providers/filtter_provider.dart';
 import 'package:app/l10n/app_localizations.dart';
 import 'package:app/app/utils/translation_service.dart';
+import 'package:app/app/utils/whatsapp_number.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -13,12 +14,10 @@ class GroupMembersScreen extends StatelessWidget {
   const GroupMembersScreen({super.key, required this.match});
 
   Future<void> contactWhatsApp(String phone, String message) async {
-    if (!phone.startsWith('+')) {
-      phone = '+$phone';
-    }
+    final linkNumber = whatsappLinkNumber(phone);
     final encodedMessage = Uri.encodeComponent(message);
-    final uriApp = Uri.parse("https://api.whatsapp.com/send?phone=$phone&text=$encodedMessage");
-    final uriWeb = Uri.parse("https://wa.me/$phone?text=$encodedMessage");
+    final uriApp = Uri.parse("https://api.whatsapp.com/send?phone=$linkNumber&text=$encodedMessage");
+    final uriWeb = Uri.parse("https://wa.me/$linkNumber?text=$encodedMessage");
 
     try {
       if (await canLaunchUrl(uriApp)) {

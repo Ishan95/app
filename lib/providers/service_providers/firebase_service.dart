@@ -116,11 +116,13 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:timezone/data/latest.dart' as timezone_data;
+import 'package:timezone/timezone.dart' as timezone;
 
 class FirebaseService {
   static final FirebaseMessaging _firebaseMessaging = FirebaseMessaging.instance;
 
-  final FlutterLocalNotificationsPlugin _localNotifications = FlutterLocalNotificationsPlugin();
+  static final FlutterLocalNotificationsPlugin _localNotifications = FlutterLocalNotificationsPlugin();
 
   final AndroidNotificationChannel _androidChannel = const AndroidNotificationChannel(
     'transer_notifications',
@@ -219,6 +221,36 @@ class FirebaseService {
 
     // Register background handler
     FirebaseMessaging.onBackgroundMessage(handleBackgroundMessage);
+  }
+
+  static Future<bool> scheduleWelcomeNotification(String title, String message) async {
+    try {
+      timezone_data.initializeTimeZones();
+      await _localNotifications.zonedSchedule(
+        23001,
+        title,
+        message,
+        timezone.TZDateTime.now(timezone.local).add(const Duration(minutes: 5)),
+        NotificationDetails(
+          android: AndroidNotificationDetails(
+            'transer_notifications',
+            'Transer Notifications',
+            channelDescription: 'This channel is used for all notifications',
+            importance: Importance.high,
+            priority: Priority.high,
+            icon: '@mipmap/ic_launcher',
+            styleInformation: BigTextStyleInformation(message),
+          ),
+          iOS: const DarwinNotificationDetails(),
+        ),
+        androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
+        payload: jsonEncode({'type': 'WELCOME_NOTIFICATION'}),
+      );
+      return true;
+    } catch (error) {
+      debugPrint('Welcome notification could not be scheduled: $error');
+      return false;
+    }
   }
 
   static Future<String?> getFcmToken() async {

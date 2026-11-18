@@ -3,16 +3,19 @@ import 'dart:io';
 import 'package:app/app/models/filter_model.dart';
 import 'package:app/app/models/person_details_model.dart';
 import 'package:app/app/utils/context_helper.dart';
+import 'package:app/app/utils/whatsapp_number.dart';
 import 'package:app/providers/service_providers/firebase_service.dart';
 import 'package:app/screens/delete/reauthenticate_screen.dart';
 import 'package:app/screens/onboarding/login_screen.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:firebase_auth/firebase_auth.dart' as firebase_auth;
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:google_sign_in/google_sign_in.dart' as google_sign_in;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:app/providers/service_providers/onesignal_service.dart';
+import 'package:app/providers/welcome_notification.dart';
 
 class AuthenticationProvider extends ChangeNotifier {
   BuildContext context = ContextHelper.navigatorKey.currentContext!;
@@ -107,13 +110,15 @@ class AuthenticationProvider extends ChangeNotifier {
   }
 
   Future<String> getDeviceId() async {
-    final deviceInfo = DeviceInfoPlugin();
-
     if (Platform.isAndroid) {
-      final android = await deviceInfo.androidInfo;
-      return android.id ?? "unknown-android";
+      const channel = MethodChannel('lk.transfer.multiservice/device_id');
+      final androidId = await channel.invokeMethod<String>('getAndroidId');
+      if (androidId == null || androidId.isEmpty) {
+        throw StateError('Android device ID is unavailable.');
+      }
+      return 'android:$androidId';
     } else if (Platform.isIOS) {
-      final ios = await deviceInfo.iosInfo;
+      final ios = await DeviceInfoPlugin().iosInfo;
       return ios.identifierForVendor ?? "unknown-ios";
     }
 
@@ -136,14 +141,11 @@ class AuthenticationProvider extends ChangeNotifier {
     try {
       final newUser = _auth.currentUser;
       if (newUser == null) return false;
-      final String currentDevice = await getDeviceId();
-
-      final existingDeviceQuery =
-          await _firestore.collection('users').where('deviceId', isEqualTo: currentDevice).limit(1).get();
-
-      if (existingDeviceQuery.docs.isNotEmpty && existingDeviceQuery.docs.first.id != newUser.uid) {
-        _errorMessage = "DEVICE_ALREADY_EXISTS";
-        return false;
+      String? currentDevice;
+      try {
+        currentDevice = await getDeviceId();
+      } catch (e) {
+        debugPrint('Device ID unavailable while creating profile: $e');
       }
 
       if (newUser != null) {
@@ -167,7 +169,7 @@ class AuthenticationProvider extends ChangeNotifier {
           'email': emailController.text.trim(),
           // 'age': age,
           'phone': contactController.text.trim(),
-          'whatsapp': whatsappController.text.trim(),
+          'whatsapp': normalizeWhatsAppNumber(whatsappController.text),
           'isPhoneHide': isPhoneHide,
           'isWhatsappHide': isWhatsappHide,
           'isSchoolHide': isSchoolHide,
@@ -193,7 +195,7 @@ class AuthenticationProvider extends ChangeNotifier {
           'scheme': filterDetails.scheme,
           'subject': filterDetails.subject,
           'subjectMedium': filterDetails.subjectMedium,
-          // 'grade': filterDetails.grade,
+          if (filterDetails.grade.isNotEmpty) 'grade': filterDetails.grade,
           'choice1': filterDetails.choice1,
           'choice2': filterDetails.choice2,
           'choice3': filterDetails.choice3,
@@ -204,14 +206,20 @@ class AuthenticationProvider extends ChangeNotifier {
           'uid': newUser.uid,
           'fcmToken': token,
           'lastLogin': FieldValue.serverTimestamp(),
-          'deviceId': currentDevice,
+          if (currentDevice != null) 'deviceId': currentDevice,
         };
 
         await _firestore.collection('users').doc(newUser.uid).set(firestoreData, SetOptions(merge: true));
         print("Additional user data saved to Firestore for UID: ${newUser.uid}");
         _errorMessage = null;
 
+        await OneSignalService.loginUser(newUser.uid);
+
         _appUser = PersonDetailsModel.fromAuthAndFirestore(firebaseUser: newUser, firestoreData: firestoreData);
+        final welcomeCreated = await createWelcomeNotification(_firestore, newUser.uid);
+        if (welcomeCreated) {
+          await FirebaseService.scheduleWelcomeNotification(welcomeNotificationTitle, welcomePushMessage);
+        }
         await notifyMatches(firestoreData, newUser.uid);
         return true;
       } else {
@@ -239,6 +247,37 @@ class AuthenticationProvider extends ChangeNotifier {
   Future<void> notifyMatches(Map<String, dynamic> newUserInfo, String currentUid) async {
     try {
       final db = FirebaseFirestore.instance;
+      final historyRef = db.collection('users').doc(currentUid).collection('match_notification_state').doc('history');
+
+      // Older match notifications used random document IDs. Remember their
+      // recipients once so an existing user is not alerted again after editing.
+      bool canUseHistory = true;
+      try {
+        final historySnapshot = await historyRef.get();
+        if (historySnapshot.data()?['historyChecked'] != true) {
+          try {
+            final sentNotifications =
+                await db.collection('notifications').where('senderId', isEqualTo: currentUid).get();
+            final previousReceivers = sentNotifications.docs
+                .map((notification) => notification.data()['receiverId'])
+                .whereType<String>()
+                .where((uid) => uid.isNotEmpty)
+                .toSet();
+            await historyRef.set({
+              'notifiedUids': FieldValue.arrayUnion(previousReceivers.toList()),
+              'historyChecked': true,
+            }, SetOptions(merge: true));
+          } on FirebaseException catch (e) {
+            if (e.code != 'permission-denied') rethrow;
+            debugPrint('Earlier match notifications are not readable yet: $e');
+          }
+        }
+      } on FirebaseException catch (e) {
+        if (e.code != 'permission-denied') rethrow;
+        canUseHistory = false;
+        // New matches must continue to work while older rules are still live.
+        debugPrint('Match notification history is not readable yet: $e');
+      }
 
       List<String> newUserChoices =
           [
@@ -260,20 +299,20 @@ class AuthenticationProvider extends ChangeNotifier {
 
       final isTeacher = userJob == "Provincial School Teacher" || userJob == "National School Teacher";
 
-      if (isTeacher) {
-        query = query
-            .where('scheme', isEqualTo: newUserInfo['scheme'])
-            .where('subject', isEqualTo: newUserInfo['subject']);
-      }
-
       query = query.where('district', whereIn: newUserChoices);
 
       final matchesQuery = await query.get();
-      final batch = db.batch();
 
       for (var doc in matchesQuery.docs) {
         Map<String, dynamic> matchedUserData = doc.data() as Map<String, dynamic>;
         if (doc.id == currentUid) continue;
+        if (isTeacher &&
+            (matchedUserData['scheme'] != newUserInfo['scheme'] ||
+                matchedUserData['subjectMedium'] != newUserInfo['subjectMedium'] ||
+                (newUserInfo['scheme'] != 'PRIMARY' &&
+                    matchedUserData['subject'] != newUserInfo['subject']))) {
+          continue;
+        }
 
         String matchingChoiceTitle = "New Match Found!";
         if (matchedUserData['choice1'] == newUserInfo['district']) {
@@ -295,31 +334,46 @@ class AuthenticationProvider extends ChangeNotifier {
           final notificationMessage =
               '${newUserInfo['name'] ?? 'A user'} wants to move to ${matchedUserData['district']}.';
 
-          await OneSignalService.sendMatchNotification(
-            receiverUid: doc.id,
-            title: matchingChoiceTitle,
-            message: notificationMessage,
-          );
+          final notificationRef = db.collection('notifications').doc('match_${currentUid}_${doc.id}');
+          try {
+            final created = await db.runTransaction<bool>((transaction) async {
+              if (canUseHistory) {
+                final history = await transaction.get(historyRef);
+                final notifiedUids = history.data()?['notifiedUids'];
+                if (notifiedUids is List && notifiedUids.contains(doc.id)) {
+                  return false;
+                }
+                transaction.set(historyRef, {
+                  'notifiedUids': FieldValue.arrayUnion([doc.id]),
+                }, SetOptions(merge: true));
+              }
+              transaction.set(notificationRef, {
+                'receiverId': doc.id,
+                'senderId': currentUid,
+                'title': matchingChoiceTitle,
+                'message': notificationMessage,
+                'createdAt': FieldValue.serverTimestamp(),
+                'isRead': false,
+              });
+              return true;
+            });
 
-          final notificationRef = db.collection('notifications').doc();
-          batch.set(notificationRef, {
-            'receiverId': doc.id,
-            'senderId': currentUid,
-            'title': matchingChoiceTitle,
-            'message': notificationMessage,
-            'createdAt': FieldValue.serverTimestamp(),
-            'isRead': false,
-          });
+            if (created) {
+              await OneSignalService.sendMatchNotification(
+                receiverUid: doc.id,
+                title: matchingChoiceTitle,
+                message: notificationMessage,
+              );
+            }
+          } catch (e) {
+            print('Could not create match notification for ${doc.id}: $e');
+          }
         }
       }
-
-      await batch.commit();
     } catch (e) {
       print("Error in notifyMatches: $e");
     }
   }
-
-  String currentDeviceID = "";
 
   Future<bool> signIn({required String email, required String password}) async {
     _isLoading = true;
@@ -345,33 +399,11 @@ class AuthenticationProvider extends ChangeNotifier {
         return false;
       }
 
-      final String currentDevice = await getDeviceId();
-      final String? savedDevice = userDoc.data()?['deviceId'];
-
-      if (savedDevice == null || savedDevice == '') {
-        await _firestore.collection('users').doc(uid).update({
-          'deviceId': currentDevice,
-          'lastLogin': FieldValue.serverTimestamp(),
-        });
-        _errorMessage = null;
-        _isLoading = false;
-        notifyListeners();
-        return true;
-      } else if (savedDevice != currentDevice) {
-        currentDeviceID = currentDevice;
-        _errorMessage = "This account is already used on another device.";
-        await _auth.signOut();
-        OneSignalService.logoutUser();
-        _isLoading = false;
-        notifyListeners();
-        return false;
-      } else {
-        await _firestore.collection('users').doc(uid).update({'lastLogin': FieldValue.serverTimestamp()});
-        _errorMessage = null;
-        _isLoading = false;
-        notifyListeners();
-        return true;
-      }
+      await _firestore.collection('users').doc(uid).update({'lastLogin': FieldValue.serverTimestamp()});
+      _errorMessage = null;
+      _isLoading = false;
+      notifyListeners();
+      return true;
     } on firebase_auth.FirebaseAuthException catch (e) {
       _errorMessage = e.code;
       _isLoading = false;
@@ -438,24 +470,7 @@ class AuthenticationProvider extends ChangeNotifier {
         isGoogleAuth = false;
         await updateFcmToken();
         OneSignalService.loginUser(user.uid);
-        final String currentDevice = await getDeviceId();
-        final String? savedDevice = userData['deviceId']?.toString();
-        if (savedDevice == null || savedDevice.isEmpty) {
-          await _firestore.collection('users').doc(user.uid).update({
-            'deviceId': currentDevice,
-            'lastLogin': FieldValue.serverTimestamp(),
-          });
-        } else if (savedDevice != currentDevice) {
-          currentDeviceID = currentDevice;
-          _errorMessage = 'This account is already used on another device.';
-          await _auth.signOut();
-          OneSignalService.logoutUser();
-          _isLoading = false;
-          notifyListeners();
-          return {'success': false, 'error': _errorMessage};
-        } else {
-          await _firestore.collection('users').doc(user.uid).update({'lastLogin': FieldValue.serverTimestamp()});
-        }
+        await _firestore.collection('users').doc(user.uid).update({'lastLogin': FieldValue.serverTimestamp()});
         _isLoading = false;
         notifyListeners();
         return {'success': true, 'isComplete': true};
@@ -585,6 +600,12 @@ class AuthenticationProvider extends ChangeNotifier {
     final String uidToDelete = currentUser.uid;
 
     try {
+      await _firestore
+          .collection('users')
+          .doc(uidToDelete)
+          .collection('match_notification_state')
+          .doc('history')
+          .delete();
       await _firestore.collection('users').doc(uidToDelete).delete();
       await currentUser.delete();
 

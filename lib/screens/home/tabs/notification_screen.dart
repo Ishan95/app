@@ -20,6 +20,15 @@ class _NotificationScreenState extends State<NotificationScreen> with TickerProv
   void initState() {
     _tabController = TabController(length: 2, vsync: this);
     super.initState();
+    _tabController!.addListener(() {
+      if (mounted) setState(() {});
+    });
+  }
+
+  @override
+  void dispose() {
+    _tabController?.dispose();
+    super.dispose();
   }
 
   @override
@@ -59,7 +68,6 @@ class _NotificationScreenState extends State<NotificationScreen> with TickerProv
                   height: context.verticalSize(50),
                   decoration: BoxDecoration(color: ColorManager.white10, borderRadius: BorderRadius.circular(25.0)),
                   child: TabBar(
-                    onTap: (value) => setState(() {}),
                     controller: _tabController,
                     labelColor: ColorManager.white,
                     labelStyle: context.bold12(color: ColorManager.black),
@@ -86,7 +94,13 @@ class _NotificationScreenState extends State<NotificationScreen> with TickerProv
               Expanded(
                 child: Padding(
                   padding: context.padding(horizontal: 15),
-                  child: TabBarView(controller: _tabController, children: const [TabView(index: 1), TabView(index: 2)]),
+                  child: TabBarView(
+                    controller: _tabController,
+                    children: [
+                      TabView(index: 1, isActive: _tabController!.index == 0),
+                      TabView(index: 2, isActive: _tabController!.index == 1),
+                    ],
+                  ),
                 ),
               ),
               SizedBox(height: context.verticalSize(50)),

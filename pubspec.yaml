@@ -45,6 +45,7 @@ dependencies:
   http: ^1.6.0
   flutter_dotenv: ^6.0.1
   google_sign_in: ^7.2.0
+  timezone: ^0.10.1
   # firebase_messaging_platform_interface: ^4.7.2
 
 dev_dependencies:

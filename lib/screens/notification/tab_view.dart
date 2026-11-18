@@ -13,7 +13,8 @@ import 'package:app/l10n/app_localizations.dart';
 
 class TabView extends StatefulWidget {
   final int index;
-  const TabView({super.key, required this.index});
+  final bool isActive;
+  const TabView({super.key, required this.index, this.isActive = true});
 
   @override
   State<TabView> createState() => _TabViewState();
@@ -21,6 +22,16 @@ class TabView extends StatefulWidget {
 
 class _TabViewState extends State<TabView> {
   Set<String> expandedIds = {};
+  final Map<String, NotificationModel> _openedNotifications = {};
+
+  @override
+  void didUpdateWidget(TabView oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.isActive && !widget.isActive) {
+      _openedNotifications.clear();
+      expandedIds.clear();
+    }
+  }
 
   Future<void> markAsRead(String notificationId) async {
     await FirebaseFirestore.instance.collection('notifications').doc(notificationId).update({'isRead': true});
@@ -29,6 +40,7 @@ class _TabViewState extends State<TabView> {
   Future<void> deleteNotification(String notificationId, AppLocalizations l10n) async {
     try {
       await FirebaseFirestore.instance.collection('notifications').doc(notificationId).delete();
+      _openedNotifications.remove(notificationId);
 
       ScaffoldMessenger.of(
         context,
@@ -57,17 +69,22 @@ class _TabViewState extends State<TabView> {
           return Center(child: SpinKitFadingCircle(color: ColorManager.kPrimary, size: 40));
         }
 
-        final docs = snapshot.data!.docs;
-        if (docs.isEmpty) {
+        final visibleNotifications = <String, NotificationModel>{
+          for (final doc in snapshot.data!.docs)
+            doc.id: NotificationModel.fromFirestore(doc.data() as Map<String, dynamic>, doc.id),
+          if (isUnreadList) ..._openedNotifications,
+        };
+        final notifications = visibleNotifications.values.toList()
+          ..sort((a, b) => b.createdAt.compareTo(a.createdAt));
+        if (notifications.isEmpty) {
           return Center(child: Text(l10n.noNotifications, style: context.semiBold14(color: ColorManager.grayText)));
         }
 
         return ListView.builder(
           padding: EdgeInsets.zero,
-          itemCount: docs.length,
+          itemCount: notifications.length,
           itemBuilder: (context, index) {
-            final data = docs[index].data() as Map<String, dynamic>;
-            final notification = NotificationModel.fromFirestore(data, docs[index].id);
+            final notification = notifications[index];
             bool isExpanded = expandedIds.contains(notification.id);
 
             return Dismissible(
@@ -112,25 +129,63 @@ class _TabViewState extends State<TabView> {
                                   : ColorManager.blackMedium,
                         ),
                       ),
-                      subtitle: Text(notification.message, style: context.regular14(color: ColorManager.grayText)),
+                      subtitle: Text(
+                        notification.message,
+                        maxLines: notification.senderID == '23' && !isExpanded ? 3 : null,
+                        overflow: notification.senderID == '23' && !isExpanded ? TextOverflow.ellipsis : null,
+                        style: context.regular14(color: ColorManager.grayText),
+                      ),
                       trailing:
                           isUnreadList
                               ? (notification.isRead
                                   ? Icon(Icons.check_circle, color: ColorManager.kPrimary)
                                   : Icon(Icons.circle, size: 10, color: ColorManager.kPrimary))
                               : null,
-                      onTap: () {
+                      onTap: () async {
                         setState(() {
                           if (isExpanded) {
                             expandedIds.remove(notification.id);
                           } else {
                             expandedIds.add(notification.id);
+                            if (isUnreadList && !notification.isRead) {
+                              _openedNotifications[notification.id] = NotificationModel(
+                                id: notification.id,
+                                title: notification.title,
+                                message: notification.message,
+                                receiverID: notification.receiverID,
+                                senderID: notification.senderID,
+                                isRead: true,
+                                createdAt: notification.createdAt,
+                              );
+                            }
                           }
                         });
+                        if (!isExpanded && isUnreadList && !notification.isRead) {
+                          try {
+                            await markAsRead(notification.id);
+                          } catch (e) {
+                            if (mounted) {
+                              setState(() => _openedNotifications.remove(notification.id));
+                            }
+                            debugPrint('Could not mark notification as read: $e');
+                          }
+                        }
                       },
                     ),
 
-                    if (isExpanded)
+                    if (isExpanded && notification.senderID == '23' && !notification.isRead)
+                      Padding(
+                        padding: const EdgeInsets.only(right: 18, bottom: 12),
+                        child: Align(
+                          alignment: Alignment.centerRight,
+                          child: TextButton(
+                            onPressed: () => markAsRead(notification.id),
+                            child: Text(l10n.markAsRead),
+                          ),
+                        ),
+                      ),
+
+                    if (isExpanded && notification.senderID != '23')
                       FutureBuilder<DocumentSnapshot>(
                         future: FirebaseFirestore.instance.collection('users').doc(notification.senderID).get(),
                         builder: (context, userSnap) {
